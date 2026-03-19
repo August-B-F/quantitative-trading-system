@@ -1,115 +1,93 @@
-"""Market regime detection using Hidden Markov Models on benchmark returns.
-
-Detects N regimes (default 3: bull, bear, sideways/chop).
-Used to adapt position sizing and confidence thresholds dynamically.
-"""
+"""Market regime detection using Hidden Markov Model on SPY returns."""
 import numpy as np
 import pandas as pd
-import pickle
-from pathlib import Path
+from typing import Optional
 from ultimate_trader.utils.logging import get_logger
 
-logger = get_logger("regimes")
+logger = get_logger(__name__)
+
+# Regime labels
+REGIME_BULL = "bull"
+REGIME_BEAR = "bear"
+REGIME_SIDEWAYS = "sideways"
 
 
-def fit_hmm(
-    market_close: pd.Series,
-    n_components: int = 3,
-    n_iter: int = 200,
-) -> tuple:
+class RegimeDetector:
     """
-    Fit a Gaussian HMM on daily log-returns of the market series.
-    Returns (fitted_model, states_series).
-    States are re-labeled by mean return: 0=bear, 1=neutral, 2=bull.
+    Fits a Gaussian HMM on SPY daily returns to identify 3 market regimes:
+      - Bull (high positive drift, medium vol)
+      - Bear (negative drift, high vol)
+      - Sideways (near-zero drift, low vol)
+
+    The current regime is used by the risk module to adjust position sizes,
+    confidence thresholds, and exposure limits.
     """
-    from hmmlearn.hmm import GaussianHMM
 
-    log_ret = np.log(market_close / market_close.shift(1)).dropna().values.reshape(-1, 1)
+    def __init__(self, n_components: int = 3):
+        self.n_components = n_components
+        self.model = None
+        self._regime_map = {}  # hidden state index -> label
 
-    model = GaussianHMM(
-        n_components=n_components,
-        covariance_type="full",
-        n_iter=n_iter,
-        random_state=42,
-    )
-    model.fit(log_ret)
-
-    raw_states = model.predict(log_ret)
-
-    # relabel states by their mean return (ascending: bear->bull)
-    means = [model.means_[i][0] for i in range(n_components)]
-    sorted_idx = np.argsort(means)                     # low mean = bear
-    remap = {old: new for new, old in enumerate(sorted_idx)}
-    relabeled = np.array([remap[s] for s in raw_states])
-
-    index = market_close.dropna().index[1:]            # align with diff'd returns
-    states_series = pd.Series(relabeled, index=index, name="regime")
-
-    return model, states_series
-
-
-def save_hmm(model, path: str = "data/models/hmm_regime.pkl"):
-    Path(path).parent.mkdir(parents=True, exist_ok=True)
-    with open(path, "wb") as f:
-        pickle.dump(model, f)
-    logger.info(f"HMM saved to {path}")
-
-
-def load_hmm(path: str = "data/models/hmm_regime.pkl"):
-    with open(path, "rb") as f:
-        return pickle.load(f)
-
-
-def predict_regime(model, market_close: pd.Series, n_components: int = 3) -> pd.Series:
-    """
-    Predict regime labels for a market_close series using a fitted HMM.
-    Returns pd.Series of regime labels.
-    """
-    log_ret = np.log(market_close / market_close.shift(1)).dropna().values.reshape(-1, 1)
-    means = [model.means_[i][0] for i in range(n_components)]
-    sorted_idx = np.argsort(means)
-    remap = {old: new for new, old in enumerate(sorted_idx)}
-    raw = model.predict(log_ret)
-    relabeled = np.array([remap[s] for s in raw])
-    index = market_close.dropna().index[1:]
-    return pd.Series(relabeled, index=index, name="regime")
-
-
-def get_current_regime(model, market_close: pd.Series, n_components: int = 3) -> int:
-    """Return the most recent regime label (0=bear, 1=neutral, 2=bull)."""
-    states = predict_regime(model, market_close, n_components)
-    return int(states.iloc[-1])
-
-
-def build_regime_features(
-    market_close: pd.Series,
-    model=None,
-    model_path: str = "data/models/hmm_regime.pkl",
-    n_components: int = 3,
-) -> pd.DataFrame:
-    """
-    Build regime one-hot features for the full time series.
-    Returns DataFrame with columns: regime_0, regime_1, regime_2.
-    """
-    if model is None:
+    def fit(self, spy_bars: pd.DataFrame) -> "RegimeDetector":
+        """
+        Fit HMM on SPY log returns.
+        spy_bars must have a 'close' column.
+        """
         try:
-            model = load_hmm(model_path)
-            states = predict_regime(model, market_close, n_components)
-        except Exception:
-            logger.info("Fitting new HMM regime model...")
-            model, states = fit_hmm(market_close, n_components)
-            save_hmm(model, model_path)
-    else:
-        states = predict_regime(model, market_close, n_components)
+            from hmmlearn.hmm import GaussianHMM
+        except ImportError:
+            logger.error("hmmlearn not installed. Run: pip install hmmlearn")
+            return self
 
-    # one-hot encode
-    one_hot = pd.get_dummies(states, prefix="regime")
-    for i in range(n_components):
-        col = f"regime_{i}"
-        if col not in one_hot.columns:
-            one_hot[col] = 0
+        returns = np.log(spy_bars["close"]).diff().dropna().values.reshape(-1, 1)
+        self.model = GaussianHMM(
+            n_components=self.n_components,
+            covariance_type="full",
+            n_iter=200,
+            random_state=42,
+        )
+        self.model.fit(returns)
 
-    # also include raw label and VIX-style rolling vol as proxy
-    one_hot["regime_raw"] = states
+        # Assign labels based on mean return of each hidden state
+        means = self.model.means_.flatten()
+        ranked = np.argsort(means)  # lowest mean -> highest mean
+        labels = [REGIME_BEAR, REGIME_SIDEWAYS, REGIME_BULL]
+        self._regime_map = {int(ranked[i]): labels[i] for i in range(len(labels))}
 
-    return one_hot
+        logger.info(f"Regime HMM fitted. State means: {dict(zip(self._regime_map.values(), sorted(means)))}")
+        return self
+
+    def predict(self, spy_bars: pd.DataFrame) -> pd.Series:
+        """
+        Returns a pd.Series of regime labels indexed by date.
+        """
+        if self.model is None:
+            logger.warning("RegimeDetector not fitted. Returning 'sideways' for all dates.")
+            return pd.Series(REGIME_SIDEWAYS, index=spy_bars.index)
+
+        returns = np.log(spy_bars["close"]).diff().fillna(0).values.reshape(-1, 1)
+        hidden_states = self.model.predict(returns)
+        labels = [self._regime_map.get(int(s), REGIME_SIDEWAYS) for s in hidden_states]
+        return pd.Series(labels, index=spy_bars.index, name="regime")
+
+    def current_regime(self, spy_bars: pd.DataFrame) -> str:
+        """
+        Returns the regime label for the most recent date.
+        """
+        series = self.predict(spy_bars)
+        return series.iloc[-1]
+
+    def save(self, path: str):
+        import pickle
+        with open(path, "wb") as f:
+            pickle.dump({"model": self.model, "regime_map": self._regime_map}, f)
+        logger.info(f"RegimeDetector saved to {path}")
+
+    def load(self, path: str) -> "RegimeDetector":
+        import pickle
+        with open(path, "rb") as f:
+            data = pickle.load(f)
+        self.model = data["model"]
+        self._regime_map = data["regime_map"]
+        logger.info(f"RegimeDetector loaded from {path}")
+        return self
