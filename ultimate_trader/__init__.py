@@ -1,1 +1,1 @@
-# ultimate_trader package
+# Ultimate AI Stock Trader
