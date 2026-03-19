@@ -1,263 +1,187 @@
+"""Master feature builder: assembles all feature types into a single aligned DataFrame per symbol.
+
+Also computes target labels for training.
+
+Design:
+  - All features aligned to trading-day index of the symbol's bar data.
+  - Returns forward-filled where appropriate, NaN-dropped for training.
+  - Scalers fitted per feature group and saved to disk.
 """
-feature_builder.py
-
-Builds the final feature tensors for model training and inference.
-
-Key fixes vs old bot:
-  - Scalers are FIT on training data ONLY, saved to disk, then
-    only TRANSFORM is applied during inference (no leakage)
-  - News sentiment aligned to bars by date, not forced into a time-series
-  - Company encoded via integer index (for learned embedding), not char-sum
-  - All features normalized per-scaler-group, saved as joblib
-
-Output feature groups (all windows = price_window length unless noted):
-  1. price_features   : returns, vol, rsi, macd, obv, atr, bb, volume_z
-  2. sentiment_features: avg_score, score_std, pos_ratio, neg_ratio,
-                          sentiment_momentum_3d, sentiment_momentum_5d
-  3. macro_features   : yield_spread, fed_rate, vix (from SPY vol proxy)
-  4. regime_feature   : one-hot of regime {0,1,2}
-  5. company_idx      : integer index for embedding lookup
-  6. sector_idx       : integer index for sector embedding
-  7. label            : target class {0..4} (strong_sell..strong_buy)
-"""
-
-import os
 import numpy as np
 import pandas as pd
 import joblib
-from typing import List, Tuple, Optional, Dict
-from sklearn.preprocessing import StandardScaler
+import os
+from pathlib import Path
+from typing import Optional
 
-from ultimate_trader.features.technicals import compute_all
-from ultimate_trader.features.sentiment import compute_sentiment_features
+from ultimate_trader.features.technicals import build_technical_features
+from ultimate_trader.features.sentiment import build_daily_sentiment
+from ultimate_trader.features.regimes import build_regime_features
+from ultimate_trader.data_sources.alpaca_market import load_bars
 from ultimate_trader.utils.logging import get_logger
 
 logger = get_logger("feature_builder")
 
-SECTOR_MAP = {
-    "AAPL": 0, "MSFT": 0, "AMZN": 0, "GOOGL": 0, "META": 0,
-    "NVDA": 0, "AMD": 0, "INTC": 0, "QCOM": 0, "TXN": 0,
-    "AVGO": 0, "MU": 0, "AMAT": 0, "ADBE": 0, "CRM": 0,
-    "JPM": 1, "BAC": 1, "GS": 1, "V": 1, "MA": 1,
-    "PYPL": 1, "SQ": 1, "COIN": 1, "HOOD": 1, "BRK.B": 1,
-    "XOM": 2, "CVX": 2,
-    "JNJ": 3, "UNH": 3, "PFE": 3, "ABBV": 3, "MRNA": 3, "AMGN": 3, "GILD": 3,
-    "HD": 4, "MCD": 4, "NKE": 4, "DIS": 4, "NFLX": 4,
-    "WMT": 4, "COST": 4, "TGT": 4, "KO": 4, "PEP": 4,
-    "BA": 5, "CAT": 5, "GE": 5, "MMM": 5, "LMT": 5,
-}
+FEATURE_GROUPS = ["price", "sentiment", "macro", "regime"]
 
 
-class FeatureBuilder:
+def compute_labels(
+    close: pd.Series,
+    horizon: int = 3,
+    r_hi: float = 0.03,
+    r_lo: float = 0.005,
+) -> pd.Series:
     """
-    Builds windowed feature tensors for all symbols.
-    Call fit_scalers() on training data, then build() for any split.
+    Compute 5-class labels:
+      4 = strong buy  (forward return > r_hi)
+      3 = weak buy    (r_lo < forward return <= r_hi)
+      2 = hold        (|forward return| <= r_lo)
+      1 = weak sell   (-r_hi <= forward return < -r_lo)
+      0 = strong sell (forward return < -r_hi)
     """
+    fwd_ret = close.shift(-horizon) / close - 1
+    labels = pd.Series(2, index=close.index, dtype=int, name="label")
+    labels[fwd_ret > r_hi] = 4
+    labels[(fwd_ret > r_lo) & (fwd_ret <= r_hi)] = 3
+    labels[(fwd_ret < -r_lo) & (fwd_ret >= -r_hi)] = 1
+    labels[fwd_ret < -r_hi] = 0
+    return labels
 
-    def __init__(self, cfg, symbols: List[str]):
-        self.cfg = cfg
-        self.symbols = symbols
-        self.price_window = cfg.model.price_window
-        self.sentiment_window = cfg.model.sentiment_window
-        self.macro_window = cfg.model.macro_window
-        self.horizon = cfg.targets.horizon_days
-        self.r_hi = cfg.targets.r_hi
-        self.r_lo = cfg.targets.r_lo
-        self.scalers_dir = cfg.paths.scalers_dir
-        self.raw_dir = cfg.paths.raw_dir
-        os.makedirs(self.scalers_dir, exist_ok=True)
 
-        # Scalers per group
-        self._price_scaler = StandardScaler()
-        self._sentiment_scaler = StandardScaler()
-        self._macro_scaler = StandardScaler()
-        self._scalers_fitted = False
+def build_features_for_symbol(
+    symbol: str,
+    symbol_idx: int,
+    num_symbols: int,
+    cfg: dict,
+    market_close: pd.Series,
+    market_regime: pd.DataFrame,
+    macro_data: dict,
+    raw_bars_dir: str = "data/raw/bars",
+    raw_news_dir: str = "data/raw/news",
+    price_window: int = 40,
+    sentiment_window: int = 20,
+) -> pd.DataFrame:
+    """
+    Build a full feature DataFrame for one symbol.
+    Rows = trading days. Columns = all features + label.
+    """
+    bars = load_bars(symbol, raw_bars_dir)
+    close = bars["close"]
 
-        # Symbol / sector index maps
-        self.symbol_to_idx = {s: i for i, s in enumerate(symbols)}
+    # ── Technical features ───────────────────────────────────────────────────
+    tech = build_technical_features(bars, market_close=market_close)
 
-    # ------------------------------------------------------------------
-    # Public API
-    # ------------------------------------------------------------------
+    # ── Sentiment features ───────────────────────────────────────────────────
+    try:
+        sent = build_daily_sentiment(symbol, raw_news_dir)
+        sent = sent.reindex(close.index, method="ffill").fillna(0)
+    except Exception as e:
+        logger.warning(f"  Sentiment failed for {symbol}: {e}")
+        sent = pd.DataFrame(index=close.index)
 
-    def fit_scalers(self, all_price_features: np.ndarray,
-                    all_sentiment_features: np.ndarray,
-                    all_macro_features: np.ndarray) -> None:
-        """
-        Fit scalers on TRAINING data only.
-        Pass flattened 2D arrays (n_samples * window, n_features).
-        """
-        self._price_scaler.fit(all_price_features)
-        self._sentiment_scaler.fit(all_sentiment_features)
-        self._macro_scaler.fit(all_macro_features)
-        self._scalers_fitted = True
+    # ── Regime features (market-level, same for all symbols) ─────────────────
+    regime = market_regime.reindex(close.index, method="ffill").fillna(0)
 
-        joblib.dump(self._price_scaler, os.path.join(self.scalers_dir, "price_scaler.joblib"))
-        joblib.dump(self._sentiment_scaler, os.path.join(self.scalers_dir, "sentiment_scaler.joblib"))
-        joblib.dump(self._macro_scaler, os.path.join(self.scalers_dir, "macro_scaler.joblib"))
-        logger.info("Scalers fitted and saved.")
+    # ── Macro features ────────────────────────────────────────────────────────
+    macro_cols = {}
+    for ticker, series in macro_data.items():
+        col_name = ticker.replace("^", "").replace("=", "").replace("-", "_").replace(".", "")
+        aligned = series.reindex(close.index, method="ffill").pct_change().fillna(0)
+        macro_cols[f"macro_{col_name}_ret"] = aligned
+        # level normalised
+        macro_cols[f"macro_{col_name}_lvl"] = (
+            (series.reindex(close.index, method="ffill") - series.mean()) / (series.std() + 1e-8)
+        ).fillna(0)
+    macro_df = pd.DataFrame(macro_cols, index=close.index)
 
-    def load_scalers(self) -> None:
-        """Load previously fitted scalers for inference (transform only)."""
-        self._price_scaler = joblib.load(os.path.join(self.scalers_dir, "price_scaler.joblib"))
-        self._sentiment_scaler = joblib.load(os.path.join(self.scalers_dir, "sentiment_scaler.joblib"))
-        self._macro_scaler = joblib.load(os.path.join(self.scalers_dir, "macro_scaler.joblib"))
-        self._scalers_fitted = True
-        logger.info("Scalers loaded.")
+    # ── Symbol identity ───────────────────────────────────────────────────────
+    # Integer index (0..N-1) used by embedding layer
+    identity = pd.DataFrame(
+        {"symbol_idx": symbol_idx},
+        index=close.index
+    )
 
-    def build_dataset(
-        self,
-        bars_dict: Dict[str, pd.DataFrame],
-        macro_df: pd.DataFrame,
-        spy_bars: pd.DataFrame,
-        regimes: pd.Series,
-        start_date: str,
-        end_date: str,
-        fit_scalers: bool = False,
-    ) -> Tuple:
-        """
-        Builds the full dataset for a date range.
-        Returns:
-          price_X      : (N, window, n_price_features)
-          sentiment_X  : (N, window, n_sent_features)
-          macro_X      : (N, window, n_macro_features)
-          regime_X     : (N, 3)  one-hot
-          company_idx  : (N,)    int
-          sector_idx   : (N,)    int
-          labels       : (N,)    int  class 0-4
-          meta         : list of (symbol, date) for each sample
-        """
-        if not self._scalers_fitted and not fit_scalers:
-            self.load_scalers()
+    # ── Labels ────────────────────────────────────────────────────────────────
+    h = cfg["targets"]["horizon_days"]
+    r_hi = cfg["targets"]["r_hi"]
+    r_lo = cfg["targets"]["r_lo"]
+    labels = compute_labels(close, h, r_hi, r_lo)
 
-        spy_returns = spy_bars["close"].pct_change()
+    # ── Concatenate all ───────────────────────────────────────────────────────
+    df = pd.concat([tech, sent, regime, macro_df, identity, labels], axis=1)
+    df = df.replace([np.inf, -np.inf], np.nan)
+    df.dropna(inplace=True)
 
-        all_price_raw, all_sent_raw, all_macro_raw = [], [], []
-        all_labels, all_regimes, all_company, all_sector, all_meta = [], [], [], [], []
+    return df
 
-        for sym in self.symbols:
-            if sym not in bars_dict:
-                continue
-            bars = bars_dict[sym]
-            bars = bars[(bars.index >= start_date) & (bars.index <= end_date)]
-            if len(bars) < self.price_window + self.horizon + 5:
-                continue
 
-            # Technical features
-            bench_ret = spy_returns.reindex(bars.index).fillna(0)
-            tech = compute_all(bars, benchmark_returns=bench_ret)
+def build_all_features(
+    cfg: dict,
+    raw_bars_dir: str = "data/raw/bars",
+    raw_news_dir: str = "data/raw/news",
+    raw_alt_dir: str = "data/raw/alt",
+    processed_dir: str = "data/processed",
+):
+    """
+    Build and save feature DataFrames for all symbols.
+    Returns dict: {symbol: pd.DataFrame}.
+    """
+    from ultimate_trader.data_sources.alpaca_market import load_bars
+    from ultimate_trader.features.regimes import build_regime_features
+    from ultimate_trader.data_sources.alt_data import fetch_yfinance_series
+    import datetime
 
-            # Sentiment features
-            sent = compute_sentiment_features(sym, self.raw_dir, bars.index)
+    Path(processed_dir).mkdir(parents=True, exist_ok=True)
+    symbols = cfg["universe"]["symbols"]
+    benchmark = cfg["universe"]["benchmark"]
 
-            # Macro features (aligned)
-            macro_aligned = macro_df.reindex(bars.index).ffill().fillna(0)
+    # Load benchmark
+    try:
+        market_bars = load_bars(benchmark, raw_bars_dir)
+        market_close = market_bars["close"]
+    except Exception as e:
+        logger.error(f"Cannot load benchmark bars: {e}")
+        return {}
 
-            # Regimes
-            regime_aligned = regimes.reindex(bars.index).ffill().fillna(2).astype(int)
+    # Build regime features
+    logger.info("Building regime features...")
+    market_regime = build_regime_features(market_close)
 
-            close = bars["close"]
-            company_idx = self.symbol_to_idx.get(sym, 0)
-            sector_idx = SECTOR_MAP.get(sym, 6)  # 6 = unknown
+    # Load macro data
+    logger.info("Loading macro data...")
+    start = cfg["data"]["start_date"]
+    end = cfg["data"].get("end_date") or datetime.date.today().isoformat()
+    macro_tickers = ["^VIX", "^TNX", "^IRX", "GC=F", "CL=F"]
+    try:
+        macro_data = fetch_yfinance_series(macro_tickers, start, end, raw_dir=raw_alt_dir)
+    except Exception as e:
+        logger.warning(f"Macro data fetch failed: {e}")
+        macro_data = {}
 
-            # Build windowed samples
-            pw = self.price_window
-            sw = self.sentiment_window
-            mw = self.macro_window
-            max_w = max(pw, sw, mw)
-
-            price_cols = [c for c in tech.columns]
-            sent_cols = [c for c in sent.columns]
-            macro_cols = [c for c in macro_aligned.columns]
-
-            tech_arr = tech.values
-            sent_arr = sent.values
-            macro_arr = macro_aligned.values
-            close_arr = close.values
-            regime_arr = regime_aligned.values
-
-            for i in range(max_w, len(bars) - self.horizon):
-                # Label: forward return class
-                future_ret = (close_arr[i + self.horizon] - close_arr[i]) / (close_arr[i] + 1e-10)
-                label = self._classify(future_ret)
-
-                p_window = tech_arr[i - pw: i]
-                s_window = sent_arr[i - sw: i] if len(sent_arr) > 0 else np.zeros((sw, len(sent_cols)))
-                m_window = macro_arr[i - mw: i]
-
-                if p_window.shape[0] < pw or m_window.shape[0] < mw:
-                    continue
-
-                all_price_raw.append(p_window)
-                all_sent_raw.append(s_window)
-                all_macro_raw.append(m_window)
-                all_labels.append(label)
-                all_regimes.append(regime_arr[i])
-                all_company.append(company_idx)
-                all_sector.append(sector_idx)
-                all_meta.append((sym, bars.index[i].strftime("%Y-%m-%d")))
-
-        if not all_price_raw:
-            raise ValueError("No samples built. Check date ranges and data availability.")
-
-        price_X = np.array(all_price_raw, dtype=np.float32)   # (N, pw, F_price)
-        sent_X = np.array(all_sent_raw, dtype=np.float32)     # (N, sw, F_sent)
-        macro_X = np.array(all_macro_raw, dtype=np.float32)   # (N, mw, F_macro)
-        labels = np.array(all_labels, dtype=np.int64)
-        regimes_arr = np.array(all_regimes, dtype=np.int64)
-        company_arr = np.array(all_company, dtype=np.int64)
-        sector_arr = np.array(all_sector, dtype=np.int64)
-
-        # Fit or transform scalers
-        N, pw, fp = price_X.shape
-        _, sw2, fs = sent_X.shape
-        _, mw2, fm = macro_X.shape
-
-        if fit_scalers:
-            self.fit_scalers(
-                price_X.reshape(-1, fp),
-                sent_X.reshape(-1, fs),
-                macro_X.reshape(-1, fm),
+    # Build per-symbol features
+    all_features = {}
+    for idx, symbol in enumerate(symbols):
+        logger.info(f"Building features [{idx+1}/{len(symbols)}]: {symbol}")
+        try:
+            df = build_features_for_symbol(
+                symbol=symbol,
+                symbol_idx=idx,
+                num_symbols=len(symbols),
+                cfg=cfg,
+                market_close=market_close,
+                market_regime=market_regime,
+                macro_data=macro_data,
+                raw_bars_dir=raw_bars_dir,
+                raw_news_dir=raw_news_dir,
+                price_window=cfg["model"]["price_window"],
+                sentiment_window=cfg["model"]["sentiment_window"],
             )
+            out_path = Path(processed_dir) / f"{symbol}.parquet"
+            df.to_parquet(out_path)
+            all_features[symbol] = df
+            logger.info(f"  {symbol}: {len(df)} rows, {len(df.columns)} features")
+        except Exception as e:
+            logger.error(f"  Failed to build features for {symbol}: {e}")
+            continue
 
-        price_X = self._price_scaler.transform(price_X.reshape(-1, fp)).reshape(N, pw, fp)
-        sent_X = self._sentiment_scaler.transform(sent_X.reshape(-1, fs)).reshape(N, sw2, fs)
-        macro_X = self._macro_scaler.transform(macro_X.reshape(-1, fm)).reshape(N, mw2, fm)
-
-        # One-hot regimes
-        regime_onehot = np.eye(3, dtype=np.float32)[regimes_arr]
-
-        return (
-            price_X.astype(np.float32),
-            sent_X.astype(np.float32),
-            macro_X.astype(np.float32),
-            regime_onehot,
-            company_arr,
-            sector_arr,
-            labels,
-            all_meta,
-        )
-
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
-
-    def _classify(self, ret: float) -> int:
-        """
-        Maps a forward return to a class label:
-          4 = strong buy    (ret >  r_hi)
-          3 = weak buy      (r_lo < ret <= r_hi)
-          2 = hold          (-r_lo <= ret <= r_lo)
-          1 = weak sell     (-r_hi <= ret < -r_lo)
-          0 = strong sell   (ret < -r_hi)
-        """
-        if ret > self.r_hi:
-            return 4
-        elif ret > self.r_lo:
-            return 3
-        elif ret >= -self.r_lo:
-            return 2
-        elif ret >= -self.r_hi:
-            return 1
-        else:
-            return 0
+    return all_features
