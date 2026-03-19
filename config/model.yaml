@@ -1,23 +1,23 @@
 model:
-  type: "lstm_transformer"
-  price_window: 40
-  sentiment_window: 20
-  macro_window: 20
+  type: "multi_branch"           # multi_branch lstm+transformer
+  price_window: 40               # days of price/tech history
+  sentiment_window: 20           # days of sentiment history
+  macro_window: 20               # days of macro feature history
   hidden_dim: 128
-  num_layers: 2
-  num_attention_heads: 4
-  dropout: 0.3
+  num_lstm_layers: 2
+  num_attn_heads: 4
+  transformer_layers: 2
+  dropout: 0.25                  # used for MC dropout too
   company_embedding_dim: 16
   sector_embedding_dim: 8
   macro_hidden_dim: 64
-  fusion_hidden_dim: 256
+  final_hidden_dims: [256, 128]
+  num_classes: 5                 # strong_sell, sell, hold, buy, strong_buy
 
 targets:
   horizon_days: 3
-  r_hi: 0.03
-  r_lo: 0.005
-  # Labels: 4=strong_buy, 3=weak_buy, 2=hold, 1=weak_sell, 0=strong_sell
+  r_hi: 0.025                    # threshold for strong buy/sell label
+  r_lo: 0.005                    # threshold for hold label
 
 uncertainty:
   mc_dropout_samples: 50
-  min_confidence: 0.55

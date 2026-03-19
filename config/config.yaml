@@ -9,89 +9,101 @@ universe:
     - AAPL
     - MSFT
     - AMZN
-    - GOOG
+    - GOOGL
     - META
     - NVDA
     - TSLA
     - JPM
-    - BAC
-    - GS
-    - XOM
-    - CVX
-    - JNJ
-    - UNH
-    - PFE
-    - WMT
-    - COST
-    - HD
     - V
-    - MA
-    - PYPL
-    - NFLX
-    - DIS
-    - CMCSA
-    - INTC
-    - AMD
-    - QCOM
-    - CRM
-    - ORCL
-    - IBM
-    - BA
-    - CAT
-    - DE
-    - GE
-    - MMM
-    - LMT
-    - RTX
-    - T
-    - VZ
-    - TMUS
-    - PG
-    - KO
-    - PEP
-    - MCD
-    - SBUX
-    - NKE
-    - AMGN
-    - GILD
-    - MRK
+    - UNH
+    - XOM
     - LLY
+    - JNJ
+    - WMT
+    - MA
+    - AVGO
+    - PG
+    - HD
+    - CVX
+    - MRK
+    - COST
+    - ABBV
+    - BAC
+    - KO
+    - NFLX
+    - PEP
+    - ADBE
+    - TMO
+    - ORCL
+    - CRM
+    - MCD
+    - CSCO
+    - ABT
+    - ACN
+    - AMD
+    - NKE
+    - TXN
+    - DHR
+    - LIN
+    - AMGN
+    - PM
+    - INTU
+    - UPS
+    - INTC
+    - RTX
+    - NOW
+    - QCOM
+    - NEE
+    - SPGI
+    - GS
   benchmark: "SPY"
   sector_etfs:
-    - "XLK"
-    - "XLF"
-    - "XLE"
-    - "XLY"
-    - "XLV"
-    - "XLI"
-    - "XLP"
-    - "XLU"
-    - "XLRE"
+    - XLK
+    - XLF
+    - XLE
+    - XLY
+    - XLV
+    - XLI
+    - XLP
+    - XLU
+    - XLB
+    - XLRE
+  macro_tickers:
+    - TLT   # 20yr treasury
+    - GLD   # gold
+    - DX-Y.NYB  # dollar index (if available)
+    - USO   # oil
+  vix_ticker: "VIXY"  # VIX ETF proxy
 
 data:
   start_date: "2018-01-01"
   end_date: null
   bar_timeframe: "1Day"
   timezone: "America/New_York"
+  min_history_days: 300
 
 news:
   enabled: true
-  max_articles_per_day: 30
-  lookback_days: 365
+  max_articles_per_day: 20
+  lookback_days: 90
+  sources:
+    - alpaca
 
 paths:
   raw_dir: "data/raw"
   processed_dir: "data/processed"
   models_dir: "data/models"
   scalers_dir: "data/scalers"
-  logs_dir: "data/logs"
+  logs_dir: "logs"
   db_path: "data/performance.db"
 
 trading:
   live: false
   run_time: "15:45"
-  max_gross_exposure: 1.0
+  max_gross_exposure: 0.95
   max_single_position: 0.15
   min_cash_buffer: 0.05
-  allow_short: true
-  earnings_buffer_days: 1
+  kelly_fraction: 0.3
+  min_confidence: 0.60
+  bracket_orders: true
+  allow_short: false
