@@ -1,224 +1,204 @@
-"""Ultimate multi-input stock prediction model in PyTorch.
+"""Multi-branch PyTorch model for stock direction prediction.
 
 Architecture:
-  Branch 1: Bidirectional LSTM + Attention  -> price/technical time series
-  Branch 2: Bidirectional LSTM              -> sentiment time series
-  Branch 3: Small MLP                       -> macro snapshot (VIX, yields, etc.)
-  Branch 4: Embedding layer                 -> symbol identity
-  Fusion:   Concat -> LayerNorm -> 2x Linear -> Dropout -> 5-class output
+  Branch 1 - Price/Technical: Bi-LSTM -> Self-Attention
+  Branch 2 - Sentiment:       Bi-LSTM
+  Branch 3 - Macro:           Bi-LSTM
+  Branch 4 - Symbol identity: Embedding(n_symbols, d_sym)
+  Branch 5 - Sector identity: Embedding(n_sectors, d_sec)
+  All branches -> Concat -> LayerNorm -> MLP -> 5-class softmax
 
-Uncertainty:
-  MC Dropout: inference with model.train() for N samples.
-  Confidence = 1 - entropy(mean_probs).
+MC Dropout uncertainty:
+  model.train() kept on at inference -> dropout stochastic -> run N times
 """
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
+from typing import Tuple
 
 
-class AttentionPool(nn.Module):
-    """Learnable attention pooling over a sequence (B, T, H) -> (B, H)."""
-    def __init__(self, hidden_dim: int):
-        super().__init__()
-        self.attn = nn.Linear(hidden_dim, 1)
+class BranchLSTM(nn.Module):
+    """Bi-LSTM encoder for a time-series branch."""
 
-    def forward(self, x):
-        # x: (B, T, H)
-        weights = torch.softmax(self.attn(x), dim=1)  # (B, T, 1)
-        return (weights * x).sum(dim=1)               # (B, H)
-
-
-class PriceBranch(nn.Module):
-    """Bidirectional LSTM with attention pooling for price/technical features."""
-    def __init__(self, input_dim: int, hidden_dim: int, num_layers: int, dropout: float):
+    def __init__(self, input_dim: int, hidden_dim: int, num_layers: int,
+                 dropout: float):
         super().__init__()
         self.lstm = nn.LSTM(
-            input_dim, hidden_dim,
+            input_size=input_dim,
+            hidden_size=hidden_dim,
             num_layers=num_layers,
             batch_first=True,
             bidirectional=True,
             dropout=dropout if num_layers > 1 else 0.0,
         )
-        self.attn = AttentionPool(hidden_dim * 2)
         self.dropout = nn.Dropout(dropout)
-        self.output_dim = hidden_dim * 2
+        self.out_dim = hidden_dim * 2  # bidirectional
 
-    def forward(self, x):
-        # x: (B, T, input_dim)
-        out, _ = self.lstm(x)           # (B, T, H*2)
-        out = self.dropout(out)
-        return self.attn(out)           # (B, H*2)
-
-
-class SentimentBranch(nn.Module):
-    """Bidirectional LSTM for sentiment time series."""
-    def __init__(self, input_dim: int, hidden_dim: int, dropout: float):
-        super().__init__()
-        self.lstm = nn.LSTM(
-            input_dim, hidden_dim,
-            num_layers=1,
-            batch_first=True,
-            bidirectional=True,
-        )
-        self.attn = AttentionPool(hidden_dim * 2)
-        self.dropout = nn.Dropout(dropout)
-        self.output_dim = hidden_dim * 2
-
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # x: (batch, seq, features)
         out, _ = self.lstm(x)
-        return self.attn(self.dropout(out))
+        # Use last timestep from both directions
+        out = self.dropout(out[:, -1, :])
+        return out
 
 
-class MacroBranch(nn.Module):
-    """MLP for macro/regime snapshot features."""
-    def __init__(self, input_dim: int, hidden_dim: int, dropout: float):
+class SelfAttention(nn.Module):
+    """Multi-head self-attention pooling over sequence."""
+
+    def __init__(self, d_model: int, num_heads: int, dropout: float):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.LayerNorm(hidden_dim),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, hidden_dim),
-            nn.GELU(),
+        self.attn = nn.MultiheadAttention(
+            embed_dim=d_model, num_heads=num_heads,
+            dropout=dropout, batch_first=True
         )
-        self.output_dim = hidden_dim
+        self.norm = nn.LayerNorm(d_model)
+        self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x):
-        return self.net(x)
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # x: (batch, seq, d_model)
+        attn_out, _ = self.attn(x, x, x)
+        x = self.norm(x + self.dropout(attn_out))
+        return x[:, -1, :]  # take last token after attention
 
 
-class UltimateStockModel(nn.Module):
+class UltraTradingModel(nn.Module):
     """
-    Full multi-branch model.
-
-    Args:
-        price_input_dim:     number of price/technical features per timestep
-        sentiment_input_dim: number of sentiment features per timestep
-        macro_input_dim:     number of macro/regime scalar features
-        num_symbols:         vocabulary size for symbol embedding
-        cfg:                 model config dict
+    Full multi-branch trading model.
     """
+
     def __init__(
         self,
-        price_input_dim: int,
-        sentiment_input_dim: int,
+        tech_input_dim: int,
+        sent_input_dim: int,
         macro_input_dim: int,
-        num_symbols: int,
-        cfg: dict,
+        n_symbols: int,
+        n_sectors: int,
+        hidden_dim: int = 128,
+        num_lstm_layers: int = 2,
+        num_attn_heads: int = 4,
+        company_embedding_dim: int = 16,
+        sector_embedding_dim: int = 8,
+        macro_hidden_dim: int = 64,
+        final_hidden_dims: Tuple[int] = (256, 128),
+        dropout: float = 0.25,
+        num_classes: int = 5,
     ):
         super().__init__()
-        mcfg = cfg["model"]
-        hidden = mcfg["hidden_dim"]
-        dropout = mcfg["dropout"]
+        self.dropout = dropout
 
-        # Branches
-        self.price_branch = PriceBranch(
-            price_input_dim, hidden, mcfg["num_layers"], dropout
-        )
-        self.sentiment_branch = SentimentBranch(
-            sentiment_input_dim, hidden // 2, dropout
-        )
-        self.macro_branch = MacroBranch(
-            macro_input_dim, mcfg["macro_hidden_dim"], dropout
-        )
-        self.symbol_embedding = nn.Embedding(
-            num_symbols, mcfg["company_embedding_dim"]
-        )
+        # Branch 1: Tech/Price with LSTM + attention
+        self.tech_lstm = BranchLSTM(tech_input_dim, hidden_dim, num_lstm_layers, dropout)
+        self.tech_attn = SelfAttention(hidden_dim * 2, num_attn_heads, dropout)
+        # We feed both last-timestep and attention output into classifier
+        tech_out = hidden_dim * 4  # lstm_out + attn_out
 
-        # Fusion
-        fusion_in = (
-            self.price_branch.output_dim
-            + self.sentiment_branch.output_dim
-            + self.macro_branch.output_dim
-            + mcfg["company_embedding_dim"]
-        )
-        fusion_hidden = mcfg["fusion_hidden_dim"]
-        self.fusion = nn.Sequential(
-            nn.LayerNorm(fusion_in),
-            nn.Linear(fusion_in, fusion_hidden),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(fusion_hidden, fusion_hidden // 2),
-            nn.GELU(),
-            nn.Dropout(dropout),
-            nn.Linear(fusion_hidden // 2, 5),  # 5-class output
-        )
+        # Branch 2: Sentiment LSTM
+        self.sent_lstm = BranchLSTM(sent_input_dim, hidden_dim // 2, num_lstm_layers, dropout)
+        sent_out = hidden_dim
+
+        # Branch 3: Macro LSTM
+        self.macro_lstm = BranchLSTM(macro_input_dim, macro_hidden_dim, 1, dropout)
+        macro_out = macro_hidden_dim * 2
+
+        # Branch 4: Symbol embedding
+        self.sym_embed = nn.Embedding(n_symbols + 1, company_embedding_dim, padding_idx=0)
+        self.sym_dropout = nn.Dropout(dropout)
+
+        # Branch 5: Sector embedding
+        self.sec_embed = nn.Embedding(n_sectors + 1, sector_embedding_dim, padding_idx=0)
+
+        # Concat all branches
+        total_dim = tech_out + sent_out + macro_out + company_embedding_dim + sector_embedding_dim
+
+        # MLP head
+        layers = []
+        in_dim = total_dim
+        for out_dim in final_hidden_dims:
+            layers += [
+                nn.Linear(in_dim, out_dim),
+                nn.LayerNorm(out_dim),
+                nn.GELU(),
+                nn.Dropout(dropout),
+            ]
+            in_dim = out_dim
+        layers.append(nn.Linear(in_dim, num_classes))
+        self.classifier = nn.Sequential(*layers)
 
     def forward(
         self,
-        price_seq,       # (B, T_price, price_input_dim)
-        sentiment_seq,   # (B, T_sent, sentiment_input_dim)
-        macro_snap,      # (B, macro_input_dim)
-        symbol_idx,      # (B,) long
-    ):
-        p = self.price_branch(price_seq)
-        s = self.sentiment_branch(sentiment_seq)
-        m = self.macro_branch(macro_snap)
-        e = self.symbol_embedding(symbol_idx)          # (B, emb_dim)
-        fused = torch.cat([p, s, m, e], dim=-1)
-        return self.fusion(fused)                      # (B, 5) logits
+        tech: torch.Tensor,       # (B, price_window, tech_dim)
+        sent: torch.Tensor,       # (B, sent_window, sent_dim)
+        macro: torch.Tensor,      # (B, macro_window, macro_dim)
+        sym_idx: torch.Tensor,    # (B,) long
+        sec_idx: torch.Tensor,    # (B,) long
+    ) -> torch.Tensor:
+        # Tech branch: run LSTM, then attention on LSTM output
+        lstm_out_seq, _ = self.tech_lstm.lstm(tech)
+        lstm_last = self.tech_lstm.dropout(lstm_out_seq[:, -1, :])
+        attn_out = self.tech_attn(lstm_out_seq)
+        tech_feat = torch.cat([lstm_last, attn_out], dim=-1)
+
+        # Sentiment branch
+        sent_feat = self.sent_lstm(sent)
+
+        # Macro branch
+        macro_feat = self.macro_lstm(macro)
+
+        # Embedding branches
+        sym_feat = self.sym_dropout(self.sym_embed(sym_idx))
+        sec_feat = self.sec_embed(sec_idx)
+
+        # Concatenate
+        combined = torch.cat([tech_feat, sent_feat, macro_feat, sym_feat, sec_feat], dim=-1)
+
+        return self.classifier(combined)
+
+    def predict_with_uncertainty(
+        self, tech, sent, macro, sym_idx, sec_idx, n_samples: int = 50
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        MC Dropout inference: run forward pass n_samples times with dropout ON.
+        Returns (mean_probs, uncertainty) both shape (B, num_classes).
+        uncertainty = predictive entropy across samples.
+        """
+        self.train()  # keep dropout active
+        all_probs = []
+
+        with torch.no_grad():
+            for _ in range(n_samples):
+                logits = self(tech, sent, macro, sym_idx, sec_idx)
+                probs = torch.softmax(logits, dim=-1)
+                all_probs.append(probs.unsqueeze(0))
+
+        all_probs = torch.cat(all_probs, dim=0)  # (n_samples, B, C)
+        mean_probs = all_probs.mean(dim=0)        # (B, C)
+
+        # Predictive entropy: H = -sum(p * log(p))
+        entropy = -(mean_probs * (mean_probs + 1e-9).log()).sum(dim=-1)  # (B,)
+        # Normalize to [0, 1] by dividing by max entropy = log(num_classes)
+        max_entropy = torch.log(torch.tensor(float(mean_probs.shape[-1])))
+        uncertainty = entropy / max_entropy
+
+        self.eval()
+        return mean_probs, uncertainty
 
 
-# ── Inference utilities ──────────────────────────────────────────────────────
-
-def mc_dropout_predict(
-    model: UltimateStockModel,
-    price_seq: torch.Tensor,
-    sentiment_seq: torch.Tensor,
-    macro_snap: torch.Tensor,
-    symbol_idx: torch.Tensor,
-    n_samples: int = 50,
-    device: str = "cpu",
-) -> dict:
-    """
-    MC Dropout inference. model.train() is used to keep dropout active.
-    Returns dict with mean_probs, std_probs, confidence, predicted_class.
-
-    confidence = 1 - normalised_entropy(mean_probs)
-    """
-    model.train()   # CRITICAL: keeps dropout stochastic
-    model.to(device)
-
-    all_probs = []
-    with torch.no_grad():
-        for _ in range(n_samples):
-            logits = model(
-                price_seq.to(device),
-                sentiment_seq.to(device),
-                macro_snap.to(device),
-                symbol_idx.to(device),
-            )
-            probs = F.softmax(logits, dim=-1).cpu().numpy()
-            all_probs.append(probs)
-
-    all_probs = np.array(all_probs)          # (N, B, 5)
-    mean_probs = all_probs.mean(axis=0)      # (B, 5)
-    std_probs = all_probs.std(axis=0)        # (B, 5)
-
-    # entropy-based confidence
-    eps = 1e-8
-    entropy = -np.sum(mean_probs * np.log(mean_probs + eps), axis=-1)  # (B,)
-    max_entropy = np.log(mean_probs.shape[-1])                          # log(5)
-    confidence = 1.0 - entropy / max_entropy                           # (B,)
-
-    predicted_class = mean_probs.argmax(axis=-1)                       # (B,)
-
-    return {
-        "mean_probs": mean_probs,
-        "std_probs": std_probs,
-        "confidence": confidence,
-        "predicted_class": predicted_class,
-    }
-
-
-def save_model(model: nn.Module, path: str):
-    import os
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    torch.save(model.state_dict(), path)
-
-
-def load_model(model: nn.Module, path: str, device: str = "cpu") -> nn.Module:
-    state = torch.load(path, map_location=device)
-    model.load_state_dict(state)
-    return model
+def build_model(cfg, n_symbols: int, n_sectors: int,
+                tech_dim: int, sent_dim: int, macro_dim: int) -> UltraTradingModel:
+    """Build model from config."""
+    m = cfg.model
+    return UltraTradingModel(
+        tech_input_dim=tech_dim,
+        sent_input_dim=sent_dim,
+        macro_input_dim=macro_dim,
+        n_symbols=n_symbols,
+        n_sectors=n_sectors,
+        hidden_dim=m.hidden_dim,
+        num_lstm_layers=m.num_lstm_layers,
+        num_attn_heads=m.num_attn_heads,
+        company_embedding_dim=m.company_embedding_dim,
+        sector_embedding_dim=m.sector_embedding_dim,
+        macro_hidden_dim=m.macro_hidden_dim,
+        final_hidden_dims=tuple(m.final_hidden_dims),
+        dropout=m.dropout,
+        num_classes=m.num_classes,
+    )

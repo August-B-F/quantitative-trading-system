@@ -1,34 +1,56 @@
-"""Loss functions for training."""
+"""Loss functions for multi-class trading prediction."""
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+import numpy as np
+from typing import List
 
 
-class LabelSmoothingCrossEntropy(nn.Module):
-    """Cross-entropy with label smoothing to prevent overconfidence."""
-    def __init__(self, smoothing: float = 0.05, weight: torch.Tensor = None):
+def compute_class_weights(labels: List[int], num_classes: int = 5) -> torch.Tensor:
+    """
+    Compute inverse-frequency class weights to handle class imbalance.
+    'Hold' is typically dominant; buy/sell signals are rare.
+    """
+    counts = np.bincount(labels, minlength=num_classes).astype(float)
+    counts = np.maximum(counts, 1)  # avoid zero
+    weights = 1.0 / counts
+    weights = weights / weights.sum() * num_classes  # normalize
+    return torch.tensor(weights, dtype=torch.float32)
+
+
+class FocalLoss(nn.Module):
+    """
+    Focal loss: down-weights easy examples (the common 'hold' class)
+    and focuses training on hard rare examples (buy/sell signals).
+    gamma=2 is a common default.
+    """
+
+    def __init__(self, gamma: float = 2.0, weight: torch.Tensor = None):
         super().__init__()
-        self.smoothing = smoothing
+        self.gamma = gamma
         self.weight = weight
 
-    def forward(self, logits: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
-        n_classes = logits.size(-1)
-        log_prob = F.log_softmax(logits, dim=-1)
-        smooth_target = torch.full_like(log_prob, self.smoothing / (n_classes - 1))
-        smooth_target.scatter_(1, target.unsqueeze(1), 1.0 - self.smoothing)
-        if self.weight is not None:
-            w = self.weight[target].unsqueeze(1).to(logits.device)
-            loss = -(smooth_target * log_prob * w).sum(dim=-1)
-        else:
-            loss = -(smooth_target * log_prob).sum(dim=-1)
-        return loss.mean()
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        ce = nn.functional.cross_entropy(logits, targets,
+                                          weight=self.weight, reduction="none")
+        pt = torch.exp(-ce)
+        focal = ((1 - pt) ** self.gamma) * ce
+        return focal.mean()
 
 
-def compute_class_weights(labels, n_classes: int = 5) -> torch.Tensor:
-    """Inverse-frequency class weights to handle label imbalance."""
-    counts = torch.zeros(n_classes)
-    for c in range(n_classes):
-        counts[c] = (labels == c).sum().float()
-    counts = counts.clamp(min=1)
-    weights = 1.0 / counts
-    return weights / weights.sum() * n_classes  # normalise
+class LabelSmoothingLoss(nn.Module):
+    """Cross-entropy with label smoothing to prevent overconfident predictions."""
+
+    def __init__(self, smoothing: float = 0.1, num_classes: int = 5,
+                 weight: torch.Tensor = None):
+        super().__init__()
+        self.smoothing = smoothing
+        self.num_classes = num_classes
+        self.weight = weight
+
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        log_probs = nn.functional.log_softmax(logits, dim=-1)
+        # Hard label cross-entropy
+        nll = nn.functional.nll_loss(log_probs, targets, weight=self.weight)
+        # Uniform smoothing
+        smooth = -log_probs.mean(dim=-1).mean()
+        return (1 - self.smoothing) * nll + self.smoothing * smooth

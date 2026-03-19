@@ -1,51 +1,68 @@
-"""Evaluation metrics for model and strategy performance."""
+"""Evaluation metrics for training and backtesting."""
 import numpy as np
-import pandas as pd
-from sklearn.metrics import classification_report, confusion_matrix
+from typing import List, Dict
 
 
-def classification_metrics(y_true, y_pred) -> dict:
-    """Compute per-class precision/recall/F1 + accuracy."""
-    report = classification_report(
-        y_true, y_pred,
-        labels=[0, 1, 2, 3, 4],
-        target_names=["strong_sell", "weak_sell", "hold", "weak_buy", "strong_buy"],
-        output_dict=True,
-        zero_division=0,
-    )
-    return report
+def directional_accuracy(preds: List[int], labels: List[int]) -> float:
+    """Fraction of predictions where direction (buy/sell) is correct."""
+    correct = sum(1 for p, l in zip(preds, labels) if p == l)
+    return correct / max(len(preds), 1)
 
 
-def sharpe_ratio(returns: pd.Series, risk_free: float = 0.0, periods: int = 252) -> float:
-    """Annualised Sharpe ratio."""
-    excess = returns - risk_free / periods
-    if excess.std() == 0:
+def sharpe_ratio(returns: List[float], risk_free: float = 0.0,
+                 annualize: bool = True) -> float:
+    """Annualized Sharpe ratio from daily returns."""
+    r = np.array(returns)
+    if r.std() < 1e-9:
         return 0.0
-    return float(excess.mean() / excess.std() * np.sqrt(periods))
+    sr = (r.mean() - risk_free / 252) / r.std()
+    return float(sr * np.sqrt(252) if annualize else sr)
 
 
-def sortino_ratio(returns: pd.Series, risk_free: float = 0.0, periods: int = 252) -> float:
-    """Annualised Sortino ratio."""
-    excess = returns - risk_free / periods
-    downside = excess[excess < 0]
-    if downside.std() == 0:
-        return 0.0
-    return float(excess.mean() / downside.std() * np.sqrt(periods))
+def sortino_ratio(returns: List[float], risk_free: float = 0.0) -> float:
+    """Annualized Sortino ratio (penalizes only downside vol)."""
+    r = np.array(returns)
+    downside = r[r < 0]
+    if len(downside) == 0 or downside.std() < 1e-9:
+        return float("inf") if r.mean() > 0 else 0.0
+    return float((r.mean() - risk_free / 252) / downside.std() * np.sqrt(252))
 
 
-def max_drawdown(returns: pd.Series) -> float:
-    """Maximum drawdown from a returns series."""
-    cumulative = (1 + returns).cumprod()
-    rolling_max = cumulative.cummax()
-    drawdown = (cumulative - rolling_max) / rolling_max
-    return float(drawdown.min())
+def max_drawdown(equity_curve: List[float]) -> float:
+    """Maximum peak-to-trough drawdown as a fraction."""
+    eq = np.array(equity_curve)
+    peak = np.maximum.accumulate(eq)
+    dd = (eq - peak) / (peak + 1e-9)
+    return float(dd.min())
 
 
-def win_rate(returns: pd.Series) -> float:
-    return float((returns > 0).mean())
+def win_rate(pnl_per_trade: List[float]) -> float:
+    wins = sum(1 for p in pnl_per_trade if p > 0)
+    return wins / max(len(pnl_per_trade), 1)
 
 
-def calmar_ratio(returns: pd.Series, periods: int = 252) -> float:
-    ann_return = (1 + returns).prod() ** (periods / len(returns)) - 1
-    mdd = abs(max_drawdown(returns))
-    return float(ann_return / mdd) if mdd > 0 else 0.0
+def per_class_precision(preds: List[int], labels: List[int],
+                         num_classes: int = 5) -> Dict[int, float]:
+    """Precision per class."""
+    result = {}
+    for c in range(num_classes):
+        tp = sum(1 for p, l in zip(preds, labels) if p == c and l == c)
+        fp = sum(1 for p, l in zip(preds, labels) if p == c and l != c)
+        result[c] = tp / max(tp + fp, 1)
+    return result
+
+
+def summarize(equity: List[float], returns: List[float],
+              preds: List[int] = None, labels: List[int] = None) -> dict:
+    """Full summary dict of all metrics."""
+    s = {
+        "sharpe": sharpe_ratio(returns),
+        "sortino": sortino_ratio(returns),
+        "max_drawdown": max_drawdown(equity),
+        "total_return": float((equity[-1] / equity[0] - 1) * 100) if equity else 0.0,
+        "win_rate": win_rate(returns),
+    }
+    if preds and labels:
+        s["accuracy"] = directional_accuracy(preds, labels)
+        s["per_class_precision"] = per_class_precision(preds, labels)
+    return s
