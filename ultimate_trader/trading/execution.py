@@ -16,7 +16,6 @@ from ultimate_trader.utils.config_loader import Config
 
 logger = get_logger(__name__)
 
-# Prediction class -> action mapping
 CLASS_TO_ACTION = {
     0: "strong_sell",
     1: "sell",
@@ -25,13 +24,18 @@ CLASS_TO_ACTION = {
     4: "strong_buy",
 }
 
+# Hard gate: trades are SKIPPED (not just logged) when uncertainty exceeds this
+UNCERTAINTY_HARD_GATE = 0.75
+# Soft gate: exit existing positions when uncertainty exceeds this
+UNCERTAINTY_EXIT_GATE = 0.85
+
 
 class Executor:
     """
     Executes trades based on model predictions.
     - Closes positions that hit exit criteria or have earnings upcoming
     - Opens new positions using Kelly-sized bracket orders
-    - Respects all risk limits
+    - Hard uncertainty gating: no trades when model is uncertain
     """
 
     def __init__(self, cfg: Config, portfolio: Portfolio,
@@ -46,7 +50,7 @@ class Executor:
         )
 
     def get_live_price(self, symbol: str) -> Optional[float]:
-        """Get latest trade price from Alpaca (real-time, not CSV)."""
+        """Get latest trade price from Alpaca."""
         try:
             from alpaca.data.historical import StockHistoricalDataClient
             from alpaca.data.requests import StockLatestTradeRequest
@@ -85,109 +89,113 @@ class Executor:
 
     def run(
         self,
-        predictions: Dict[str, Dict],  # {symbol: {pred_class, confidence, uncertainty, probs}}
+        predictions: Dict[str, Dict],
         regime: str,
         earnings_dates: Dict[str, List[str]] = None,
     ):
         """
         Main execution loop:
-        1. Reconcile portfolio from Alpaca
-        2. Exit any positions with signals to sell or upcoming earnings
-        3. Enter new positions for buy signals within risk limits
+        1. Reconcile portfolio
+        2. Exit positions: sell signal OR earnings OR uncertainty > EXIT_GATE
+        3. Enter positions: buy signal AND confidence >= threshold AND uncertainty < HARD_GATE
         """
         earnings_dates = earnings_dates or {}
-
-        # Step 1: Reconcile
         self.portfolio.reconcile()
         equity = self.portfolio.equity
         min_conf = self.risk.min_confidence(regime)
 
-        logger.info(f"Execution start | regime={regime} | equity=${equity:,.2f} | "
-                    f"min_confidence={min_conf:.2f}")
+        logger.info(
+            f"Execution start | regime={regime} | equity=${equity:,.2f} | "
+            f"min_conf={min_conf:.2f} | "
+            f"uncertainty_gate={UNCERTAINTY_HARD_GATE}"
+        )
 
-        # Step 2: Exit logic
+        # ── Step 1: Exits ─────────────────────────────────────────────
         for symbol in list(self.portfolio.positions.keys()):
-            pos = self.portfolio.positions[symbol]
             pred = predictions.get(symbol, {})
-            pred_class = pred.get("pred_class", 2)  # default hold
-            confidence = pred.get("confidence", 0.0)
+            pred_class  = pred.get("pred_class",  2)
+            confidence  = pred.get("confidence",  0.0)
+            uncertainty = pred.get("uncertainty", 0.0)
 
             should_exit = False
             exit_reason = ""
 
-            # Exit if model says sell with confidence
             if pred_class in (0, 1) and confidence >= min_conf:
                 should_exit = True
                 exit_reason = f"Model signal={CLASS_TO_ACTION[pred_class]}, conf={confidence:.2f}"
 
-            # Exit before earnings
             if self.has_earnings_soon(symbol, earnings_dates):
                 should_exit = True
                 exit_reason = "Earnings upcoming"
 
-            # Exit if uncertainty too high (model is confused)
-            if pred.get("uncertainty", 0) > 0.85:
+            # Hard exit when model is too uncertain (actually enforced, not just logged)
+            if uncertainty > UNCERTAINTY_EXIT_GATE:
                 should_exit = True
-                exit_reason = f"High uncertainty={pred['uncertainty']:.2f}"
+                exit_reason = f"High uncertainty={uncertainty:.2f} > {UNCERTAINTY_EXIT_GATE}"
 
             if should_exit:
                 self.close_position(symbol, exit_reason)
-                time.sleep(0.3)  # rate limit courtesy
+                time.sleep(0.3)
 
-        # Step 3: Refresh after exits
+        # ── Step 2: Refresh after exits ───────────────────────────────
         self.portfolio.reconcile()
         equity = self.portfolio.equity
 
-        # Step 4: Entry logic
-        # Sort by confidence, best first
-        buy_signals = [
-            (sym, pred) for sym, pred in predictions.items()
-            if pred.get("pred_class", 2) in (3, 4)
-            and pred.get("confidence", 0) >= min_conf
-            and pred.get("uncertainty", 1.0) < 0.75
-            and not self.portfolio.is_open(sym)
-        ]
+        # ── Step 3: Entries ───────────────────────────────────────────
+        buy_signals = []
+        for sym, pred in predictions.items():
+            if pred.get("pred_class", 2) not in (3, 4):
+                continue
+            if pred.get("confidence", 0) < min_conf:
+                logger.debug(f"Skipping {sym}: confidence {pred.get('confidence',0):.2f} < {min_conf:.2f}")
+                continue
+
+            uncertainty = pred.get("uncertainty", 1.0)
+            if uncertainty >= UNCERTAINTY_HARD_GATE:
+                # Hard gate: trade skipped entirely, not just logged
+                logger.info(
+                    f"Skipping {sym}: uncertainty={uncertainty:.2f} >= hard_gate={UNCERTAINTY_HARD_GATE}"
+                )
+                continue
+
+            if self.portfolio.is_open(sym):
+                continue
+
+            buy_signals.append((sym, pred))
+
         buy_signals.sort(key=lambda x: x[1]["confidence"], reverse=True)
 
         for symbol, pred in buy_signals:
-            # Check portfolio-level limits
             if not self.risk.check_portfolio_limits(
                 self.portfolio.get_gross_exposure(), equity, regime
             ):
                 logger.info("Portfolio exposure limit reached, stopping entries")
                 break
 
-            # Get live price
             price = self.get_live_price(symbol)
             if price is None or price <= 0:
                 continue
 
-            # Skip earnings
             if self.has_earnings_soon(symbol, earnings_dates):
                 logger.info(f"Skipping {symbol}: earnings soon")
                 continue
 
-            confidence = pred["confidence"]
-            pred_class = pred["pred_class"]
+            confidence  = pred["confidence"]
+            pred_class  = pred["pred_class"]
+            uncertainty = pred.get("uncertainty", 0.0)
 
-            # Compute stop/take
             stop_price, take_price = self.risk.compute_stop_take(
                 price, regime,
-                base_stop=self.cfg.trading.get("base_stop_loss", 0.07),
+                base_stop=self.cfg.trading.get("base_stop_loss",   0.07),
                 base_take=self.cfg.trading.get("base_take_profit", 0.12),
             )
             stop_pct = (price - stop_price) / price
             take_pct = (take_price - price) / price
 
-            # Kelly sizing
             dollar_amount, shares = self.risk.kelly_size(
-                equity=equity,
-                confidence=confidence,
-                pred_class=pred_class,
-                current_price=price,
-                regime=regime,
-                stop_loss_pct=stop_pct,
-                take_profit_pct=take_pct,
+                equity=equity, confidence=confidence,
+                pred_class=pred_class, current_price=price,
+                regime=regime, stop_loss_pct=stop_pct, take_profit_pct=take_pct,
             )
 
             shares = round(shares, 2)
@@ -199,12 +207,10 @@ class Executor:
                 logger.warning(f"Skipping {symbol}: insufficient cash")
                 continue
 
-            # Submit bracket order (stop + take profit handled server-side by Alpaca)
             try:
                 if self.cfg.trading.bracket_orders:
                     order = MarketOrderRequest(
-                        symbol=symbol,
-                        qty=shares,
+                        symbol=symbol, qty=shares,
                         side=OrderSide.BUY,
                         time_in_force=TimeInForce.DAY,
                         order_class=OrderClass.BRACKET,
@@ -219,19 +225,17 @@ class Executor:
                     )
 
                 self.client.submit_order(order)
-
                 logger.info(
-                    f"BUY {symbol}: {shares} shares @ ~${price:.2f} "
-                    f"| stop=${stop_price} take=${take_price} "
-                    f"| conf={confidence:.2f} regime={regime}"
+                    f"BUY {symbol}: {shares} @ ~${price:.2f} "
+                    f"stop=${stop_price:.2f} take=${take_price:.2f} "
+                    f"conf={confidence:.2f} unc={uncertainty:.2f} regime={regime}"
                 )
                 self.db.log_trade(
                     symbol=symbol, side="buy", qty=shares, price=price,
                     confidence=confidence, regime=regime,
                     stop_loss=stop_price, take_profit=take_price
                 )
-
-                equity -= dollar_amount  # rough local tracking
+                equity -= dollar_amount
                 time.sleep(0.3)
 
             except Exception as e:

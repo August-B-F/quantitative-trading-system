@@ -27,6 +27,12 @@ TECH_FEATURES = [
     "williams_r",
     "momentum_10", "momentum_20",
     "price_range_20d",
+    # Earnings proximity features (added)
+    "days_to_earnings",
+    "earnings_flag",
+    # Inter-symbol correlation features (added)
+    "corr_spy_20d",
+    "corr_sector_20d",
 ]
 
 SENTIMENT_FEATURES = [
@@ -43,11 +49,106 @@ MACRO_FEATURES = [
 ]
 
 
+def _add_earnings_features(
+    df: pd.DataFrame,
+    earnings_dates: Optional[Dict[str, List[str]]],
+    symbol: str,
+) -> pd.DataFrame:
+    """
+    Add days_to_earnings and earnings_flag columns.
+    - days_to_earnings: normalised distance to nearest upcoming earnings (0=today, 1=30+days)
+    - earnings_flag: 1 if earnings within 3 days, else 0
+    """
+    df = df.copy()
+    df["days_to_earnings"] = 1.0  # default: no upcoming earnings known
+    df["earnings_flag"] = 0.0
+
+    if not earnings_dates:
+        return df
+
+    dates_list = earnings_dates.get(symbol, [])
+    if not dates_list:
+        return df
+
+    parsed = []
+    for d in dates_list:
+        try:
+            parsed.append(pd.Timestamp(d))
+        except Exception:
+            pass
+    if not parsed:
+        return df
+
+    for ts in df.index:
+        future = [e for e in parsed if e >= ts]
+        if future:
+            nearest = min(future)
+            delta = (nearest - ts).days
+            df.at[ts, "days_to_earnings"] = min(delta / 30.0, 1.0)  # normalise to [0,1]
+            df.at[ts, "earnings_flag"] = 1.0 if delta <= 3 else 0.0
+    return df
+
+
+def _add_correlation_features(
+    df: pd.DataFrame,
+    symbol: str,
+    bars: Dict[str, pd.DataFrame],
+    symbol_to_sector_etf: Optional[Dict[str, str]] = None,
+    window: int = 20,
+) -> pd.DataFrame:
+    """
+    Add rolling correlation vs SPY and vs the symbol's sector ETF.
+    """
+    df = df.copy()
+    sym_ret = df["close"].pct_change() if "close" in df.columns else None
+
+    # vs SPY
+    spy = bars.get("SPY")
+    if spy is not None and sym_ret is not None:
+        spy_ret = spy["close"].pct_change().reindex(df.index)
+        df["corr_spy_20d"] = sym_ret.rolling(window).corr(spy_ret).fillna(0.0)
+    else:
+        df["corr_spy_20d"] = 0.0
+
+    # vs sector ETF
+    sector_etf = (symbol_to_sector_etf or {}).get(symbol)
+    if sector_etf and sector_etf in bars and sym_ret is not None:
+        sec_ret = bars[sector_etf]["close"].pct_change().reindex(df.index)
+        df["corr_sector_20d"] = sym_ret.rolling(window).corr(sec_ret).fillna(0.0)
+    else:
+        df["corr_sector_20d"] = df.get("corr_spy_20d", pd.Series(0.0, index=df.index))
+
+    return df
+
+
+SECTOR_ETF_MAP = {
+    "AAPL": "XLK", "MSFT": "XLK", "NVDA": "XLK", "AVGO": "XLK",
+    "ORCL": "XLK", "CRM": "XLK", "ADBE": "XLK", "AMD": "XLK",
+    "INTC": "XLK", "QCOM": "XLK", "TXN": "XLK", "ACN": "XLK",
+    "INTU": "XLK", "NOW": "XLK", "CSCO": "XLK",
+    "JPM": "XLF", "BAC": "XLF", "GS": "XLF", "V": "XLF", "MA": "XLF", "SPGI": "XLF",
+    "UNH": "XLV", "LLY": "XLV", "JNJ": "XLV", "ABT": "XLV", "MRK": "XLV",
+    "ABBV": "XLV", "TMO": "XLV", "DHR": "XLV", "AMGN": "XLV",
+    "XOM": "XLE", "CVX": "XLE",
+    "WMT": "XLP", "KO": "XLP", "PG": "XLP", "COST": "XLP", "PEP": "XLP", "PM": "XLP",
+    "AMZN": "XLY", "TSLA": "XLY", "MCD": "XLY", "NKE": "XLY", "HD": "XLY",
+    "META": "XLC", "GOOGL": "XLC", "NFLX": "XLC",
+    "RTX": "XLI", "UPS": "XLI", "LIN": "XLI", "NEE": "XLI",
+}
+
+
 class FeatureBuilder:
     """
-    Builds windowed feature arrays and labels for each symbol.
-    Scalers are fitted ONCE on training data and saved to disk.
-    At inference time, saved scalers are loaded and only transform() is called.
+    Builds windowed feature arrays and labels for model training/inference.
+
+    Scaler fit/transform separation:
+      - fit_scalers() is called ONCE on training-fold data
+      - All subsequent calls use transform() only
+      - Scalers are saved to disk and reloaded at inference
+
+    Added features vs v1:
+      - Earnings proximity (days_to_earnings, earnings_flag)
+      - Inter-symbol correlation (corr_spy_20d, corr_sector_20d)
     """
 
     def __init__(self, cfg: Config):
@@ -61,7 +162,6 @@ class FeatureBuilder:
         self.scalers_dir = cfg.paths.scalers_dir
         os.makedirs(self.scalers_dir, exist_ok=True)
 
-        # Scalers - one per feature group
         self.tech_scaler = RobustScaler()
         self.sent_scaler = RobustScaler()
         self.macro_scaler = RobustScaler()
@@ -69,10 +169,7 @@ class FeatureBuilder:
 
     def fit_scalers(self, all_tech: np.ndarray, all_sent: np.ndarray,
                     all_macro: np.ndarray):
-        """
-        Fit scalers on training data pooled across all symbols.
-        Call this ONCE on training set, then save.
-        """
+        """Fit scalers on TRAINING data only. Call once, then save."""
         self.tech_scaler.fit(all_tech.reshape(-1, all_tech.shape[-1]))
         self.sent_scaler.fit(all_sent.reshape(-1, all_sent.shape[-1]))
         if all_macro.shape[-1] > 0:
@@ -107,22 +204,11 @@ class FeatureBuilder:
         symbols: List[str],
         symbol_to_idx: Dict[str, int],
         symbol_to_sector: Dict[str, int],
+        earnings_dates: Optional[Dict[str, List[str]]] = None,
         fit: bool = False,
     ) -> Tuple[dict, Optional[dict]]:
-        """
-        Build feature tensors for all symbols.
-
-        Returns:
-            features: dict with keys per symbol, each a dict of:
-                'tech'     : np.ndarray (price_window, n_tech_features)
-                'sent'     : np.ndarray (sentiment_window, n_sent_features)
-                'macro'    : np.ndarray (macro_window, n_macro_features)
-                'sym_idx'  : int
-                'sec_idx'  : int
-            labels: dict {symbol: int} or None if no future data
-        """
         tech_pool, sent_pool, macro_pool = [], [], []
-        raw = {}  # hold unscaled data before pooled fit
+        raw = {}
 
         for symbol in symbols:
             if symbol not in bars:
@@ -130,27 +216,22 @@ class FeatureBuilder:
 
             df = bars[symbol].copy()
             df = add_technicals(df)
+            df = _add_earnings_features(df, earnings_dates, symbol)
+            df = _add_correlation_features(df, symbol, bars, SECTOR_ETF_MAP)
 
-            # Align macro
-            macro_aligned = macro_df.reindex(df.index).fillna(method="ffill").fillna(0)
+            # FIX: use .ffill() not deprecated fillna(method='ffill')
+            macro_aligned = macro_df.reindex(df.index).ffill().fillna(0)
 
-            # Align sentiment
-            sent_df = sentiment.get(symbol, pd.DataFrame()).reindex(
-                df.index).fillna(0)
+            sent_df = sentiment.get(symbol, pd.DataFrame()).reindex(df.index).fillna(0)
             sent_cols = [c for c in SENTIMENT_FEATURES if c in sent_df.columns]
-            if not sent_cols:
-                sent_arr = np.zeros((len(df), len(SENTIMENT_FEATURES)))
-            else:
-                sent_arr = sent_df[sent_cols].values
+            sent_arr = sent_df[sent_cols].values if sent_cols else np.zeros((len(df), len(SENTIMENT_FEATURES)))
 
-            tech_arr = df[[c for c in TECH_FEATURES if c in df.columns]].values
-            macro_arr = macro_aligned[[c for c in MACRO_FEATURES
-                                        if c in macro_aligned.columns]].values
+            tech_arr = df[[c for c in TECH_FEATURES if c in df.columns]].values.astype(np.float32)
+            macro_arr = macro_aligned[[c for c in MACRO_FEATURES if c in macro_aligned.columns]].values.astype(np.float32)
 
             raw[symbol] = {
-                "tech": tech_arr, "sent": sent_arr,
-                "macro": macro_arr, "index": df.index,
-                "close": df["close"].values,
+                "tech": tech_arr, "sent": sent_arr, "macro": macro_arr,
+                "index": df.index, "close": df["close"].values,
                 "sym_idx": symbol_to_idx.get(symbol, 0),
                 "sec_idx": symbol_to_sector.get(symbol, 0),
             }
@@ -159,29 +240,25 @@ class FeatureBuilder:
             macro_pool.append(macro_arr)
 
         if fit and tech_pool:
-            all_tech = np.concatenate(tech_pool, axis=0)
-            all_sent = np.concatenate(sent_pool, axis=0)
-            all_macro = np.concatenate(macro_pool, axis=0)
-            self.fit_scalers(all_tech, all_sent, all_macro)
+            self.fit_scalers(
+                np.concatenate(tech_pool),
+                np.concatenate(sent_pool),
+                np.concatenate(macro_pool)
+            )
 
-        features = {}
-        labels = {}
-
+        features, labels = {}, {}
         for symbol, data in raw.items():
             tech_s = self.tech_scaler.transform(data["tech"]) if self._fitted else data["tech"]
             sent_s = self.sent_scaler.transform(data["sent"]) if self._fitted else data["sent"]
             macro_s = self.macro_scaler.transform(data["macro"]) if self._fitted and data["macro"].shape[-1] > 0 else data["macro"]
 
-            # Take most recent windows
             features[symbol] = {
-                "tech": tech_s[-self.price_window:],
-                "sent": sent_s[-self.sentiment_window:],
-                "macro": macro_s[-self.macro_window:],
+                "tech":    tech_s[-self.price_window:],
+                "sent":    sent_s[-self.sentiment_window:],
+                "macro":   macro_s[-self.macro_window:],
                 "sym_idx": data["sym_idx"],
                 "sec_idx": data["sec_idx"],
             }
-
-            # Build label from future return
             close = data["close"]
             if len(close) > self.horizon:
                 future_ret = (close[-1] / close[-(self.horizon + 1)] - 1)
@@ -190,17 +267,12 @@ class FeatureBuilder:
         return features, labels
 
     def _label(self, ret: float) -> int:
-        """Convert return to 5-class label: 0=strong_sell, 1=sell, 2=hold, 3=buy, 4=strong_buy"""
-        if ret > self.r_hi:
-            return 4  # strong buy
-        elif ret > self.r_lo:
-            return 3  # buy
-        elif ret >= -self.r_lo:
-            return 2  # hold
-        elif ret >= -self.r_hi:
-            return 1  # sell
-        else:
-            return 0  # strong sell
+        """5-class label: 0=strong_sell … 4=strong_buy"""
+        if ret > self.r_hi:       return 4
+        elif ret > self.r_lo:     return 3
+        elif ret >= -self.r_lo:   return 2
+        elif ret >= -self.r_hi:   return 1
+        else:                     return 0
 
     def build_training_samples(
         self,
@@ -212,15 +284,16 @@ class FeatureBuilder:
         symbol_to_sector: Dict[str, int],
         date_range: pd.DatetimeIndex,
         fit_scalers: bool = False,
+        earnings_dates: Optional[Dict[str, List[str]]] = None,
     ) -> Tuple[List, List[int]]:
         """
-        Builds a flat list of (feature_dict, label) samples over all symbols
-        and all dates in date_range. This is the input to the PyTorch Dataset.
-        """
-        samples = []
-        label_list = []
+        Builds (feature_dict, label) samples over all symbols x all dates.
 
-        # Collect all raw arrays for scaler fitting
+        Scaler safety:
+          fit_scalers=True  -> fit ONLY on this date_range (training fold)
+          fit_scalers=False -> transform only (validation / inference)
+        """
+        samples, label_list = [], []
         tech_pool, sent_pool, macro_pool = [], [], []
         raw_data = {}
 
@@ -229,35 +302,49 @@ class FeatureBuilder:
                 continue
             df = bars[symbol].copy()
             df = add_technicals(df)
-            macro_aligned = macro_df.reindex(df.index).fillna(method="ffill").fillna(0)
+            df = _add_earnings_features(df, earnings_dates, symbol)
+            df = _add_correlation_features(df, symbol, bars, SECTOR_ETF_MAP)
+
+            # FIX: .ffill() instead of deprecated fillna(method='ffill')
+            macro_aligned = macro_df.reindex(df.index).ffill().fillna(0)
             sent_df = sentiment.get(symbol, pd.DataFrame()).reindex(df.index).fillna(0)
             sent_cols = [c for c in SENTIMENT_FEATURES if c in sent_df.columns]
 
-            tech_arr = df[[c for c in TECH_FEATURES if c in df.columns]].values
-            sent_arr = sent_df[sent_cols].values if sent_cols else np.zeros((len(df), len(SENTIMENT_FEATURES)))
-            macro_arr = macro_aligned[[c for c in MACRO_FEATURES if c in macro_aligned.columns]].values
+            tech_arr = df[[c for c in TECH_FEATURES if c in df.columns]].values.astype(np.float32)
+            sent_arr = (sent_df[sent_cols].values if sent_cols
+                        else np.zeros((len(df), len(SENTIMENT_FEATURES)), dtype=np.float32))
+            macro_arr = macro_aligned[[c for c in MACRO_FEATURES
+                                        if c in macro_aligned.columns]].values.astype(np.float32)
 
+            # For scaler fitting: only collect rows that fall in date_range (training data)
+            date_mask = pd.Series(df.index).isin(date_range).values
             raw_data[symbol] = {
                 "tech": tech_arr, "sent": sent_arr, "macro": macro_arr,
                 "dates": df.index, "close": df["close"].values,
                 "sym_idx": symbol_to_idx.get(symbol, 0),
                 "sec_idx": symbol_to_sector.get(symbol, 0),
+                "date_mask": date_mask,
             }
-            tech_pool.append(tech_arr)
-            sent_pool.append(sent_arr)
-            macro_pool.append(macro_arr)
+
+            if fit_scalers:
+                # Only pool training-fold rows for scaler fitting
+                tech_pool.append(tech_arr[date_mask])
+                sent_pool.append(sent_arr[date_mask])
+                macro_pool.append(macro_arr[date_mask])
 
         if fit_scalers and tech_pool:
+            # Scalers fitted strictly on training data - no leakage
             self.fit_scalers(
-                np.concatenate(tech_pool),
-                np.concatenate(sent_pool),
-                np.concatenate(macro_pool)
+                np.concatenate([t for t in tech_pool if len(t) > 0]),
+                np.concatenate([s for s in sent_pool if len(s) > 0]),
+                np.concatenate([m for m in macro_pool if len(m) > 0]),
             )
 
         for symbol, data in raw_data.items():
             dates = data["dates"]
             close = data["close"]
 
+            # transform() only - never fit on val data
             tech_s = self.tech_scaler.transform(data["tech"]) if self._fitted else data["tech"]
             sent_s = self.sent_scaler.transform(data["sent"]) if self._fitted else data["sent"]
             macro_s = self.macro_scaler.transform(data["macro"]) if self._fitted else data["macro"]
@@ -274,9 +361,9 @@ class FeatureBuilder:
                 label = self._label(future_ret)
 
                 sample = {
-                    "tech": tech_s[i - self.price_window:i].astype(np.float32),
-                    "sent": sent_s[i - self.sentiment_window:i].astype(np.float32),
-                    "macro": macro_s[i - self.macro_window:i].astype(np.float32),
+                    "tech":    tech_s[i - self.price_window:i].astype(np.float32),
+                    "sent":    sent_s[i - self.sentiment_window:i].astype(np.float32),
+                    "macro":   macro_s[i - self.macro_window:i].astype(np.float32),
                     "sym_idx": data["sym_idx"],
                     "sec_idx": data["sec_idx"],
                 }

@@ -6,6 +6,7 @@ Currently implemented:
   - Sector relative strength vs SPY
   - Dollar index proxy (UUP ETF)
   - Earnings calendar via yfinance
+  - Inter-symbol correlation helpers
 
 All are optional and gracefully disabled if data unavailable.
 """
@@ -34,15 +35,15 @@ class AltDataBuilder:
         Columns:
             vix_level         - VIXY close (VIX proxy)
             vix_change_1d     - 1d change in vix
-            vix_regime        - high/med/low (based on rolling percentile)
+            vix_regime_pct    - rolling 60d percentile rank of VIX
             yield_proxy       - TLT close (long bond price, inverse of rates)
             yield_change_5d   - 5d change in TLT
-            yield_curve_slope - TLT / IEI ratio (proxy for 10Y-2Y spread)
             spy_return_1d     - SPY 1d return
             spy_return_5d     - SPY 5d return
             spy_vol_20d       - SPY 20d rolling vol
             spy_trend         - SPY 50d vs 200d SMA ratio (>1 = bull trend)
-            uup_return_5d     - USD ETF 5d return (dollar strength proxy)
+            oil_return_5d     - USO 5d return
+            gold_return_5d    - GLD 5d return
         """
         frames = []
 
@@ -63,7 +64,7 @@ class AltDataBuilder:
             df_vix = pd.DataFrame({
                 "vix_level": vixy["close"],
                 "vix_change_1d": vixy["close"].pct_change(),
-                "vix_regime_pct": vix_pct,  # 0-1 rolling percentile
+                "vix_regime_pct": vix_pct,
             }, index=vixy.index)
             frames.append(df_vix)
 
@@ -77,24 +78,23 @@ class AltDataBuilder:
 
         uso = bars.get("USO")
         if uso is not None:
-            df_uso = pd.DataFrame({
-                "oil_return_5d": uso["close"].pct_change(5),
-            }, index=uso.index)
-            frames.append(df_uso)
+            frames.append(pd.DataFrame(
+                {"oil_return_5d": uso["close"].pct_change(5)}, index=uso.index
+            ))
 
         gld = bars.get("GLD")
         if gld is not None:
-            df_gld = pd.DataFrame({
-                "gold_return_5d": gld["close"].pct_change(5),
-            }, index=gld.index)
-            frames.append(df_gld)
+            frames.append(pd.DataFrame(
+                {"gold_return_5d": gld["close"].pct_change(5)}, index=gld.index
+            ))
 
         if not frames:
             logger.warning("No macro data available - alt features will be empty")
             return pd.DataFrame()
 
         macro = pd.concat(frames, axis=1).sort_index()
-        macro = macro.fillna(method="ffill").fillna(0)
+        # FIX: use .ffill() not deprecated fillna(method='ffill')
+        macro = macro.ffill().fillna(0)
         return macro
 
     def build_sector_strength(self, bars: Dict[str, pd.DataFrame]) -> pd.DataFrame:
@@ -124,8 +124,10 @@ class AltDataBuilder:
 
     def get_earnings_dates(self, symbols: list) -> Dict[str, list]:
         """
-        Returns {symbol: [list of upcoming earnings dates]} using yfinance.
-        Used by execution module to avoid holding through earnings.
+        Returns {symbol: [list of upcoming earnings date strings]} using yfinance.
+        Used by:
+          - execution.py: to skip entries and exit positions before earnings
+          - feature_builder.py: to add days_to_earnings and earnings_flag features
         """
         try:
             import yfinance as yf
@@ -141,7 +143,8 @@ class AltDataBuilder:
                 if cal is not None and "Earnings Date" in cal.index:
                     dates = cal.loc["Earnings Date"]
                     if isinstance(dates, pd.Series):
-                        earnings[sym] = [d.strftime("%Y-%m-%d") for d in dates]
+                        earnings[sym] = [d.strftime("%Y-%m-%d") for d in dates
+                                         if hasattr(d, "strftime")]
                     else:
                         earnings[sym] = [str(dates)]
                 else:
@@ -149,4 +152,7 @@ class AltDataBuilder:
             except Exception as e:
                 logger.debug(f"Earnings fetch failed for {sym}: {e}")
                 earnings[sym] = []
+
+        n_with_dates = sum(1 for v in earnings.values() if v)
+        logger.info(f"Earnings calendar: {n_with_dates}/{len(symbols)} symbols have upcoming dates")
         return earnings
