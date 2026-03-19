@@ -1,23 +1,37 @@
 model:
-  type: "multi_branch"          # multi-input LSTM + Transformer + MLP
-  price_window: 40              # days of price/technical history
-  sentiment_window: 20          # days of sentiment history
-  macro_window: 20              # days of macro/index history
-  hidden_dim: 128
-  num_lstm_layers: 2
-  num_transformer_heads: 4
-  num_transformer_layers: 2
-  dropout: 0.3                  # used for MC Dropout at inference too
+  type: "multi_branch"
+
+  # time-series branches
+  price_window: 40
+  sentiment_window: 20
+  macro_window: 20
+
+  # architecture
+  price_hidden: 128
+  price_lstm_layers: 2
+  sentiment_hidden: 64
+  sentiment_lstm_layers: 1
+  macro_hidden: 64
+  fusion_hidden: 256
+  fusion_layers: 3
+  dropout: 0.3
+
+  # company embedding
   company_embedding_dim: 16
   sector_embedding_dim: 8
-  macro_hidden_dim: 64
-  mlp_hidden_dims: [256, 128, 64]
+
+  # attention
+  use_attention: true
+  num_attention_heads: 4
+
+  # output
+  num_classes: 5   # strong_sell, sell, hold, buy, strong_buy
 
 targets:
-  horizon_days: 3               # predict N-day forward return
-  r_hi: 0.03                    # threshold for strong buy/sell label
-  r_lo: 0.008                   # threshold for weak buy/sell label
-  num_classes: 5                # strong sell, sell, hold, buy, strong buy
+  horizon_days: 3
+  r_hi: 0.03      # threshold for strong buy/sell (3% move)
+  r_lo: 0.005     # threshold for weak buy/sell (0.5% move)
 
 uncertainty:
-  mc_dropout_samples: 50        # number of stochastic forward passes
+  mc_dropout_samples: 50
+  min_confidence: 0.55   # minimum pred probability to act

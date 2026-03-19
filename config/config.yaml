@@ -20,54 +20,54 @@ universe:
     - LLY
     - AVGO
     - JNJ
-    - PG
+    - WMT
     - MA
+    - PG
     - HD
     - MRK
     - COST
-    - ABBV
+    - ORCL
     - CVX
-    - CRM
     - BAC
+    - ABBV
+    - KO
     - PEP
     - ADBE
-    - ORCL
-    - AMD
-    - MCD
-    - NFLX
-    - KO
-    - TMO
     - CSCO
-    - ACN
-    - ABT
-    - INTC
-    - WMT
-    - DHR
-    - VZ
-    - TXN
-    - NEE
-    - PM
-    - RTX
-    - AMGN
-    - COP
-    - T
-    - HON
-    - UNP
+    - AMD
+    - NFLX
+    - CRM
+    - TMO
+    - MCD
     - QCOM
-    - BMY
+    - INTC
+    - DIS
+    - ABT
+    - INTU
+    - TXN
+    - GE
+    - AMGN
+    - HON
+    - SPGI
     - LOW
+    - GS
+    - IBM
+    - CAT
+    - AXP
+    - MS
+    - BLK
   benchmark: "SPY"
   sector_etfs:
-    - XLK
-    - XLF
-    - XLE
-    - XLY
-    - XLV
-    - XLI
-    - XLP
-    - XLU
-    - XLB
-    - XLRE
+    - "XLK"
+    - "XLF"
+    - "XLE"
+    - "XLY"
+    - "XLV"
+    - "XLI"
+    - "XLP"
+    - "XLB"
+    - "XLRE"
+    - "XLU"
 
 data:
   start_date: "2018-01-01"
@@ -77,8 +77,19 @@ data:
 
 news:
   enabled: true
-  max_articles_per_day: 20
-  lookback_days: 1460  # 4 years
+  max_articles_per_symbol_per_day: 20
+  lookback_days: 365
+
+macro:
+  enabled: true
+  symbols:
+    - "VIXY"    # VIX proxy ETF
+    - "TLT"     # 20yr treasury
+    - "SHY"     # 1-3yr treasury (spread = TLT-SHY)
+    - "GLD"     # gold
+    - "USO"     # crude oil
+    - "DXY"     # USD index via UUP
+    - "UUP"     # USD bullish ETF
 
 paths:
   raw_dir: "data/raw"
@@ -86,12 +97,14 @@ paths:
   models_dir: "data/models"
   scalers_dir: "data/scalers"
   logs_dir: "data/logs"
+  db_path: "data/performance.db"
 
 trading:
   live: false
   run_time: "15:45"
-  max_gross_exposure: 0.9
+  max_gross_exposure: 0.95
   max_single_position: 0.15
-  min_cash_buffer: 0.1
-  allow_short: true
-  earnings_blackout_days: 1
+  min_cash_buffer: 0.05
+  allow_short: false           # set true when ready
+  kelly_fraction: 0.25         # fractional Kelly multiplier
+  server_side_orders: true     # use bracket orders on Alpaca

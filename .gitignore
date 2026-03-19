@@ -1,0 +1,40 @@
+# secrets
+.env
+config/secrets.yaml
+
+# data (too large for git)
+data/raw/
+data/processed/
+data/scalers/
+data/logs/
+data/performance.db
+
+# keep model dir but not weights
+data/models/*.pt
+data/models/*.pth
+
+# python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# venv
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db

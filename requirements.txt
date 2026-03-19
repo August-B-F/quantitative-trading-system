@@ -1,0 +1,51 @@
+# core
+numpy>=1.24
+pandas>=2.0
+scikit-learn>=1.3
+scipy>=1.11
+joblib>=1.3
+pyyaml>=6.0
+python-dotenv>=1.0
+tqdm>=4.66
+
+# deep learning
+torch>=2.2
+torchvision>=0.17
+
+# NLP / sentiment
+transformers>=4.38
+torch-audio>=2.2
+sentencepiece>=0.1.99
+
+# trading
+alpaca-trade-api>=3.0
+alpaca-py>=0.20
+
+# data
+yfinance>=0.2.36
+pandas-market-calendars>=4.3
+
+# hyperparameter search
+optuna>=3.5
+
+# explainability
+shap>=0.44
+
+# backtesting
+vectorbt>=0.26
+
+# database
+sqlalchemy>=2.0
+
+# hidden markov model
+hmmlearn>=0.3
+
+# visualization
+matplotlib>=3.8
+seaborn>=0.13
+plotly>=5.20
+
+# utilities
+requests>=2.31
+pytz>=2024.1
+rich>=13.7
