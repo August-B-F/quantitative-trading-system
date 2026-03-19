@@ -1,219 +1,204 @@
-"""Fetch financial news from Alpaca News API and run FinBERT sentiment scoring."""
-import json
-import time
-from pathlib import Path
-from datetime import datetime, timedelta
+"""
+alpaca_news.py
 
-import torch
+Fetches news articles from the Alpaca News API for every symbol.
+Scores each article with FinBERT (loaded ONCE globally).
+Saves daily aggregated sentiment per symbol as Parquet.
+
+Fixes vs old bot:
+  - No Selenium / Tor — pure REST API
+  - FinBERT loaded once, not per company
+  - Scores full article content, not just title
+  - Sentiment momentum computed here
+"""
+
+import os
+import time
+from datetime import datetime, timedelta
+from typing import List, Optional
+
 import pandas as pd
+import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from alpaca.data.historical.news import NewsClient
 from alpaca.data.requests import NewsRequest
 
 from ultimate_trader.utils.logging import get_logger
-from ultimate_trader.utils.time_utils import today_str
+from ultimate_trader.utils.config_loader import Config
 
-log = get_logger(__name__)
+logger = get_logger("alpaca_news")
 
 FINBERT_MODEL = "ProsusAI/finbert"
-LABELS = ["positive", "negative", "neutral"]
 
 
-class NewsFetcher:
-    """Fetches + scores news. FinBERT is loaded ONCE and reused for all companies."""
+class FinBERTScorer:
+    """
+    Singleton-style FinBERT wrapper.
+    Load once, score many. Supports GPU if available.
+    """
+    _instance = None
 
-    def __init__(self, cfg: dict):
-        self.cfg = cfg
-        self.raw_dir = Path(cfg["paths"]["raw_dir"]) / "news"
-        self.raw_dir.mkdir(parents=True, exist_ok=True)
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance._loaded = False
+        return cls._instance
 
-        self.client = NewsClient(
-            api_key=cfg["alpaca"]["key_id"],
-            secret_key=cfg["alpaca"]["secret_key"]
-        )
-
-        # Load FinBERT once
-        log.info("Loading FinBERT model...")
+    def load(self):
+        if self._loaded:
+            return
+        logger.info("Loading FinBERT model...")
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.tokenizer = AutoTokenizer.from_pretrained(FINBERT_MODEL)
         self.model = AutoModelForSequenceClassification.from_pretrained(FINBERT_MODEL).to(self.device)
         self.model.eval()
-        log.info(f"FinBERT loaded on {self.device}")
+        self.labels = ["positive", "negative", "neutral"]
+        self._loaded = True
+        logger.info(f"FinBERT loaded on {self.device}")
 
-    def fetch_news(
-        self,
-        symbols: list[str],
-        start: str,
-        end: str | None = None,
-        save: bool = True
-    ) -> dict[str, list[dict]]:
-        """Fetch raw news articles for each symbol from Alpaca News API."""
-        end = end or today_str()
-        all_news: dict[str, list[dict]] = {sym: [] for sym in symbols}
-
-        log.info(f"Fetching news for {len(symbols)} symbols from {start} to {end}")
-
-        for symbol in symbols:
-            existing = self._load_raw_news(symbol)
-            request = NewsRequest(
-                symbols=[symbol],
-                start=start,
-                end=end,
-                limit=self.cfg["news"]["max_articles_per_day"] * 30
-            )
-            try:
-                news_items = self.client.get_news(request)
-                articles = []
-                for item in news_items.news:
-                    article = {
-                        "id": item.id,
-                        "date": item.created_at.strftime("%Y-%m-%d"),
-                        "title": item.headline or "",
-                        "summary": item.summary or "",
-                        "content": item.content or "",
-                        "source": item.source or "",
-                        "url": item.url or "",
-                        "sentiment_score": None,
-                        "sentiment_label": None,
-                        "p_positive": None,
-                        "p_negative": None,
-                        "p_neutral": None,
-                    }
-                    articles.append(article)
-
-                # Merge with existing (avoid re-scoring already processed)
-                existing_ids = {a["id"] for a in existing}
-                new_articles = [a for a in articles if a["id"] not in existing_ids]
-                all_articles = existing + new_articles
-
-                all_news[symbol] = all_articles
-                log.debug(f"{symbol}: {len(new_articles)} new articles fetched")
-
-            except Exception as e:
-                log.error(f"Failed to fetch news for {symbol}: {e}")
-                all_news[symbol] = existing
-
-            if save:
-                self._save_raw_news(symbol, all_news[symbol])
-
-        return all_news
-
-    def score_sentiment(self, all_news: dict[str, list[dict]], save: bool = True) -> dict[str, list[dict]]:
-        """Run FinBERT over headline+summary for each unscored article."""
-        for symbol, articles in all_news.items():
-            log.debug(f"Scoring sentiment for {symbol} ({len(articles)} articles)")
-            changed = False
-            for article in articles:
-                if article["sentiment_score"] is not None:
-                    continue  # Already scored
-
-                text = (article["title"] + " " + article["summary"]).strip()
-                if not text:
-                    article["sentiment_score"] = 0.0
-                    article["sentiment_label"] = "neutral"
-                    article["p_positive"] = 0.0
-                    article["p_negative"] = 0.0
-                    article["p_neutral"] = 1.0
-                    changed = True
-                    continue
-
-                # Truncate to 512 tokens max
-                text = text[:1024]
-                try:
-                    probs = self._run_finbert(text)
-                    article["p_positive"] = round(probs[0], 4)
-                    article["p_negative"] = round(probs[1], 4)
-                    article["p_neutral"] = round(probs[2], 4)
-                    article["sentiment_score"] = round(probs[0] - probs[1], 4)  # signed score
-                    article["sentiment_label"] = LABELS[int(probs.argmax())]
-                    changed = True
-                except Exception as e:
-                    log.warning(f"Sentiment scoring failed for article in {symbol}: {e}")
-                    article["sentiment_score"] = 0.0
-                    article["sentiment_label"] = "neutral"
-
-            if save and changed:
-                self._save_raw_news(symbol, articles)
-
-        return all_news
-
-    def build_daily_sentiment(
-        self, all_news: dict[str, list[dict]]
-    ) -> dict[str, pd.DataFrame]:
+    def score(self, text: str) -> dict:
         """
-        Aggregate per-day sentiment features per symbol.
-        Returns dict symbol -> DataFrame with columns:
-            date, sentiment_mean, sentiment_std, sentiment_momentum_3d,
-            sentiment_momentum_5d, article_count, p_positive_mean, p_negative_mean
+        Returns {positive, negative, neutral} probabilities and a scalar score:
+        score = P(positive) - P(negative), range [-1, 1]
         """
-        result = {}
-        for symbol, articles in all_news.items():
-            if not articles:
-                result[symbol] = pd.DataFrame()
-                continue
+        if not text or len(text.strip()) < 5:
+            return {"positive": 0.33, "negative": 0.33, "neutral": 0.34, "score": 0.0}
 
-            df = pd.DataFrame(articles)
-            df = df[df["sentiment_score"].notna()]
-            df["date"] = pd.to_datetime(df["date"])
+        # Truncate to model max
+        text = text[:2000]
+        tokens = self.tokenizer(
+            text, return_tensors="pt", truncation=True,
+            max_length=512, padding=True
+        ).to(self.device)
 
-            daily = df.groupby("date").agg(
-                sentiment_mean=("sentiment_score", "mean"),
-                sentiment_std=("sentiment_score", "std"),
-                article_count=("sentiment_score", "count"),
-                p_positive_mean=("p_positive", "mean"),
-                p_negative_mean=("p_negative", "mean")
-            ).reset_index()
+        with torch.no_grad():
+            logits = self.model(**tokens).logits
+            probs = torch.softmax(logits, dim=-1).squeeze().cpu().tolist()
 
-            daily = daily.sort_values("date").set_index("date")
-            daily["sentiment_std"] = daily["sentiment_std"].fillna(0)
-
-            # Sentiment momentum: change from N days ago
-            daily["sentiment_momentum_3d"] = daily["sentiment_mean"].diff(3)
-            daily["sentiment_momentum_5d"] = daily["sentiment_mean"].diff(5)
-            daily["news_volume_anomaly"] = (
-                daily["article_count"] / daily["article_count"].rolling(20, min_periods=1).mean()
-            )
-
-            result[symbol] = daily
-
+        result = dict(zip(self.labels, probs))
+        result["score"] = result["positive"] - result["negative"]
         return result
 
-    def fetch_and_score_all(
-        self,
-        symbols: list[str],
-        start: str,
-        end: str | None = None
-    ) -> dict[str, pd.DataFrame]:
-        """Full pipeline: fetch -> score -> aggregate. Returns daily sentiment DataFrames."""
-        raw = self.fetch_news(symbols, start, end)
-        scored = self.score_sentiment(raw)
-        return self.build_daily_sentiment(scored)
+    def score_batch(self, texts: List[str]) -> List[dict]:
+        return [self.score(t) for t in texts]
 
-    # ------------------------------------------------------------------ internal
 
-    @torch.no_grad()
-    def _run_finbert(self, text: str) -> torch.Tensor:
-        inputs = self.tokenizer(
-            text,
-            return_tensors="pt",
-            truncation=True,
-            max_length=512,
-            padding=True
-        ).to(self.device)
-        logits = self.model(**inputs).logits
-        return torch.softmax(logits, dim=-1).squeeze().cpu()
+# Global singleton
+finbert = FinBERTScorer()
 
-    def _raw_news_path(self, symbol: str) -> Path:
-        return self.raw_dir / f"{symbol}.json"
 
-    def _load_raw_news(self, symbol: str) -> list[dict]:
-        path = self._raw_news_path(symbol)
-        if not path.exists():
-            return []
-        with open(path) as f:
-            return json.load(f)
+class NewsFetcher:
+    """
+    Fetches and scores news for all symbols via Alpaca News API.
+    Output: data/raw/news_{SYMBOL}.parquet
+      Columns: date, num_articles, avg_score, score_std, pos_ratio, neg_ratio,
+               sentiment_momentum_3d, sentiment_momentum_5d
+    """
 
-    def _save_raw_news(self, symbol: str, articles: list[dict]) -> None:
-        path = self._raw_news_path(symbol)
-        with open(path, "w") as f:
-            json.dump(articles, f, indent=2, default=str)
+    def __init__(self, cfg: Config):
+        self.cfg = cfg
+        self.client = NewsClient(
+            api_key=cfg.alpaca.key_id,
+            secret_key=cfg.alpaca.secret_key,
+        )
+        self.raw_dir = cfg.paths.raw_dir
+        os.makedirs(self.raw_dir, exist_ok=True)
+        finbert.load()  # load once here
+
+    def fetch_all(self, symbols: List[str], start: str, end: Optional[str] = None) -> None:
+        end = end or datetime.today().strftime("%Y-%m-%d")
+        for sym in symbols:
+            try:
+                self._fetch_symbol(sym, start, end)
+            except Exception as e:
+                logger.error(f"News fetch failed for {sym}: {e}")
+
+    def get_sentiment(self, symbol: str) -> pd.DataFrame:
+        path = self._news_path(symbol)
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"No news data for {symbol}. Run fetch_all first.")
+        df = pd.read_parquet(path)
+        df.index = pd.to_datetime(df.index)
+        return df.sort_index()
+
+    # ------------------------------------------------------------------
+
+    def _fetch_symbol(self, symbol: str, start: str, end: str) -> None:
+        path = self._news_path(symbol)
+        existing = None
+        fetch_start = start
+
+        if os.path.exists(path):
+            existing = pd.read_parquet(path)
+            existing.index = pd.to_datetime(existing.index)
+            last_date = existing.index.max()
+            fetch_start = (last_date + timedelta(days=1)).strftime("%Y-%m-%d")
+            if fetch_start > end:
+                logger.debug(f"{symbol} news: already up to date.")
+                return
+
+        logger.info(f"Fetching news for {symbol} from {fetch_start} to {end}")
+
+        req = NewsRequest(
+            symbols=[symbol],
+            start=datetime.strptime(fetch_start, "%Y-%m-%d"),
+            end=datetime.strptime(end, "%Y-%m-%d"),
+            limit=self.cfg.news.max_articles_per_day * 200,
+            include_content=True,
+        )
+        news_items = self.client.get_news(req)
+        articles = news_items.news if hasattr(news_items, 'news') else list(news_items)
+
+        if not articles:
+            logger.warning(f"{symbol}: no news articles found.")
+            return
+
+        # Score all articles
+        rows = []
+        for article in articles:
+            pub_date = article.created_at.strftime("%Y-%m-%d") if article.created_at else None
+            if not pub_date:
+                continue
+
+            # Prefer content > summary > headline
+            text = article.content or article.summary or article.headline or ""
+            scored = finbert.score(text)
+
+            rows.append({
+                "date": pub_date,
+                "positive": scored["positive"],
+                "negative": scored["negative"],
+                "neutral": scored["neutral"],
+                "score": scored["score"],
+            })
+
+        if not rows:
+            return
+
+        df_raw = pd.DataFrame(rows)
+        df_raw["date"] = pd.to_datetime(df_raw["date"])
+
+        # Aggregate to daily
+        daily = df_raw.groupby("date").agg(
+            num_articles=("score", "count"),
+            avg_score=("score", "mean"),
+            score_std=("score", "std"),
+            pos_ratio=("positive", "mean"),
+            neg_ratio=("negative", "mean"),
+        ).fillna(0)
+
+        # Sentiment momentum (change in avg_score)
+        daily["sentiment_momentum_3d"] = daily["avg_score"].diff(3)
+        daily["sentiment_momentum_5d"] = daily["avg_score"].diff(5)
+
+        if existing is not None:
+            daily = pd.concat([existing, daily])
+            daily = daily[~daily.index.duplicated(keep="last")]
+
+        daily.sort_index(inplace=True)
+        daily.to_parquet(path)
+        logger.info(f"{symbol} news: saved {len(daily)} daily rows.")
+        time.sleep(0.1)
+
+    def _news_path(self, symbol: str) -> str:
+        return os.path.join(self.raw_dir, f"news_{symbol}.parquet")
