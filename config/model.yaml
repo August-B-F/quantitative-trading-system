@@ -1,31 +1,22 @@
 model:
   type: "lstm_transformer"
-
-  # time series branches
   price_window: 40
   sentiment_window: 20
   macro_window: 20
-
-  # architecture
-  price_hidden_dim: 128
-  sentiment_hidden_dim: 64
-  macro_hidden_dim: 64
-  fusion_hidden_dim: 256
-  num_lstm_layers: 2
+  hidden_dim: 128
+  num_layers: 2
   num_attention_heads: 4
   dropout: 0.3
-
-  # company embedding
   company_embedding_dim: 16
   sector_embedding_dim: 8
-
-  # output classes: strong_sell, sell, hold, buy, strong_buy
-  num_classes: 5
+  macro_hidden_dim: 64
+  fusion_hidden_dim: 256
 
 targets:
   horizon_days: 3
-  r_hi: 0.03       # threshold for strong buy/sell
-  r_lo: 0.005      # threshold for weak buy/sell vs hold
+  r_hi: 0.03
+  r_lo: 0.005
+  # Labels: 4=strong_buy, 3=weak_buy, 2=hold, 1=weak_sell, 0=strong_sell
 
 uncertainty:
   mc_dropout_samples: 50

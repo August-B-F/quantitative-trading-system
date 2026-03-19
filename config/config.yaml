@@ -1,6 +1,6 @@
 alpaca:
-  key_id: "${ALPACA_KEY}"
-  secret_key: "${ALPACA_SECRET}"
+  key_id: "YOUR_ALPACA_KEY"
+  secret_key: "YOUR_ALPACA_SECRET"
   base_url: "https://paper-api.alpaca.markets"
   data_base_url: "https://data.alpaca.markets"
 
@@ -9,7 +9,7 @@ universe:
     - AAPL
     - MSFT
     - AMZN
-    - GOOGL
+    - GOOG
     - META
     - NVDA
     - TSLA
@@ -21,54 +21,52 @@ universe:
     - JNJ
     - UNH
     - PFE
-    - ABBV
-    - HD
-    - MCD
-    - NKE
-    - DIS
-    - NFLX
-    - ADBE
-    - CRM
-    - AMD
-    - INTC
-    - QCOM
-    - TXN
-    - AVGO
-    - MU
-    - AMAT
-    - BA
-    - CAT
-    - GE
-    - MMM
-    - LMT
-    - KO
-    - PEP
     - WMT
     - COST
-    - TGT
-    - AMGN
-    - GILD
-    - MRNA
-    - BRK.B
+    - HD
     - V
     - MA
     - PYPL
-    - SQ
-    - COIN
-    - HOOD
+    - NFLX
+    - DIS
+    - CMCSA
+    - INTC
+    - AMD
+    - QCOM
+    - CRM
+    - ORCL
+    - IBM
+    - BA
+    - CAT
+    - DE
+    - GE
+    - MMM
+    - LMT
+    - RTX
+    - T
+    - VZ
+    - TMUS
+    - PG
+    - KO
+    - PEP
+    - MCD
+    - SBUX
+    - NKE
+    - AMGN
+    - GILD
+    - MRK
+    - LLY
   benchmark: "SPY"
   sector_etfs:
-    - XLK
-    - XLF
-    - XLE
-    - XLY
-    - XLV
-    - XLI
-    - XLB
-    - XLRE
-    - XLP
-    - XLU
-  vix_symbol: "VIXY"
+    - "XLK"
+    - "XLF"
+    - "XLE"
+    - "XLY"
+    - "XLV"
+    - "XLI"
+    - "XLP"
+    - "XLU"
+    - "XLRE"
 
 data:
   start_date: "2018-01-01"
@@ -79,7 +77,7 @@ data:
 news:
   enabled: true
   max_articles_per_day: 30
-  lookback_days: 730
+  lookback_days: 365
 
 paths:
   raw_dir: "data/raw"
@@ -92,10 +90,8 @@ paths:
 trading:
   live: false
   run_time: "15:45"
-  max_gross_exposure: 0.95
+  max_gross_exposure: 1.0
   max_single_position: 0.15
   min_cash_buffer: 0.05
   allow_short: true
-  max_short_exposure: 0.3
-  kelly_fraction: 0.3
-  bracket_orders: true
+  earnings_buffer_days: 1
