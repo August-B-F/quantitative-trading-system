@@ -1,207 +1,177 @@
-"""Trade execution with bracket orders, Kelly sizing, and regime-aware filters.
-
-Key design principles:
-  - Server-side bracket orders (stop loss + take profit on Alpaca servers)
-    so limits fire even when the bot is not running.
-  - Fractional Kelly position sizing based on model confidence.
-  - Earnings blackout: never enter a new position within N days of earnings.
-  - Both long AND short supported.
-  - All executions logged to structured logs.
-"""
-import datetime
-from typing import Optional
-from alpaca.trading.client import TradingClient
-from alpaca.trading.requests import MarketOrderRequest, LimitOrderRequest
-from alpaca.trading.enums import OrderSide, TimeInForce, OrderClass
-from alpaca.trading.requests import TakeProfitRequest, StopLossRequest
-
-from ultimate_trader.trading.portfolio import get_trading_client, get_account_info
+"""Order execution: translate model decisions into Alpaca bracket orders."""
+import time
+from typing import Dict, List
+from ultimate_trader.utils.logging import get_logger, PerformanceDB
+from ultimate_trader.trading.portfolio import Portfolio
 from ultimate_trader.trading.risk import (
-    apply_regime_filters,
-    check_earnings_blackout,
-    compute_kelly_sizes,
-    apply_exposure_limits,
+    compute_position_size, apply_regime_filters,
+    BULLISH_ACTIONS, BEARISH_ACTIONS, ACTION_NAMES, check_kill_switch
 )
-from ultimate_trader.utils.logging import get_logger
-from ultimate_trader.utils.config_loader import get_full_config
 
-logger = get_logger(__name__)
+log = get_logger(__name__)
 
 
-def run_trading_session(
-    predictions: dict,
-    current_portfolio: dict,
-    earnings_calendar: dict,
-    current_regime: int,
-    cfg: Optional[dict] = None,
-) -> dict:
+class TradeExecutor:
     """
-    Main trade execution function. Runs once per day.
-
-    Args:
-        predictions: dict of symbol -> {
-            pred_class: int (0-4),
-            confidence: float (0-1),
-            mean_probs: list of 5 floats,
-        }
-        current_portfolio: live positions dict from reconcile_portfolio()
-        earnings_calendar: dict of symbol -> list of earnings date strings
-        current_regime: integer regime (0=bull, 1=mixed, 2=bear)
-        cfg: full config dict
-
-    Returns:
-        dict summarising orders placed
+    Converts model predictions into live/paper trades on Alpaca.
+    Uses server-side bracket orders for stop-loss and take-profit.
     """
-    if cfg is None:
-        cfg = get_full_config()
 
-    client = get_trading_client(cfg)
-    account = get_account_info(cfg)
-    equity = account["equity"]
-    today = datetime.datetime.now().strftime("%Y-%m-%d")
+    def __init__(
+        self,
+        api,
+        portfolio: Portfolio,
+        db: PerformanceDB,
+        config: dict,
+    ):
+        self.api       = api
+        self.portfolio = portfolio
+        self.db        = db
+        self.cfg       = config
+        self._start_equity = None
 
-    trading_cfg = cfg["trading"]
-    blackout_days = trading_cfg.get("earnings_blackout_days", 1)
-    allow_short = trading_cfg.get("allow_short", True)
-    max_single = trading_cfg.get("max_single_position", 0.15)
+    def execute(
+        self,
+        predictions: Dict[str, dict],  # symbol -> {pred_class, confidence, uncertainty}
+        current_prices: Dict[str, float],
+        regime: str,
+        symbol_to_sector: Dict[str, int] = None,
+    ):
+        """
+        Main entry point. Runs full trade cycle:
+          1. Kill-switch check
+          2. Close positions that model now rates as sell/short
+          3. Apply regime filters to risk params
+          4. Open new positions for bullish signals with sufficient confidence
+        """
+        # reconcile portfolio first
+        self.portfolio.reconcile()
 
-    orders_placed = []
+        # set starting equity for kill switch on first call of day
+        if self._start_equity is None:
+            self._start_equity = self.portfolio.equity
 
-    # --- 1. Close positions that no longer have a buy/hold signal ---
-    for symbol, pos in current_portfolio.items():
-        pred = predictions.get(symbol, {})
-        pred_class = pred.get("pred_class", 2)
-        side = pos["side"]
+        # kill switch
+        if check_kill_switch(self.portfolio.equity, self._start_equity,
+                              self.cfg.get("max_daily_loss", 0.05)):
+            log.critical("Trading halted by kill switch.")
+            return
 
-        should_close = False
-        if side == "long" and pred_class in [0, 1]:  # Was long, now bearish
-            should_close = True
-        elif side == "short" and pred_class in [3, 4]:  # Was short, now bullish
-            should_close = True
-        elif pred.get("confidence", 1.0) < 0.3:  # Very uncertain
-            should_close = True
+        # regime-adjusted params
+        conf_thresh, kelly_mult, max_gross = apply_regime_filters(
+            predictions, regime,
+            base_confidence_threshold=self.cfg.get("confidence_threshold", 0.55),
+            base_kelly_multiplier=self.cfg.get("kelly_fraction", 0.25),
+            base_max_gross=self.cfg.get("max_gross_exposure", 0.95),
+        )
 
-        if should_close:
-            try:
-                client.close_position(symbol)
-                logger.info(f"Closed position in {symbol} (pred_class={pred_class}, side={side})")
-                orders_placed.append({"action": "close", "symbol": symbol})
-            except Exception as e:
-                logger.error(f"Failed to close {symbol}: {e}")
+        # 1. exit stale positions
+        self._exit_positions(predictions, current_prices, conf_thresh, regime)
 
-    # --- 2. Filter predictions to actionable signals ---
-    # Regime-adjusted confidence threshold
-    base_conf = cfg.get("hyperparam_search", {}).get("search_space", {}).get("confidence_threshold", [0.6])
-    conf_threshold = apply_regime_filters(base_conf if isinstance(base_conf, float) else 0.6, current_regime)
+        # 2. enter new positions
+        self._enter_positions(
+            predictions, current_prices,
+            conf_thresh, kelly_mult, max_gross, regime
+        )
 
-    candidates = []
-    for symbol, pred in predictions.items():
-        pred_class = pred.get("pred_class", 2)
-        confidence = pred.get("confidence", 0.0)
-        mean_probs = pred.get("mean_probs", [0.2] * 5)
+    def _exit_positions(self, predictions, current_prices, conf_thresh, regime):
+        """Close positions the model now rates as sell/strong_sell with high confidence."""
+        for symbol, position in list(self.portfolio.positions.items()):
+            pred = predictions.get(symbol)
+            if pred is None:
+                continue
+            pred_class  = int(pred["pred_class"])
+            confidence  = float(pred["confidence"])
 
-        if pred_class == 2:  # hold
-            continue
-        if confidence < conf_threshold:
-            continue
-        if check_earnings_blackout(symbol, today, earnings_calendar, blackout_days):
-            logger.info(f"{symbol}: skipped — earnings blackout")
-            continue
-        if not allow_short and pred_class in [0, 1]:
-            continue
+            if pred_class in BEARISH_ACTIONS and confidence > conf_thresh:
+                try:
+                    self.api.close_position(symbol)
+                    price = current_prices.get(symbol, 0.0)
+                    qty   = position["qty"]
+                    reason = f"model:{ACTION_NAMES[pred_class]} conf:{confidence:.2f} regime:{regime}"
+                    log.info(f"Closed {symbol}: {reason}")
+                    self.db.log_trade(symbol, "sell", qty, price, reason, confidence, regime)
+                except Exception as e:
+                    log.error(f"Failed to close {symbol}: {e}")
+                time.sleep(0.2)
 
-        side = "buy" if pred_class >= 3 else "sell"
-        # Edge estimate: expected value from probability distribution
-        # Classes: 0=-2r, 1=-r, 2=0, 3=r, 4=2r where r = r_hi
-        r = cfg["targets"]["r_hi"]
-        class_returns = [-2 * r, -r, 0, r, 2 * r]
-        expected_return = sum(p * ret for p, ret in zip(mean_probs, class_returns))
+    def _enter_positions(
+        self, predictions, current_prices,
+        conf_thresh, kelly_mult, max_gross, regime
+    ):
+        """Open new long positions for bullish signals above confidence threshold."""
+        # sort by confidence descending, enter highest conviction first
+        candidates = [
+            (sym, pred) for sym, pred in predictions.items()
+            if int(pred["pred_class"]) in BULLISH_ACTIONS
+            and float(pred["confidence"]) > conf_thresh
+            and sym not in self.portfolio.positions
+        ]
+        candidates.sort(key=lambda x: x[1]["confidence"], reverse=True)
 
-        candidates.append({
-            "symbol": symbol,
-            "side": side,
-            "confidence": confidence,
-            "expected_return": abs(expected_return),
-            "pred_class": pred_class,
-        })
+        for symbol, pred in candidates:
+            # check gross exposure
+            if self.portfolio.total_invested_fraction() >= max_gross:
+                log.info("Max gross exposure reached, stopping new entries.")
+                break
 
-    # Sort by expected return descending, take top N
-    max_positions = cfg.get("hyperparam_search", {}).get("search_space", {}).get("diversification", [8])
-    if isinstance(max_positions, list):
-        max_positions = 8
-    candidates = sorted(candidates, key=lambda x: x["expected_return"], reverse=True)[:max_positions]
-
-    # --- 3. Kelly sizing ---
-    candidates = compute_kelly_sizes(
-        candidates, equity, max_single, cfg.get("hyperparam_search", {}).get("search_space", {})
-    )
-
-    # --- 4. Exposure limit check ---
-    candidates = apply_exposure_limits(candidates, equity, trading_cfg)
-
-    # --- 5. Submit bracket orders ---
-    stop_loss_pct = 0.05   # These will be tuned by hyperparam search
-    take_profit_pct = 0.10
-
-    for trade in candidates:
-        symbol = trade["symbol"]
-        side = trade["side"]
-        dollar_amount = trade.get("dollar_amount", 0)
-
-        if dollar_amount < 1:
-            continue
-
-        try:
-            # Get current price from Alpaca
-            from alpaca.data.historical import StockHistoricalDataClient
-            from alpaca.data.requests import StockLatestTradeRequest
-            data_client = StockHistoricalDataClient(
-                api_key=cfg["alpaca"]["key_id"],
-                secret_key=cfg["alpaca"]["secret_key"],
-            )
-            latest = data_client.get_stock_latest_trade(StockLatestTradeRequest(symbol_or_symbols=symbol))
-            price = float(latest[symbol].price)
-            qty = round(dollar_amount / price, 4)
-
-            if qty < 0.01:
+            price = current_prices.get(symbol)
+            if not price or price <= 0:
                 continue
 
-            order_side = OrderSide.BUY if side == "buy" else OrderSide.SELL
+            confidence  = float(pred["confidence"])
+            uncertainty = float(pred["uncertainty"])
 
-            # Bracket: server-side stop loss and take profit
-            if side == "buy":
-                sl_price = round(price * (1 - stop_loss_pct), 4)
-                tp_price = round(price * (1 + take_profit_pct), 4)
-            else:  # short
-                sl_price = round(price * (1 + stop_loss_pct), 4)
-                tp_price = round(price * (1 - take_profit_pct), 4)
+            # skip high-uncertainty signals
+            if uncertainty > self.cfg.get("max_uncertainty", 1.5):
+                log.info(f"Skipping {symbol}: uncertainty too high ({uncertainty:.3f})")
+                continue
 
-            order_req = MarketOrderRequest(
-                symbol=symbol,
-                qty=qty,
-                side=order_side,
-                time_in_force=TimeInForce.DAY,
-                order_class=OrderClass.BRACKET,
-                stop_loss=StopLossRequest(stop_price=sl_price),
-                take_profit=TakeProfitRequest(limit_price=tp_price),
+            dollar_amount = compute_position_size(
+                equity=self.portfolio.equity,
+                win_probability=confidence,
+                current_position_fraction=self.portfolio.position_fraction(symbol),
+                max_single_position=self.cfg.get("max_single_position", 0.15),
+                kelly_multiplier=kelly_mult,
+                min_cash_buffer=self.cfg.get("min_cash_buffer", 0.05),
+                available_cash=self.portfolio.cash,
             )
 
-            order = client.submit_order(order_req)
-            logger.info(
-                f"Order submitted: {side.upper()} {qty} {symbol} @ ~${price:.2f} "
-                f"| SL=${sl_price} TP=${tp_price} | conf={trade['confidence']:.3f}"
-            )
-            orders_placed.append({
-                "action": side,
-                "symbol": symbol,
-                "qty": qty,
-                "price": price,
-                "confidence": trade["confidence"],
-                "order_id": str(order.id),
-            })
+            shares = round(dollar_amount / price, 2)
+            if shares < 1:
+                continue
 
-        except Exception as e:
-            logger.error(f"Order failed for {symbol}: {e}")
+            stop_price  = round(price * (1 - self.cfg.get("stop_loss", 0.07)), 2)
+            limit_price = round(price * (1 + self.cfg.get("take_profit", 0.12)), 2)
 
-    logger.info(f"Trading session complete. {len(orders_placed)} actions taken.")
-    return {"orders": orders_placed, "equity": equity}
+            try:
+                if self.cfg.get("server_side_orders", True):
+                    # server-side bracket order -- enforced by Alpaca 24/7
+                    self.api.submit_order(
+                        symbol=symbol,
+                        qty=shares,
+                        side="buy",
+                        type="market",
+                        time_in_force="day",
+                        order_class="bracket",
+                        stop_loss={"stop_price": stop_price},
+                        take_profit={"limit_price": limit_price},
+                    )
+                else:
+                    self.api.submit_order(
+                        symbol=symbol,
+                        qty=shares,
+                        side="buy",
+                        type="market",
+                        time_in_force="day",
+                    )
+
+                reason = (f"model:{ACTION_NAMES[int(pred['pred_class'])]} "
+                          f"conf:{confidence:.2f} uncert:{uncertainty:.3f} regime:{regime}")
+                log.info(f"Bought {shares} {symbol} @ ~${price:.2f} | {reason}")
+                self.db.log_trade(symbol, "buy", shares, price, reason, confidence, regime)
+
+            except Exception as e:
+                log.error(f"Order failed for {symbol}: {e}")
+
+            time.sleep(0.3)

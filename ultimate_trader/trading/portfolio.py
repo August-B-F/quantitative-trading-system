@@ -1,88 +1,94 @@
-"""Portfolio state management.
-
-Alpaca is ALWAYS the source of truth.  Local state is a cache synced at
-the start of every run.  Never trust local JSON over live API positions.
-"""
+"""Portfolio state management. Alpaca is always source of truth."""
 import json
 from pathlib import Path
-from typing import Optional
-from alpaca.trading.client import TradingClient
-from alpaca.trading.requests import GetAssetsRequest
+from typing import Dict
+from ultimate_trader.utils.logging import get_logger, PerformanceDB
 
-from ultimate_trader.utils.logging import get_logger
-from ultimate_trader.utils.config_loader import get_full_config
-
-logger = get_logger(__name__)
-_PORTFOLIO_CACHE = Path("data/portfolio.json")
+log = get_logger(__name__)
 
 
-def get_trading_client(cfg: Optional[dict] = None) -> TradingClient:
-    if cfg is None:
-        cfg = get_full_config()
-    return TradingClient(
-        api_key=cfg["alpaca"]["key_id"],
-        secret_key=cfg["alpaca"]["secret_key"],
-        paper=not cfg["trading"]["live"],
-    )
-
-
-def reconcile_portfolio(cfg: Optional[dict] = None) -> dict:
+class Portfolio:
     """
-    Fetch live positions from Alpaca and reconcile with local cache.
-    Alpaca is source of truth — overwrites local state.
-
-    Returns:
-        dict of symbol -> {
-            qty: float,
-            avg_entry_price: float,
-            side: 'long' | 'short',
-            market_value: float,
-            unrealized_pl: float,
-        }
+    Manages portfolio state by reconciling with Alpaca live positions.
+    Local state is only a cache and supplementary metadata store.
     """
-    client = get_trading_client(cfg)
-    positions = {}
-    try:
-        for pos in client.get_all_positions():
-            positions[pos.symbol] = {
-                "qty": float(pos.qty),
-                "avg_entry_price": float(pos.avg_entry_price),
-                "side": pos.side.value,
-                "market_value": float(pos.market_value),
-                "unrealized_pl": float(pos.unrealized_pl),
+
+    def __init__(self, api, db: PerformanceDB, cache_path: str = "data/portfolio.json"):
+        """
+        api: alpaca REST client
+        db:  PerformanceDB instance for logging
+        """
+        self.api = api
+        self.db = db
+        self.cache_path = Path(cache_path)
+        self.positions: Dict[str, dict] = {}
+        self.cash: float = 0.0
+        self.equity: float = 0.0
+
+    def reconcile(self):
+        """
+        Fetch live positions and account from Alpaca.
+        This MUST be called at the start of every trading run.
+        Alpaca is always authoritative. Local cache is overwritten.
+        """
+        try:
+            account = self.api.get_account()
+            self.cash   = float(account.cash)
+            self.equity = float(account.equity)
+
+            live_positions = self.api.list_positions()
+            self.positions = {
+                p.symbol: {
+                    "qty":         float(p.qty),
+                    "avg_price":   float(p.avg_entry_price),
+                    "market_val":  float(p.market_value),
+                    "side":        p.side,
+                }
+                for p in live_positions
             }
-        logger.info(f"Reconciled {len(positions)} live positions from Alpaca")
-    except Exception as e:
-        logger.error(f"Failed to fetch live positions: {e}")
+            self._save_cache()
+            log.info(f"Portfolio reconciled: {len(self.positions)} positions, "
+                     f"cash=${self.cash:,.0f}, equity=${self.equity:,.0f}")
+            self.db.log_equity(self.equity, self.cash, len(self.positions))
+        except Exception as e:
+            log.error(f"Portfolio reconciliation failed: {e}")
+            self._load_cache()
 
-    # Persist reconciled state
-    _PORTFOLIO_CACHE.parent.mkdir(parents=True, exist_ok=True)
-    with open(_PORTFOLIO_CACHE, "w") as f:
-        json.dump(positions, f, indent=2)
+    def get_position_value(self, symbol: str) -> float:
+        """Return current market value of a position, or 0."""
+        return self.positions.get(symbol, {}).get("market_val", 0.0)
 
-    return positions
+    def get_position_qty(self, symbol: str) -> float:
+        """Return current quantity held for a symbol."""
+        return self.positions.get(symbol, {}).get("qty", 0.0)
 
+    def position_fraction(self, symbol: str) -> float:
+        """Return position size as fraction of total equity."""
+        if self.equity == 0:
+            return 0.0
+        return self.get_position_value(symbol) / self.equity
 
-def get_account_info(cfg: Optional[dict] = None) -> dict:
-    """
-    Fetch account cash, equity, and buying power from Alpaca.
+    def total_invested_fraction(self) -> float:
+        """Fraction of equity currently in positions."""
+        if self.equity == 0:
+            return 0.0
+        total_val = sum(p["market_val"] for p in self.positions.values())
+        return total_val / self.equity
 
-    Returns:
-        dict with keys: cash, equity, buying_power, portfolio_value
-    """
-    client = get_trading_client(cfg)
-    account = client.get_account()
-    return {
-        "cash": float(account.cash),
-        "equity": float(account.equity),
-        "buying_power": float(account.buying_power),
-        "portfolio_value": float(account.portfolio_value),
-    }
+    def _save_cache(self):
+        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self.cache_path, "w") as f:
+            json.dump({
+                "positions": self.positions,
+                "cash": self.cash,
+                "equity": self.equity,
+            }, f, indent=2)
 
-
-def load_local_portfolio() -> dict:
-    """Load last-saved local portfolio cache (use reconcile_portfolio for live runs)."""
-    if _PORTFOLIO_CACHE.exists():
-        with open(_PORTFOLIO_CACHE) as f:
-            return json.load(f)
-    return {}
+    def _load_cache(self):
+        if self.cache_path.exists():
+            with open(self.cache_path) as f:
+                data = json.load(f)
+            self.positions = data.get("positions", {})
+            self.cash      = data.get("cash", 0.0)
+            self.equity    = data.get("equity", 0.0)
+            log.warning("Using cached portfolio (Alpaca reconciliation failed)")

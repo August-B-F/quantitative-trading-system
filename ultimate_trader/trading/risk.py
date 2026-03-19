@@ -1,168 +1,99 @@
-"""Risk management: Kelly sizing, exposure limits, regime filters, earnings blackout."""
-import datetime
+"""Risk management: position sizing, exposure limits, kill-switch."""
 import numpy as np
 from typing import Optional
-
 from ultimate_trader.utils.logging import get_logger
+from ultimate_trader.features.regimes import get_regime_overrides
 
-logger = get_logger(__name__)
+log = get_logger(__name__)
 
-
-def apply_regime_filters(
-    base_confidence_threshold: float,
-    regime: int,
-) -> float:
-    """
-    Adjust confidence threshold based on market regime.
-
-    Regime 0 (bull): relax threshold slightly, we trust signals more
-    Regime 1 (mixed): use base threshold
-    Regime 2 (bear/crash): tighten threshold significantly
-
-    Args:
-        base_confidence_threshold: threshold from config / hyperparam search
-        regime: integer 0, 1, or 2
-
-    Returns:
-        Adjusted confidence threshold
-    """
-    adjustments = {0: -0.05, 1: 0.0, 2: +0.15}
-    adjusted = base_confidence_threshold + adjustments.get(regime, 0.0)
-    return float(np.clip(adjusted, 0.3, 0.99))
-
-
-def check_earnings_blackout(
-    symbol: str,
-    today: str,
-    earnings_calendar: dict,
-    blackout_days: int = 1,
-) -> bool:
-    """
-    Return True if today is within blackout_days of an earnings announcement.
-    Trading during earnings is high-risk; we skip new entries.
-
-    Args:
-        symbol: ticker string
-        today: current date as 'YYYY-MM-DD'
-        earnings_calendar: dict of symbol -> list of date strings
-        blackout_days: days before earnings to block trades
-
-    Returns:
-        True if in blackout period (skip trade), False if safe
-    """
-    dates = earnings_calendar.get(symbol, [])
-    today_dt = datetime.datetime.strptime(today, "%Y-%m-%d").date()
-    for d in dates:
-        try:
-            earnings_dt = datetime.datetime.strptime(d, "%Y-%m-%d").date()
-            delta = (earnings_dt - today_dt).days
-            if 0 <= delta <= blackout_days:
-                return True
-        except ValueError:
-            continue
-    return False
+# action index mappings (must match model output)
+ACTION_NAMES = {0: "strong_sell", 1: "sell", 2: "hold", 3: "buy", 4: "strong_buy"}
+BULLISH_ACTIONS  = {3, 4}
+BEARISH_ACTIONS  = {0, 1}
+NEUTRAL_ACTIONS  = {2}
 
 
 def kelly_fraction(
-    confidence: float,
-    expected_return: float,
-    kelly_multiplier: float = 0.25,
+    win_prob: float,
+    avg_win: float  = 0.03,
+    avg_loss: float = 0.015,
+    multiplier: float = 0.25,
 ) -> float:
     """
-    Fractional Kelly Criterion for position sizing.
-
-    Full Kelly f* = (p*b - q) / b where:
-        p = probability of win (confidence)
-        q = 1 - p
-        b = expected return if correct (expected_return)
-
-    We use fractional Kelly (default 0.25x) for robustness.
-
-    Args:
-        confidence: model confidence in [0, 1]
-        expected_return: expected return if prediction is correct
-        kelly_multiplier: fraction of full Kelly to use (0.25 = quarter-Kelly)
-
-    Returns:
-        Fraction of portfolio to allocate in [0, 1]
+    Fractional Kelly position sizing.
+    f* = (p * b - q) / b  where b = avg_win/avg_loss, q = 1-p
+    Clamped to [0, 1] then scaled by multiplier for safety.
     """
-    if expected_return <= 0:
+    if avg_loss == 0:
         return 0.0
-    p = confidence
-    q = 1.0 - p
-    b = expected_return
-    full_kelly = (p * b - q) / b
-    full_kelly = max(0.0, full_kelly)  # Can't be negative (would mean don't trade)
-    return min(kelly_multiplier * full_kelly, 0.4)  # Hard cap at 40% of equity per trade
+    b = avg_win / avg_loss
+    q = 1 - win_prob
+    f_star = (win_prob * b - q) / b
+    f_star = max(0.0, min(1.0, f_star))
+    return f_star * multiplier
 
 
-def compute_kelly_sizes(
-    candidates: list[dict],
+def compute_position_size(
     equity: float,
-    max_single_position: float,
-    search_space: dict,
-) -> list[dict]:
+    win_probability: float,
+    current_position_fraction: float,
+    max_single_position: float = 0.15,
+    kelly_multiplier: float    = 0.25,
+    min_cash_buffer: float     = 0.05,
+    available_cash: float      = None,
+    avg_win: float             = 0.03,
+    avg_loss: float            = 0.015,
+) -> float:
     """
-    Compute dollar amount for each candidate trade using fractional Kelly.
-
-    Args:
-        candidates: list of candidate trade dicts (must have 'confidence' and 'expected_return')
-        equity: total account equity
-        max_single_position: max fraction of equity per position
-        search_space: hyperparam search space dict (for kelly_fraction param)
-
-    Returns:
-        candidates with 'dollar_amount' field added
+    Compute target dollar allocation for a position.
+    Returns dollar amount to invest (may be 0 if limits exceeded).
     """
-    kelly_mult = search_space.get("kelly_fraction", [0.25])
-    if isinstance(kelly_mult, list):
-        kelly_mult = 0.25  # Default until hyperparams are tuned
+    kf = kelly_fraction(win_probability, avg_win, avg_loss, kelly_multiplier)
+    target_fraction = min(kf, max_single_position)
 
-    for trade in candidates:
-        frac = kelly_fraction(
-            confidence=trade["confidence"],
-            expected_return=trade["expected_return"],
-            kelly_multiplier=kelly_mult,
-        )
-        frac = min(frac, max_single_position)
-        trade["kelly_fraction"] = frac
-        trade["dollar_amount"] = frac * equity
+    # headroom after existing position
+    additional_fraction = max(0.0, target_fraction - current_position_fraction)
+    dollar_amount = additional_fraction * equity
 
-    return candidates
+    # respect cash buffer
+    if available_cash is not None:
+        max_spendable = available_cash - equity * min_cash_buffer
+        dollar_amount = min(dollar_amount, max(0.0, max_spendable))
+
+    return dollar_amount
 
 
-def apply_exposure_limits(
-    candidates: list[dict],
+def apply_regime_filters(
+    decisions: dict,
+    regime: str,
+    base_confidence_threshold: float,
+    base_kelly_multiplier: float,
+    base_max_gross: float,
+) -> tuple:
+    """
+    Scale trade parameters based on current market regime.
+    Returns (confidence_threshold, kelly_multiplier, max_gross_exposure).
+    """
+    overrides = get_regime_overrides(regime)
+    conf_thresh = max(base_confidence_threshold, overrides["confidence_threshold"])
+    kelly_mult  = base_kelly_multiplier * overrides["kelly_multiplier"]
+    max_gross   = min(base_max_gross, overrides["max_gross_exposure"])
+    log.info(f"Regime '{regime}': conf_thresh={conf_thresh:.2f}, "
+             f"kelly={kelly_mult:.2f}, max_gross={max_gross:.2f}")
+    return conf_thresh, kelly_mult, max_gross
+
+
+def check_kill_switch(
     equity: float,
-    trading_cfg: dict,
-) -> list[dict]:
+    start_equity: float,
+    max_daily_loss: float = 0.05,
+) -> bool:
     """
-    Ensure total gross exposure doesn't exceed config limits.
-    Trims candidate list from lowest-confidence trade first.
-
-    Args:
-        candidates: list of trade dicts with 'dollar_amount'
-        equity: total account equity
-        trading_cfg: trading section of config
-
-    Returns:
-        Trimmed candidates list that respects exposure limits
+    Returns True if trading should be halted (daily loss exceeded).
+    max_daily_loss: fraction of starting equity (default 5%).
     """
-    max_gross = trading_cfg.get("max_gross_exposure", 0.9) * equity
-    min_cash = trading_cfg.get("min_cash_buffer", 0.1) * equity
-    max_deployable = equity - min_cash
-
-    total = 0.0
-    allowed = []
-    for trade in sorted(candidates, key=lambda x: x["confidence"], reverse=True):
-        amount = trade["dollar_amount"]
-        if total + amount <= min(max_gross, max_deployable):
-            total += amount
-            allowed.append(trade)
-        else:
-            logger.info(
-                f"{trade['symbol']}: skipped — exposure limit reached "
-                f"(deployed=${total:.0f}, limit=${max_deployable:.0f})"
-            )
-
-    return allowed
+    loss = (start_equity - equity) / start_equity if start_equity > 0 else 0.0
+    if loss > max_daily_loss:
+        log.critical(f"KILL SWITCH TRIGGERED: daily loss {loss:.1%} > {max_daily_loss:.1%}")
+        return True
+    return False
