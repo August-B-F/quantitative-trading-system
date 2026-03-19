@@ -1,100 +1,73 @@
-"""Evaluation metrics for classification and trading performance."""
+"""Evaluation metrics for both ML and trading performance."""
 import numpy as np
 import pandas as pd
-from sklearn.metrics import classification_report, confusion_matrix
-from typing import Optional
+from typing import List
 
 
-def classification_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
+def accuracy(preds: np.ndarray, labels: np.ndarray) -> float:
+    return float((preds == labels).mean())
+
+
+def directional_accuracy(preds: np.ndarray, labels: np.ndarray) -> float:
     """
-    Compute precision, recall, F1 per class plus macro-average.
-
-    Returns:
-        dict with sklearn classification_report as a nested dict
+    Fraction of predictions where the direction (buy/sell/hold) matches.
+    Classes: 0=strong_sell,1=sell,2=hold,3=buy,4=strong_buy
+    Direction: <2 = bearish, 2 = neutral, >2 = bullish
     """
-    return classification_report(
-        y_true, y_pred,
-        target_names=["strong_sell", "sell", "hold", "buy", "strong_buy"],
-        output_dict=True,
-        zero_division=0,
-    )
+    pred_dir  = np.sign(preds  - 2)
+    label_dir = np.sign(labels - 2)
+    return float((pred_dir == label_dir).mean())
 
 
-def directional_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-    """
-    Fraction of samples where the model correctly predicted up vs down direction.
-    Ignores 'hold' class (2) predictions and labels.
-
-    Classes 0,1 = bearish; 3,4 = bullish.
-    """
-    mask = (y_true != 2) & (y_pred != 2)
-    if mask.sum() == 0:
-        return float('nan')
-    true_dir = (y_true[mask] >= 3).astype(int)
-    pred_dir = (y_pred[mask] >= 3).astype(int)
-    return (true_dir == pred_dir).mean()
-
-
-def compute_sharpe(
-    returns: np.ndarray,
-    risk_free_rate: float = 0.0,
-    annualise: bool = True,
-) -> float:
-    """
-    Annualised Sharpe ratio of a daily returns array.
-
-    Args:
-        returns: 1D array of daily portfolio returns
-        risk_free_rate: annualised risk-free rate
-        annualise: multiply by sqrt(252)
-
-    Returns:
-        Sharpe ratio (float)
-    """
-    if len(returns) == 0 or returns.std() == 0:
+def sharpe_ratio(returns: np.ndarray, risk_free: float = 0.0,
+                 periods_per_year: int = 252) -> float:
+    """Annualised Sharpe ratio from array of period returns."""
+    if len(returns) < 2:
         return 0.0
-    daily_rf = risk_free_rate / 252
-    excess = returns - daily_rf
-    ratio = excess.mean() / (excess.std() + 1e-9)
-    return ratio * np.sqrt(252) if annualise else ratio
+    excess = returns - risk_free / periods_per_year
+    std = np.std(excess, ddof=1)
+    if std == 0:
+        return 0.0
+    return float(np.mean(excess) / std * np.sqrt(periods_per_year))
 
 
-def compute_sortino(
-    returns: np.ndarray,
-    risk_free_rate: float = 0.0,
-    annualise: bool = True,
-) -> float:
-    """Sortino ratio using downside deviation only."""
-    daily_rf = risk_free_rate / 252
-    excess = returns - daily_rf
+def sortino_ratio(returns: np.ndarray, risk_free: float = 0.0,
+                  periods_per_year: int = 252) -> float:
+    """Annualised Sortino ratio (downside deviation only)."""
+    excess = returns - risk_free / periods_per_year
     downside = excess[excess < 0]
-    if len(downside) == 0:
-        return float('inf')
-    downside_std = np.sqrt((downside ** 2).mean())
-    ratio = excess.mean() / (downside_std + 1e-9)
-    return ratio * np.sqrt(252) if annualise else ratio
+    if len(downside) < 2:
+        return 0.0
+    downside_std = np.std(downside, ddof=1)
+    if downside_std == 0:
+        return 0.0
+    return float(np.mean(excess) / downside_std * np.sqrt(periods_per_year))
 
 
-def compute_max_drawdown(equity_curve: np.ndarray) -> float:
-    """
-    Maximum drawdown from an equity curve (starting at 1.0).
-
-    Returns:
-        Max drawdown as a positive fraction (e.g. 0.15 = 15% drawdown)
-    """
+def max_drawdown(equity_curve: np.ndarray) -> float:
+    """Maximum peak-to-trough drawdown as a fraction."""
     peak = np.maximum.accumulate(equity_curve)
-    drawdown = (equity_curve - peak) / (peak + 1e-9)
-    return float(-drawdown.min())
+    dd = (equity_curve - peak) / peak
+    return float(dd.min())
 
 
-def trading_metrics(daily_returns: np.ndarray) -> dict:
-    """Bundle all trading performance metrics into one dict."""
-    equity = np.cumprod(1 + daily_returns)
+def calmar_ratio(returns: np.ndarray, equity_curve: np.ndarray,
+                 periods_per_year: int = 252) -> float:
+    """Annualised return / max drawdown."""
+    ann_return = float(np.mean(returns) * periods_per_year)
+    mdd = abs(max_drawdown(equity_curve))
+    return ann_return / mdd if mdd > 0 else 0.0
+
+
+def trading_metrics(returns: np.ndarray) -> dict:
+    """Return a dict of all key trading metrics."""
+    equity = np.cumprod(1 + returns)
     return {
-        "total_return": float(equity[-1] - 1) if len(equity) > 0 else 0.0,
-        "sharpe": compute_sharpe(daily_returns),
-        "sortino": compute_sortino(daily_returns),
-        "max_drawdown": compute_max_drawdown(equity),
-        "win_rate": float((daily_returns > 0).mean()),
-        "n_days": len(daily_returns),
+        "sharpe":    sharpe_ratio(returns),
+        "sortino":   sortino_ratio(returns),
+        "max_dd":    max_drawdown(equity),
+        "calmar":    calmar_ratio(returns, equity),
+        "total_ret": float(equity[-1] - 1) if len(equity) > 0 else 0.0,
+        "win_rate":  float((returns > 0).mean()),
+        "n_trades":  len(returns),
     }

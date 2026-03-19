@@ -1,57 +1,52 @@
-"""Custom loss functions for training."""
+"""Custom loss functions."""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
 
 
-class WeightedFocalLoss(nn.Module):
+class LabelSmoothingCrossEntropy(nn.Module):
     """
-    Focal Loss with per-class weights.
-
-    Focal Loss down-weights easy examples and focuses training on hard,
-    misclassified examples.  Especially useful for imbalanced class distributions
-    (which is typical: most days are 'hold').
-
-    L_focal = -alpha_t * (1 - p_t)^gamma * log(p_t)
-
-    Args:
-        class_weights: 1D tensor of per-class weights (inverse frequency)
-        gamma: focusing parameter (0 = standard CE, 2 is typical)
+    Cross-entropy with label smoothing.
+    Smoothing prevents overconfident predictions.
     """
-
-    def __init__(self, class_weights: torch.Tensor = None, gamma: float = 2.0):
+    def __init__(self, smoothing: float = 0.05, num_classes: int = 5):
         super().__init__()
-        self.gamma = gamma
-        self.register_buffer("class_weights", class_weights)
+        self.smoothing = smoothing
+        self.num_classes = num_classes
 
     def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
-        # logits: (B, C), targets: (B,)
         log_probs = F.log_softmax(logits, dim=-1)
-        probs = log_probs.exp()
-        
-        # Gather p_t for true class
-        p_t = probs.gather(1, targets.unsqueeze(1)).squeeze(1)
-        log_p_t = log_probs.gather(1, targets.unsqueeze(1)).squeeze(1)
-
-        focal_weight = (1.0 - p_t) ** self.gamma
-
-        if self.class_weights is not None:
-            alpha_t = self.class_weights[targets]
-            loss = -alpha_t * focal_weight * log_p_t
-        else:
-            loss = -focal_weight * log_p_t
-
-        return loss.mean()
+        # smooth targets
+        with torch.no_grad():
+            smooth_targets = torch.full_like(log_probs, self.smoothing / (self.num_classes - 1))
+            smooth_targets.scatter_(1, targets.unsqueeze(1), 1.0 - self.smoothing)
+        loss = -(smooth_targets * log_probs).sum(dim=-1).mean()
+        return loss
 
 
-def compute_class_weights(labels: np.ndarray, num_classes: int = 5) -> torch.Tensor:
+class WeightedDirectionalLoss(nn.Module):
     """
-    Compute inverse-frequency class weights from label array.
-    Returns a FloatTensor of shape (num_classes,).
+    Cross-entropy that penalises directional mistakes more than magnitude mistakes.
+    e.g. predicting strong_buy when actual is strong_sell is penalised heavily.
+    Classes assumed: 0=strong_sell, 1=sell, 2=hold, 3=buy, 4=strong_buy
     """
-    counts = np.bincount(labels, minlength=num_classes).astype(np.float32)
-    counts = np.where(counts == 0, 1, counts)  # avoid div by zero
-    weights = 1.0 / counts
-    weights = weights / weights.sum() * num_classes  # normalise to sum = num_classes
-    return torch.tensor(weights, dtype=torch.float32)
+    def __init__(self, num_classes: int = 5, smoothing: float = 0.05):
+        super().__init__()
+        self.num_classes = num_classes
+        self.smoothing = smoothing
+        # directional penalty matrix: penalty[pred][true]
+        penalty = torch.zeros(num_classes, num_classes)
+        for i in range(num_classes):
+            for j in range(num_classes):
+                penalty[i][j] = abs(i - j) ** 1.5
+        self.register_buffer("penalty", penalty)
+
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        log_probs = F.log_softmax(logits, dim=-1)
+        # weighted NLL
+        target_penalties = self.penalty[targets]  # (B, C)
+        with torch.no_grad():
+            smooth_targets = torch.full_like(log_probs, self.smoothing / (self.num_classes - 1))
+            smooth_targets.scatter_(1, targets.unsqueeze(1), 1.0 - self.smoothing)
+        loss = -(smooth_targets * log_probs * (1 + target_penalties * 0.1)).sum(dim=-1).mean()
+        return loss
