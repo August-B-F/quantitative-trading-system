@@ -1,177 +1,132 @@
-"""Order execution: translate model decisions into Alpaca bracket orders."""
-import time
-from typing import Dict, List
-from ultimate_trader.utils.logging import get_logger, PerformanceDB
+"""Order execution: bracket orders, reconciliation, position management."""
+from datetime import datetime
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import MarketOrderRequest, LimitOrderRequest
+from alpaca.trading.enums import OrderSide, TimeInForce, OrderClass
+
+from ultimate_trader.utils.logging import get_logger, log_trade
 from ultimate_trader.trading.portfolio import Portfolio
-from ultimate_trader.trading.risk import (
-    compute_position_size, apply_regime_filters,
-    BULLISH_ACTIONS, BEARISH_ACTIONS, ACTION_NAMES, check_kill_switch
-)
+from ultimate_trader.trading.risk import compute_position_sizes, kill_switch_triggered
 
 log = get_logger(__name__)
 
 
-class TradeExecutor:
-    """
-    Converts model predictions into live/paper trades on Alpaca.
-    Uses server-side bracket orders for stop-loss and take-profit.
-    """
-
-    def __init__(
-        self,
-        api,
-        portfolio: Portfolio,
-        db: PerformanceDB,
-        config: dict,
-    ):
-        self.api       = api
+class OrderExecutor:
+    def __init__(self, cfg: dict, portfolio: Portfolio):
+        self.cfg = cfg
         self.portfolio = portfolio
-        self.db        = db
-        self.cfg       = config
-        self._start_equity = None
+        self.client = portfolio.client
 
     def execute(
         self,
-        predictions: Dict[str, dict],  # symbol -> {pred_class, confidence, uncertainty}
-        current_prices: Dict[str, float],
-        regime: str,
-        symbol_to_sector: Dict[str, int] = None,
-    ):
+        signals: list[dict],
+        current_prices: dict[str, float],
+        current_regime: int = 1
+    ) -> dict:
         """
-        Main entry point. Runs full trade cycle:
-          1. Kill-switch check
-          2. Close positions that model now rates as sell/short
-          3. Apply regime filters to risk params
-          4. Open new positions for bullish signals with sufficient confidence
+        Main execution loop.
+        1. Check kill-switch
+        2. Reconcile existing positions
+        3. Close positions no longer in signal set or with exit signals
+        4. Open new positions with bracket orders
+
+        signals: list of dicts with keys:
+          symbol, action ('buy'|'sell'|'hold'), confidence, prob_win,
+          expected_win, expected_loss
+        current_prices: dict symbol->float (live last trade price)
         """
-        # reconcile portfolio first
-        self.portfolio.reconcile()
+        account = self.portfolio.get_account()
+        equity = account["equity"]
+        positions = self.portfolio.get_positions()
 
-        # set starting equity for kill switch on first call of day
-        if self._start_equity is None:
-            self._start_equity = self.portfolio.equity
+        # --- Kill switch
+        total_position_value = sum(p["market_value"] for p in positions.values())
+        portfolio_start_value = equity  # simplified; ideally track from day start
+        daily_pnl_pct = sum(
+            p["unrealized_plpc"] * (p["market_value"] / equity)
+            for p in positions.values()
+        ) if positions else 0.0
 
-        # kill switch
-        if check_kill_switch(self.portfolio.equity, self._start_equity,
-                              self.cfg.get("max_daily_loss", 0.05)):
-            log.critical("Trading halted by kill switch.")
-            return
+        if kill_switch_triggered(daily_pnl_pct, max_daily_loss=-0.05):
+            self.portfolio.close_all_positions()
+            return {"status": "kill_switch", "closed": list(positions.keys())}
 
-        # regime-adjusted params
-        conf_thresh, kelly_mult, max_gross = apply_regime_filters(
-            predictions, regime,
-            base_confidence_threshold=self.cfg.get("confidence_threshold", 0.55),
-            base_kelly_multiplier=self.cfg.get("kelly_fraction", 0.25),
-            base_max_gross=self.cfg.get("max_gross_exposure", 0.95),
-        )
+        # --- Build signal lookup
+        signal_map = {s["symbol"]: s for s in signals}
 
-        # 1. exit stale positions
-        self._exit_positions(predictions, current_prices, conf_thresh, regime)
-
-        # 2. enter new positions
-        self._enter_positions(
-            predictions, current_prices,
-            conf_thresh, kelly_mult, max_gross, regime
-        )
-
-    def _exit_positions(self, predictions, current_prices, conf_thresh, regime):
-        """Close positions the model now rates as sell/strong_sell with high confidence."""
-        for symbol, position in list(self.portfolio.positions.items()):
-            pred = predictions.get(symbol)
-            if pred is None:
-                continue
-            pred_class  = int(pred["pred_class"])
-            confidence  = float(pred["confidence"])
-
-            if pred_class in BEARISH_ACTIONS and confidence > conf_thresh:
-                try:
-                    self.api.close_position(symbol)
-                    price = current_prices.get(symbol, 0.0)
-                    qty   = position["qty"]
-                    reason = f"model:{ACTION_NAMES[pred_class]} conf:{confidence:.2f} regime:{regime}"
-                    log.info(f"Closed {symbol}: {reason}")
-                    self.db.log_trade(symbol, "sell", qty, price, reason, confidence, regime)
-                except Exception as e:
-                    log.error(f"Failed to close {symbol}: {e}")
-                time.sleep(0.2)
-
-    def _enter_positions(
-        self, predictions, current_prices,
-        conf_thresh, kelly_mult, max_gross, regime
-    ):
-        """Open new long positions for bullish signals above confidence threshold."""
-        # sort by confidence descending, enter highest conviction first
-        candidates = [
-            (sym, pred) for sym, pred in predictions.items()
-            if int(pred["pred_class"]) in BULLISH_ACTIONS
-            and float(pred["confidence"]) > conf_thresh
-            and sym not in self.portfolio.positions
-        ]
-        candidates.sort(key=lambda x: x[1]["confidence"], reverse=True)
-
-        for symbol, pred in candidates:
-            # check gross exposure
-            if self.portfolio.total_invested_fraction() >= max_gross:
-                log.info("Max gross exposure reached, stopping new entries.")
-                break
-
-            price = current_prices.get(symbol)
-            if not price or price <= 0:
-                continue
-
-            confidence  = float(pred["confidence"])
-            uncertainty = float(pred["uncertainty"])
-
-            # skip high-uncertainty signals
-            if uncertainty > self.cfg.get("max_uncertainty", 1.5):
-                log.info(f"Skipping {symbol}: uncertainty too high ({uncertainty:.3f})")
-                continue
-
-            dollar_amount = compute_position_size(
-                equity=self.portfolio.equity,
-                win_probability=confidence,
-                current_position_fraction=self.portfolio.position_fraction(symbol),
-                max_single_position=self.cfg.get("max_single_position", 0.15),
-                kelly_multiplier=kelly_mult,
-                min_cash_buffer=self.cfg.get("min_cash_buffer", 0.05),
-                available_cash=self.portfolio.cash,
+        # --- Close positions not in signal set or with sell signal
+        closed = []
+        for symbol, pos in positions.items():
+            signal = signal_map.get(symbol)
+            should_close = (
+                signal is None or                          # no signal -> exit
+                signal["action"] == "hold" or             # model says hold, we exit for safety
+                (signal["action"] == "sell" and pos["side"] == "long") or
+                (signal["action"] == "buy" and pos["side"] == "short")
             )
+            if should_close:
+                if self.portfolio.close_position(symbol):
+                    closed.append(symbol)
 
-            shares = round(dollar_amount / price, 2)
-            if shares < 1:
+        # Refresh after closes
+        account = self.portfolio.get_account()
+        equity = account["equity"]
+
+        # --- Size new positions
+        new_signals = [
+            s for s in signals
+            if s["symbol"] not in positions
+            and s["action"] in ("buy", "sell")
+        ]
+        sized = compute_position_sizes(new_signals, equity, self.cfg, current_regime)
+
+        # --- Submit bracket orders
+        opened = []
+        for sig in sized:
+            symbol = sig["symbol"]
+            price = current_prices.get(symbol)
+            if price is None or price <= 0:
+                log.warning(f"No price for {symbol}, skipping")
                 continue
 
-            stop_price  = round(price * (1 - self.cfg.get("stop_loss", 0.07)), 2)
-            limit_price = round(price * (1 + self.cfg.get("take_profit", 0.12)), 2)
+            shares = round(sig["dollar_size"] / price, 2)
+            if shares < self.cfg["trading"].get("min_shares", 0.01):
+                continue
+
+            side = OrderSide.BUY if sig["action"] == "buy" else OrderSide.SELL
+            stop_loss_pct = self.cfg["trading"].get("stop_loss", 0.08)
+            take_profit_pct = self.cfg["trading"].get("take_profit", 0.12)
+
+            stop_price = round(price * (1 - stop_loss_pct) if side == OrderSide.BUY
+                               else price * (1 + stop_loss_pct), 2)
+            limit_price = round(price * (1 + take_profit_pct) if side == OrderSide.BUY
+                                else price * (1 - take_profit_pct), 2)
 
             try:
-                if self.cfg.get("server_side_orders", True):
-                    # server-side bracket order -- enforced by Alpaca 24/7
-                    self.api.submit_order(
-                        symbol=symbol,
-                        qty=shares,
-                        side="buy",
-                        type="market",
-                        time_in_force="day",
-                        order_class="bracket",
-                        stop_loss={"stop_price": stop_price},
-                        take_profit={"limit_price": limit_price},
-                    )
-                else:
-                    self.api.submit_order(
-                        symbol=symbol,
-                        qty=shares,
-                        side="buy",
-                        type="market",
-                        time_in_force="day",
-                    )
-
-                reason = (f"model:{ACTION_NAMES[int(pred['pred_class'])]} "
-                          f"conf:{confidence:.2f} uncert:{uncertainty:.3f} regime:{regime}")
-                log.info(f"Bought {shares} {symbol} @ ~${price:.2f} | {reason}")
-                self.db.log_trade(symbol, "buy", shares, price, reason, confidence, regime)
+                order = MarketOrderRequest(
+                    symbol=symbol,
+                    qty=shares,
+                    side=side,
+                    time_in_force=TimeInForce.DAY,
+                    order_class=OrderClass.BRACKET,
+                    stop_loss={"stop_price": stop_price},
+                    take_profit={"limit_price": limit_price}
+                )
+                submitted = self.client.submit_order(order)
+                log_trade(
+                    f"{side.value.upper()} {shares} x {symbol} @ ~${price:.2f} | "
+                    f"SL=${stop_price} TP=${limit_price} | "
+                    f"confidence={sig['confidence']:.3f} | "
+                    f"order_id={submitted.id} | {datetime.now()}"
+                )
+                opened.append(symbol)
 
             except Exception as e:
                 log.error(f"Order failed for {symbol}: {e}")
 
-            time.sleep(0.3)
+        return {
+            "status": "ok",
+            "closed": closed,
+            "opened": opened,
+            "equity": equity
+        }

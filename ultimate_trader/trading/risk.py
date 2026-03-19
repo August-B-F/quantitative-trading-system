@@ -1,99 +1,120 @@
-"""Risk management: position sizing, exposure limits, kill-switch."""
+"""Risk management: position sizing with Kelly Criterion, exposure limits, kill-switch."""
 import numpy as np
-from typing import Optional
 from ultimate_trader.utils.logging import get_logger
-from ultimate_trader.features.regimes import get_regime_overrides
 
 log = get_logger(__name__)
 
-# action index mappings (must match model output)
-ACTION_NAMES = {0: "strong_sell", 1: "sell", 2: "hold", 3: "buy", 4: "strong_buy"}
-BULLISH_ACTIONS  = {3, 4}
-BEARISH_ACTIONS  = {0, 1}
-NEUTRAL_ACTIONS  = {2}
+REGIME_PARAMS = {
+    # regime_id: {max_gross_exposure, confidence_boost, position_scale}
+    0: {"exposure_multiplier": 0.4, "conf_add": 0.10, "size_scale": 0.5},   # bear / high-vol
+    1: {"exposure_multiplier": 0.75, "conf_add": 0.05, "size_scale": 0.75}, # sideways
+    2: {"exposure_multiplier": 1.0, "conf_add": 0.0,  "size_scale": 1.0},   # bull / low-vol
+}
 
 
 def kelly_fraction(
-    win_prob: float,
-    avg_win: float  = 0.03,
-    avg_loss: float = 0.015,
-    multiplier: float = 0.25,
+    prob_win: float,
+    expected_win: float,
+    expected_loss: float,
+    kelly_multiplier: float = 0.25
 ) -> float:
     """
-    Fractional Kelly position sizing.
-    f* = (p * b - q) / b  where b = avg_win/avg_loss, q = 1-p
-    Clamped to [0, 1] then scaled by multiplier for safety.
+    Fractional Kelly Criterion.
+    f* = (p * b - q) / b  where b = expected_win / expected_loss
+
+    Args:
+        prob_win: probability of winning (from model)
+        expected_win: expected fractional gain if correct (e.g. 0.03)
+        expected_loss: expected fractional loss if wrong (e.g. 0.02)
+        kelly_multiplier: fraction of full Kelly to use (0.25 = quarter Kelly)
+
+    Returns:
+        Fraction of portfolio to deploy (0 to 1, clipped)
     """
-    if avg_loss == 0:
+    if expected_loss <= 0:
         return 0.0
-    b = avg_win / avg_loss
-    q = 1 - win_prob
-    f_star = (win_prob * b - q) / b
-    f_star = max(0.0, min(1.0, f_star))
-    return f_star * multiplier
+    b = expected_win / expected_loss
+    q = 1.0 - prob_win
+    full_kelly = (prob_win * b - q) / b
+    fractional = full_kelly * kelly_multiplier
+    return float(np.clip(fractional, 0.0, 1.0))
 
 
-def compute_position_size(
+def compute_position_sizes(
+    signals: list[dict],      # [{symbol, action, confidence, prob_win, regime}, ...]
     equity: float,
-    win_probability: float,
-    current_position_fraction: float,
-    max_single_position: float = 0.15,
-    kelly_multiplier: float    = 0.25,
-    min_cash_buffer: float     = 0.05,
-    available_cash: float      = None,
-    avg_win: float             = 0.03,
-    avg_loss: float            = 0.015,
-) -> float:
+    cfg: dict,
+    current_regime: int = 1
+) -> list[dict]:
     """
-    Compute target dollar allocation for a position.
-    Returns dollar amount to invest (may be 0 if limits exceeded).
+    Compute dollar position sizes for each signal.
+
+    Each signal dict must have:
+      symbol, action ('buy'|'sell'|'hold'), confidence (0-1),
+      prob_win (0-1), expected_win (float), expected_loss (float)
+
+    Returns signals enriched with 'dollar_size' and 'shares' (needs current price).
     """
-    kf = kelly_fraction(win_probability, avg_win, avg_loss, kelly_multiplier)
-    target_fraction = min(kf, max_single_position)
+    if not signals:
+        return []
 
-    # headroom after existing position
-    additional_fraction = max(0.0, target_fraction - current_position_fraction)
-    dollar_amount = additional_fraction * equity
+    regime_params = REGIME_PARAMS.get(current_regime, REGIME_PARAMS[1])
+    max_exposure = cfg["trading"]["max_gross_exposure"] * regime_params["exposure_multiplier"]
+    max_single = cfg["trading"]["max_single_position"]
+    kelly_mult = cfg["trading"].get("kelly_fraction", 0.25)
+    conf_threshold = cfg["trading"].get("confidence_threshold", 0.55)
+    conf_threshold += regime_params["conf_add"]  # tighten in bear regime
 
-    # respect cash buffer
-    if available_cash is not None:
-        max_spendable = available_cash - equity * min_cash_buffer
-        dollar_amount = min(dollar_amount, max(0.0, max_spendable))
+    actionable = [
+        s for s in signals
+        if s["action"] in ("buy", "sell")
+        and s["confidence"] >= conf_threshold
+    ]
 
-    return dollar_amount
+    # Sort by confidence descending, take top N
+    max_positions = cfg["trading"].get("diversification", 10)
+    actionable = sorted(actionable, key=lambda x: x["confidence"], reverse=True)[:max_positions]
+
+    total_allocated = 0.0
+    sized_signals = []
+
+    for sig in actionable:
+        kf = kelly_fraction(
+            sig["prob_win"],
+            sig.get("expected_win", cfg["targets"]["r_hi"]),
+            sig.get("expected_loss", cfg["targets"]["r_hi"]),
+            kelly_mult
+        )
+        kf *= regime_params["size_scale"]
+
+        dollar_size = min(equity * kf, equity * max_single)
+
+        if total_allocated + dollar_size > equity * max_exposure:
+            dollar_size = max(0, equity * max_exposure - total_allocated)
+
+        if dollar_size < 1.0:
+            continue
+
+        total_allocated += dollar_size
+        sig = {**sig, "dollar_size": dollar_size}
+        sized_signals.append(sig)
+
+    log.info(
+        f"Regime {current_regime}: {len(sized_signals)} positions, "
+        f"total allocated ${total_allocated:,.0f} / ${equity:,.0f} equity"
+    )
+    return sized_signals
 
 
-def apply_regime_filters(
-    decisions: dict,
-    regime: str,
-    base_confidence_threshold: float,
-    base_kelly_multiplier: float,
-    base_max_gross: float,
-) -> tuple:
-    """
-    Scale trade parameters based on current market regime.
-    Returns (confidence_threshold, kelly_multiplier, max_gross_exposure).
-    """
-    overrides = get_regime_overrides(regime)
-    conf_thresh = max(base_confidence_threshold, overrides["confidence_threshold"])
-    kelly_mult  = base_kelly_multiplier * overrides["kelly_multiplier"]
-    max_gross   = min(base_max_gross, overrides["max_gross_exposure"])
-    log.info(f"Regime '{regime}': conf_thresh={conf_thresh:.2f}, "
-             f"kelly={kelly_mult:.2f}, max_gross={max_gross:.2f}")
-    return conf_thresh, kelly_mult, max_gross
-
-
-def check_kill_switch(
-    equity: float,
-    start_equity: float,
-    max_daily_loss: float = 0.05,
+def kill_switch_triggered(
+    portfolio_pnl_today: float,
+    max_daily_loss: float = -0.05
 ) -> bool:
-    """
-    Returns True if trading should be halted (daily loss exceeded).
-    max_daily_loss: fraction of starting equity (default 5%).
-    """
-    loss = (start_equity - equity) / start_equity if start_equity > 0 else 0.0
-    if loss > max_daily_loss:
-        log.critical(f"KILL SWITCH TRIGGERED: daily loss {loss:.1%} > {max_daily_loss:.1%}")
+    """Return True if today's portfolio PnL exceeds max daily loss threshold."""
+    if portfolio_pnl_today < max_daily_loss:
+        log.critical(
+            f"KILL SWITCH: daily PnL {portfolio_pnl_today:.2%} exceeds limit {max_daily_loss:.2%}. "
+            "All trading halted."
+        )
         return True
     return False

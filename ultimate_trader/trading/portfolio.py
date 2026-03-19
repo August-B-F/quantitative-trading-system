@@ -1,94 +1,93 @@
-"""Portfolio state management. Alpaca is always source of truth."""
+"""Portfolio state manager. Always reconciles with Alpaca as source of truth."""
 import json
 from pathlib import Path
-from typing import Dict
-from ultimate_trader.utils.logging import get_logger, PerformanceDB
+from datetime import datetime
+
+from alpaca.trading.client import TradingClient
+from alpaca.trading.requests import GetAssetsRequest
+from alpaca.trading.enums import AssetClass
+
+from ultimate_trader.utils.logging import get_logger, log_trade
 
 log = get_logger(__name__)
 
 
 class Portfolio:
-    """
-    Manages portfolio state by reconciling with Alpaca live positions.
-    Local state is only a cache and supplementary metadata store.
-    """
+    def __init__(self, cfg: dict):
+        self.cfg = cfg
+        self.client = TradingClient(
+            api_key=cfg["alpaca"]["key_id"],
+            secret_key=cfg["alpaca"]["secret_key"],
+            paper=not cfg["trading"]["live"]
+        )
+        self.cache_path = Path(cfg["paths"]["raw_dir"]).parent / "portfolio_cache.json"
 
-    def __init__(self, api, db: PerformanceDB, cache_path: str = "data/portfolio.json"):
-        """
-        api: alpaca REST client
-        db:  PerformanceDB instance for logging
-        """
-        self.api = api
-        self.db = db
-        self.cache_path = Path(cache_path)
-        self.positions: Dict[str, dict] = {}
-        self.cash: float = 0.0
-        self.equity: float = 0.0
+    def get_account(self) -> dict:
+        """Return account summary: equity, cash, buying_power."""
+        acct = self.client.get_account()
+        return {
+            "equity": float(acct.equity),
+            "cash": float(acct.cash),
+            "buying_power": float(acct.buying_power),
+            "portfolio_value": float(acct.portfolio_value)
+        }
 
-    def reconcile(self):
+    def get_positions(self) -> dict[str, dict]:
         """
-        Fetch live positions and account from Alpaca.
-        This MUST be called at the start of every trading run.
-        Alpaca is always authoritative. Local cache is overwritten.
+        Return current positions from Alpaca (source of truth).
+        Dict: symbol -> {qty, avg_entry_price, market_value, side}
         """
+        positions = {}
         try:
-            account = self.api.get_account()
-            self.cash   = float(account.cash)
-            self.equity = float(account.equity)
-
-            live_positions = self.api.list_positions()
-            self.positions = {
-                p.symbol: {
-                    "qty":         float(p.qty),
-                    "avg_price":   float(p.avg_entry_price),
-                    "market_val":  float(p.market_value),
-                    "side":        p.side,
+            for pos in self.client.get_all_positions():
+                positions[pos.symbol] = {
+                    "qty": float(pos.qty),
+                    "avg_entry_price": float(pos.avg_entry_price),
+                    "market_value": float(pos.market_value),
+                    "side": pos.side.value,
+                    "unrealized_pl": float(pos.unrealized_pl),
+                    "unrealized_plpc": float(pos.unrealized_plpc)
                 }
-                for p in live_positions
-            }
-            self._save_cache()
-            log.info(f"Portfolio reconciled: {len(self.positions)} positions, "
-                     f"cash=${self.cash:,.0f}, equity=${self.equity:,.0f}")
-            self.db.log_equity(self.equity, self.cash, len(self.positions))
         except Exception as e:
-            log.error(f"Portfolio reconciliation failed: {e}")
-            self._load_cache()
+            log.error(f"Failed to get positions: {e}")
 
-    def get_position_value(self, symbol: str) -> float:
-        """Return current market value of a position, or 0."""
-        return self.positions.get(symbol, {}).get("market_val", 0.0)
+        # Cache to disk for audit
+        self._save_cache(positions)
+        return positions
 
-    def get_position_qty(self, symbol: str) -> float:
-        """Return current quantity held for a symbol."""
-        return self.positions.get(symbol, {}).get("qty", 0.0)
+    def get_open_orders(self) -> list:
+        try:
+            return self.client.get_orders()
+        except Exception as e:
+            log.error(f"Failed to get open orders: {e}")
+            return []
 
-    def position_fraction(self, symbol: str) -> float:
-        """Return position size as fraction of total equity."""
-        if self.equity == 0:
-            return 0.0
-        return self.get_position_value(symbol) / self.equity
+    def cancel_all_orders(self) -> None:
+        try:
+            self.client.cancel_orders()
+            log.info("All open orders cancelled")
+        except Exception as e:
+            log.error(f"Failed to cancel orders: {e}")
 
-    def total_invested_fraction(self) -> float:
-        """Fraction of equity currently in positions."""
-        if self.equity == 0:
-            return 0.0
-        total_val = sum(p["market_val"] for p in self.positions.values())
-        return total_val / self.equity
+    def close_position(self, symbol: str) -> bool:
+        try:
+            self.client.close_position(symbol)
+            log_trade(f"Closed position: {symbol} at {datetime.now()}")
+            return True
+        except Exception as e:
+            log.error(f"Failed to close position {symbol}: {e}")
+            return False
 
-    def _save_cache(self):
-        self.cache_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.cache_path, "w") as f:
-            json.dump({
-                "positions": self.positions,
-                "cash": self.cash,
-                "equity": self.equity,
-            }, f, indent=2)
+    def close_all_positions(self) -> None:
+        try:
+            self.client.close_all_positions(cancel_orders=True)
+            log_trade(f"Closed ALL positions at {datetime.now()}")
+        except Exception as e:
+            log.error(f"Failed to close all positions: {e}")
 
-    def _load_cache(self):
-        if self.cache_path.exists():
-            with open(self.cache_path) as f:
-                data = json.load(f)
-            self.positions = data.get("positions", {})
-            self.cash      = data.get("cash", 0.0)
-            self.equity    = data.get("equity", 0.0)
-            log.warning("Using cached portfolio (Alpaca reconciliation failed)")
+    def _save_cache(self, positions: dict) -> None:
+        try:
+            with open(self.cache_path, "w") as f:
+                json.dump({"timestamp": str(datetime.now()), "positions": positions}, f, indent=2)
+        except Exception:
+            pass
