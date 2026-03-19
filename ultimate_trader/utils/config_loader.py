@@ -1,63 +1,41 @@
-"""Load and merge YAML config files."""
+import os
 import yaml
 from pathlib import Path
-from typing import Any
+from dotenv import load_dotenv
+
+load_dotenv()
+
+_ROOT = Path(__file__).resolve().parents[2]
 
 
-def _deep_merge(base: dict, override: dict) -> dict:
-    result = base.copy()
-    for k, v in override.items():
-        if k in result and isinstance(result[k], dict) and isinstance(v, dict):
-            result[k] = _deep_merge(result[k], v)
-        else:
-            result[k] = v
-    return result
+def _load_yaml(path: Path) -> dict:
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
 
 
-class Config:
-    """Unified config object. Access keys as attributes or dict-style."""
+def load_config() -> dict:
+    cfg = _load_yaml(_ROOT / "config" / "config.yaml")
+    model_cfg = _load_yaml(_ROOT / "config" / "model.yaml")
+    training_cfg = _load_yaml(_ROOT / "config" / "training.yaml")
 
-    def __init__(self, data: dict):
-        self._data = data
+    # Inject secrets from environment (never hard-code keys)
+    cfg["alpaca"]["key_id"] = os.getenv("ALPACA_KEY", cfg["alpaca"].get("key_id", ""))
+    cfg["alpaca"]["secret_key"] = os.getenv("ALPACA_SECRET", cfg["alpaca"].get("secret_key", ""))
 
-    def __getattr__(self, name: str) -> Any:
-        if name.startswith("_"):
-            return super().__getattribute__(name)
-        try:
-            val = self._data[name]
-        except KeyError:
-            raise AttributeError(f"Config has no key '{name}'")
-        if isinstance(val, dict):
-            return Config(val)
-        return val
+    live = os.getenv("ALPACA_LIVE", "false").lower() == "true"
+    if live:
+        cfg["alpaca"]["base_url"] = "https://api.alpaca.markets"
+    cfg["trading"]["live"] = live
 
-    def __getitem__(self, key):
-        val = self._data[key]
-        if isinstance(val, dict):
-            return Config(val)
-        return val
+    cfg["model"] = model_cfg["model"]
+    cfg["targets"] = model_cfg["targets"]
+    cfg["uncertainty"] = model_cfg["uncertainty"]
+    cfg["training"] = training_cfg["training"]
+    cfg["walk_forward"] = training_cfg["walk_forward"]
+    cfg["hyperparam_search"] = training_cfg["hyperparam_search"]
 
-    def get(self, key, default=None):
-        val = self._data.get(key, default)
-        if isinstance(val, dict):
-            return Config(val)
-        return val
+    # Resolve absolute paths
+    for key, rel in cfg["paths"].items():
+        cfg["paths"][key] = str(_ROOT / rel)
 
-    def to_dict(self) -> dict:
-        return self._data
-
-
-def load_config(config_dir: str = "config") -> Config:
-    """
-    Load and merge config.yaml, model.yaml, training.yaml from config_dir.
-    Returns a unified Config object.
-    """
-    config_path = Path(config_dir)
-    merged: dict = {}
-    for fname in ["config.yaml", "model.yaml", "training.yaml"]:
-        fpath = config_path / fname
-        if fpath.exists():
-            with open(fpath) as f:
-                data = yaml.safe_load(f) or {}
-            merged = _deep_merge(merged, data)
-    return Config(merged)
+    return cfg
