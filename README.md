@@ -1,6 +1,6 @@
-# Ultimate AI Stock Trader
+# iStock
 
-A production-grade AI-driven stock trading bot built on PyTorch, Alpaca Markets API, and FinBERT sentiment analysis.
+An AI-driven stock trading bot built on PyTorch, Alpaca Markets API, and FinBERT sentiment analysis.
 
 ## Architecture
 
@@ -14,6 +14,7 @@ A production-grade AI-driven stock trading bot built on PyTorch, Alpaca Markets 
 - **Portfolio reconciliation** — Alpaca positions are always source of truth
 - **SHAP explainability** — per-feature importance analysis on every model version
 - **Performance tracking** — SQLite database logging every trade, daily equity, and Sharpe/drawdown metrics
+- **Terminal UI** — full Textual TUI with live charts, signals, positions, and bot control
 
 ## Setup
 
@@ -28,6 +29,11 @@ Edit `config/config.yaml` with your Alpaca API keys.
 ## Usage
 
 ```bash
+# Terminal UI (recommended)
+python scripts/tui.py
+
+# Or run steps manually:
+
 # 1. Download all historical data
 python scripts/download_data.py
 
