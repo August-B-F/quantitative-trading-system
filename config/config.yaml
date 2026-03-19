@@ -1,0 +1,97 @@
+alpaca:
+  key_id: "YOUR_ALPACA_KEY"
+  secret_key: "YOUR_ALPACA_SECRET"
+  base_url: "https://paper-api.alpaca.markets"
+  data_base_url: "https://data.alpaca.markets"
+
+universe:
+  symbols:
+    - AAPL
+    - MSFT
+    - AMZN
+    - GOOGL
+    - META
+    - NVDA
+    - TSLA
+    - JPM
+    - V
+    - UNH
+    - XOM
+    - LLY
+    - AVGO
+    - JNJ
+    - PG
+    - MA
+    - HD
+    - MRK
+    - COST
+    - ABBV
+    - CVX
+    - CRM
+    - BAC
+    - PEP
+    - ADBE
+    - ORCL
+    - AMD
+    - MCD
+    - NFLX
+    - KO
+    - TMO
+    - CSCO
+    - ACN
+    - ABT
+    - INTC
+    - WMT
+    - DHR
+    - VZ
+    - TXN
+    - NEE
+    - PM
+    - RTX
+    - AMGN
+    - COP
+    - T
+    - HON
+    - UNP
+    - QCOM
+    - BMY
+    - LOW
+  benchmark: "SPY"
+  sector_etfs:
+    - XLK
+    - XLF
+    - XLE
+    - XLY
+    - XLV
+    - XLI
+    - XLP
+    - XLU
+    - XLB
+    - XLRE
+
+data:
+  start_date: "2018-01-01"
+  end_date: null
+  bar_timeframe: "1Day"
+  timezone: "America/New_York"
+
+news:
+  enabled: true
+  max_articles_per_day: 20
+  lookback_days: 1460  # 4 years
+
+paths:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  models_dir: "data/models"
+  scalers_dir: "data/scalers"
+  logs_dir: "data/logs"
+
+trading:
+  live: false
+  run_time: "15:45"
+  max_gross_exposure: 0.9
+  max_single_position: 0.15
+  min_cash_buffer: 0.1
+  allow_short: true
+  earnings_blackout_days: 1
