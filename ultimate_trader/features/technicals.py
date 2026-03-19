@@ -1,119 +1,129 @@
-"""Technical indicator computation on OHLCV DataFrames.
-
-All functions accept a pd.DataFrame with at least ['close', 'high', 'low', 'volume']
-columns and a DatetimeIndex.  They return a new DataFrame with indicator columns
-appended, leaving the input unchanged.
-"""
+"""Technical indicator computation."""
 import numpy as np
 import pandas as pd
+from typing import Tuple
 
 
-def add_returns(df: pd.DataFrame) -> pd.DataFrame:
-    """Add 1d, 3d, 5d, 10d, 20d log returns."""
-    out = df.copy()
-    for n in [1, 3, 5, 10, 20]:
-        out[f"ret_{n}d"] = np.log(out["close"] / out["close"].shift(n))
-    return out
+def compute_returns(close: pd.Series, windows=(1, 3, 5, 10, 20)) -> pd.DataFrame:
+    """Compute rolling returns for multiple windows."""
+    out = {}
+    for w in windows:
+        out[f"return_{w}d"] = close.pct_change(w)
+    return pd.DataFrame(out, index=close.index)
 
 
-def add_rsi(df: pd.DataFrame, window: int = 14) -> pd.DataFrame:
-    """Relative Strength Index."""
-    out = df.copy()
-    delta = out["close"].diff()
+def compute_rsi(close: pd.Series, window: int = 14) -> pd.Series:
+    """Wilder RSI."""
+    delta = close.diff()
     gain = delta.clip(lower=0)
     loss = -delta.clip(upper=0)
-    avg_gain = gain.ewm(com=window - 1, min_periods=window).mean()
-    avg_loss = loss.ewm(com=window - 1, min_periods=window).mean()
+    avg_gain = gain.ewm(alpha=1/window, min_periods=window, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1/window, min_periods=window, adjust=False).mean()
     rs = avg_gain / avg_loss.replace(0, np.nan)
-    out["rsi"] = 100 - (100 / (1 + rs))
-    return out
+    return (100 - 100 / (1 + rs)).rename("rsi")
 
 
-def add_macd(
-    df: pd.DataFrame, fast: int = 12, slow: int = 26, signal: int = 9
-) -> pd.DataFrame:
-    """MACD line, signal line, and histogram."""
-    out = df.copy()
-    ema_fast = out["close"].ewm(span=fast, adjust=False).mean()
-    ema_slow = out["close"].ewm(span=slow, adjust=False).mean()
-    out["macd"] = ema_fast - ema_slow
-    out["macd_signal"] = out["macd"].ewm(span=signal, adjust=False).mean()
-    out["macd_hist"] = out["macd"] - out["macd_signal"]
-    return out
+def compute_macd(close: pd.Series,
+                 fast: int = 12, slow: int = 26, signal: int = 9
+                 ) -> Tuple[pd.Series, pd.Series, pd.Series]:
+    """MACD line, signal line, histogram."""
+    ema_fast = close.ewm(span=fast, adjust=False).mean()
+    ema_slow = close.ewm(span=slow, adjust=False).mean()
+    macd = (ema_fast - ema_slow).rename("macd")
+    signal_line = macd.ewm(span=signal, adjust=False).mean().rename("macd_signal")
+    histogram = (macd - signal_line).rename("macd_hist")
+    return macd, signal_line, histogram
 
 
-def add_obv(df: pd.DataFrame) -> pd.DataFrame:
-    """On-Balance Volume normalised to a z-score over a 20d rolling window."""
-    out = df.copy()
-    direction = np.sign(out["close"].diff())
-    obv = (direction * out["volume"]).fillna(0).cumsum()
-    mu = obv.rolling(20).mean()
-    sigma = obv.rolling(20).std().replace(0, np.nan)
-    out["obv_zscore"] = (obv - mu) / sigma
-    return out
+def compute_obv(close: pd.Series, volume: pd.Series) -> pd.Series:
+    """On-Balance Volume."""
+    direction = np.sign(close.diff()).fillna(0)
+    obv = (direction * volume).cumsum().rename("obv")
+    return obv
 
 
-def add_atr(df: pd.DataFrame, window: int = 14) -> pd.DataFrame:
-    """Average True Range (normalised by close)."""
-    out = df.copy()
-    hl = out["high"] - out["low"]
-    hc = (out["high"] - out["close"].shift()).abs()
-    lc = (out["low"] - out["close"].shift()).abs()
-    tr = pd.concat([hl, hc, lc], axis=1).max(axis=1)
-    out["atr"] = tr.ewm(span=window, adjust=False).mean()
-    out["atr_pct"] = out["atr"] / out["close"]  # normalised
-    return out
+def compute_atr(high: pd.Series, low: pd.Series, close: pd.Series,
+                window: int = 14) -> pd.Series:
+    """Average True Range."""
+    tr = pd.concat([
+        high - low,
+        (high - close.shift()).abs(),
+        (low - close.shift()).abs(),
+    ], axis=1).max(axis=1)
+    return tr.ewm(span=window, adjust=False).mean().rename("atr")
 
 
-def add_bollinger(df: pd.DataFrame, window: int = 20, num_std: float = 2.0) -> pd.DataFrame:
-    """Bollinger Band width and %B (position within bands)."""
-    out = df.copy()
-    sma = out["close"].rolling(window).mean()
-    std = out["close"].rolling(window).std()
-    upper = sma + num_std * std
-    lower = sma - num_std * std
-    out["bb_width"] = (upper - lower) / sma
-    out["bb_pct"] = (out["close"] - lower) / (upper - lower + 1e-9)
-    return out
+def compute_bollinger(close: pd.Series, window: int = 20,
+                      n_std: float = 2.0) -> pd.DataFrame:
+    """Bollinger Bands: mid, upper, lower, width, %B."""
+    mid = close.rolling(window).mean()
+    std = close.rolling(window).std()
+    upper = mid + n_std * std
+    lower = mid - n_std * std
+    width = ((upper - lower) / mid).rename("bb_width")
+    pct_b = ((close - lower) / (upper - lower)).rename("bb_pct_b")
+    return pd.DataFrame({"bb_width": width, "bb_pct_b": pct_b})
 
 
-def add_volume_anomaly(df: pd.DataFrame, window: int = 20) -> pd.DataFrame:
-    """Volume anomaly: today's volume relative to rolling mean as a z-score."""
-    out = df.copy()
-    mu = out["volume"].rolling(window).mean()
-    sigma = out["volume"].rolling(window).std().replace(0, np.nan)
-    out["vol_anomaly"] = (out["volume"] - mu) / sigma
-    return out
+def compute_volume_anomaly(volume: pd.Series, window: int = 20) -> pd.Series:
+    """Volume anomaly: today's volume / rolling mean. >2 is unusual."""
+    return (volume / volume.rolling(window).mean()).rename("volume_anomaly")
 
 
-def add_rolling_volatility(df: pd.DataFrame, windows: list[int] = [5, 10, 20]) -> pd.DataFrame:
-    """Rolling realised volatility of log returns at multiple horizons."""
-    out = df.copy()
-    log_ret = np.log(out["close"] / out["close"].shift(1))
+def compute_rolling_volatility(close: pd.Series, window: int = 20) -> pd.Series:
+    """Annualised rolling volatility."""
+    return (close.pct_change().rolling(window).std() * np.sqrt(252)).rename("volatility")
+
+
+def compute_price_vs_ma(close: pd.Series, windows=(20, 50, 200)) -> pd.DataFrame:
+    """Price relative to moving averages. >1 means above MA."""
+    out = {}
     for w in windows:
-        out[f"rvol_{w}d"] = log_ret.rolling(w).std() * np.sqrt(252)
-    return out
+        ma = close.rolling(w).mean()
+        out[f"price_vs_ma{w}"] = close / ma
+    return pd.DataFrame(out, index=close.index)
 
 
-def add_stochastic(df: pd.DataFrame, k_window: int = 14, d_window: int = 3) -> pd.DataFrame:
-    """Stochastic oscillator %K and %D."""
-    out = df.copy()
-    low_min = out["low"].rolling(k_window).min()
-    high_max = out["high"].rolling(k_window).max()
-    out["stoch_k"] = 100 * (out["close"] - low_min) / (high_max - low_min + 1e-9)
-    out["stoch_d"] = out["stoch_k"].rolling(d_window).mean()
-    return out
+def compute_beta(returns: pd.Series, benchmark_returns: pd.Series,
+                 window: int = 60) -> pd.Series:
+    """Rolling beta of stock returns vs benchmark."""
+    cov = returns.rolling(window).cov(benchmark_returns)
+    var = benchmark_returns.rolling(window).var()
+    return (cov / var).rename("beta")
 
 
-def add_all_technicals(df: pd.DataFrame) -> pd.DataFrame:
-    """Apply all technical indicator functions in sequence."""
-    df = add_returns(df)
-    df = add_rsi(df)
-    df = add_macd(df)
-    df = add_obv(df)
-    df = add_atr(df)
-    df = add_bollinger(df)
-    df = add_volume_anomaly(df)
-    df = add_rolling_volatility(df)
-    df = add_stochastic(df)
-    return df
+def compute_all_technicals(bars: pd.DataFrame,
+                           benchmark_returns: pd.Series = None) -> pd.DataFrame:
+    """
+    Compute the full technical feature set from an OHLCV DataFrame.
+    bars must have columns: open, high, low, close, volume
+    benchmark_returns: optional Series of daily benchmark returns (for beta)
+    Returns a DataFrame with all technical features.
+    """
+    close  = bars["close"]
+    high   = bars["high"]
+    low    = bars["low"]
+    volume = bars["volume"]
+
+    returns_df     = compute_returns(close)
+    rsi            = compute_rsi(close)
+    macd, sig, hist = compute_macd(close)
+    obv            = compute_obv(close, volume)
+    atr            = compute_atr(high, low, close)
+    boll           = compute_bollinger(close)
+    vol_anom       = compute_volume_anomaly(volume)
+    roll_vol       = compute_rolling_volatility(close)
+    price_ma       = compute_price_vs_ma(close)
+
+    features = pd.concat([
+        returns_df, rsi, macd, sig, hist, obv, atr,
+        boll, vol_anom, roll_vol, price_ma
+    ], axis=1)
+
+    if benchmark_returns is not None:
+        stock_ret = close.pct_change()
+        beta = compute_beta(stock_ret, benchmark_returns)
+        rel_return = (stock_ret - benchmark_returns).rename("relative_return")
+        features = pd.concat([features, beta, rel_return], axis=1)
+
+    return features
