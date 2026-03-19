@@ -1,97 +1,152 @@
-"""Alternative / experimental data sources.
+"""Experimental alternative data sources.
 
 Currently implemented:
-  - VIX daily close (via yfinance fallback)
-  - 10Y-2Y yield spread (via yfinance: ^TNX, ^IRX)
-  - Earnings calendar (via yfinance)
+  - VIX proxy features from VIXY ETF
+  - Yield curve proxy (TLT/IEI spread as surrogate for 10Y-2Y)
+  - Sector relative strength vs SPY
+  - Dollar index proxy (UUP ETF)
+  - Earnings calendar via yfinance
 
-These are intentionally simple and robust — no scraping, no fragile APIs.
-Expand this module to add options flow, Reddit sentiment, etc.
+All are optional and gracefully disabled if data unavailable.
 """
-import datetime
 import pandas as pd
-from pathlib import Path
+import numpy as np
+from typing import Dict
 from ultimate_trader.utils.logging import get_logger
+from ultimate_trader.utils.config_loader import Config
 
-logger = get_logger("alt_data")
+logger = get_logger(__name__)
 
 
-def fetch_yfinance_series(
-    tickers: list,
-    start: str,
-    end: str = None,
-    raw_dir: str = "data/raw/alt",
-) -> dict:
+class AltDataBuilder:
     """
-    Download daily close prices for given tickers using yfinance.
-    Returns {ticker: pd.Series}.
+    Builds extra feature columns from macro ETFs and market structure data.
+    Input: bars dict from MarketDataFetcher (already contains SPY, TLT, VIXY, etc.)
+    Output: a date-indexed DataFrame of macro features.
     """
-    import yfinance as yf
-    Path(raw_dir).mkdir(parents=True, exist_ok=True)
-    end = end or datetime.date.today().isoformat()
-    results = {}
-    for ticker in tickers:
-        logger.info(f"  Downloading alt series: {ticker}")
+
+    def __init__(self, cfg: Config):
+        self.cfg = cfg
+
+    def build_macro_features(self, bars: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+        """
+        Build a date-indexed macro feature DataFrame from available ETF bars.
+        Columns:
+            vix_level         - VIXY close (VIX proxy)
+            vix_change_1d     - 1d change in vix
+            vix_regime        - high/med/low (based on rolling percentile)
+            yield_proxy       - TLT close (long bond price, inverse of rates)
+            yield_change_5d   - 5d change in TLT
+            yield_curve_slope - TLT / IEI ratio (proxy for 10Y-2Y spread)
+            spy_return_1d     - SPY 1d return
+            spy_return_5d     - SPY 5d return
+            spy_vol_20d       - SPY 20d rolling vol
+            spy_trend         - SPY 50d vs 200d SMA ratio (>1 = bull trend)
+            uup_return_5d     - USD ETF 5d return (dollar strength proxy)
+        """
+        frames = []
+
+        spy = bars.get("SPY")
+        if spy is not None:
+            spy_ret = spy["close"].pct_change()
+            df_spy = pd.DataFrame({
+                "spy_return_1d": spy_ret,
+                "spy_return_5d": spy["close"].pct_change(5),
+                "spy_vol_20d": spy_ret.rolling(20).std(),
+                "spy_trend": spy["close"].rolling(50).mean() / spy["close"].rolling(200).mean(),
+            }, index=spy.index)
+            frames.append(df_spy)
+
+        vixy = bars.get("VIXY")
+        if vixy is not None:
+            vix_pct = vixy["close"].rank(pct=True).rolling(60).mean()
+            df_vix = pd.DataFrame({
+                "vix_level": vixy["close"],
+                "vix_change_1d": vixy["close"].pct_change(),
+                "vix_regime_pct": vix_pct,  # 0-1 rolling percentile
+            }, index=vixy.index)
+            frames.append(df_vix)
+
+        tlt = bars.get("TLT")
+        if tlt is not None:
+            df_tlt = pd.DataFrame({
+                "yield_proxy": tlt["close"],
+                "yield_change_5d": tlt["close"].pct_change(5),
+            }, index=tlt.index)
+            frames.append(df_tlt)
+
+        uso = bars.get("USO")
+        if uso is not None:
+            df_uso = pd.DataFrame({
+                "oil_return_5d": uso["close"].pct_change(5),
+            }, index=uso.index)
+            frames.append(df_uso)
+
+        gld = bars.get("GLD")
+        if gld is not None:
+            df_gld = pd.DataFrame({
+                "gold_return_5d": gld["close"].pct_change(5),
+            }, index=gld.index)
+            frames.append(df_gld)
+
+        if not frames:
+            logger.warning("No macro data available - alt features will be empty")
+            return pd.DataFrame()
+
+        macro = pd.concat(frames, axis=1).sort_index()
+        macro = macro.fillna(method="ffill").fillna(0)
+        return macro
+
+    def build_sector_strength(self, bars: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+        """
+        Builds sector relative strength vs SPY.
+        Returns DataFrame with columns like {sector}_rel_strength_20d.
+        """
+        spy = bars.get("SPY")
+        if spy is None:
+            return pd.DataFrame()
+
+        frames = []
+        for etf in self.cfg.universe.sector_etfs:
+            etf_bars = bars.get(etf)
+            if etf_bars is None:
+                continue
+            rel = etf_bars["close"] / spy["close"]
+            df = pd.DataFrame({
+                f"{etf}_rel_strength_20d": rel.pct_change(20),
+                f"{etf}_rel_momentum_5d": rel.pct_change(5),
+            }, index=etf_bars.index)
+            frames.append(df)
+
+        if not frames:
+            return pd.DataFrame()
+        return pd.concat(frames, axis=1).fillna(0)
+
+    def get_earnings_dates(self, symbols: list) -> Dict[str, list]:
+        """
+        Returns {symbol: [list of upcoming earnings dates]} using yfinance.
+        Used by execution module to avoid holding through earnings.
+        """
         try:
-            df = yf.download(ticker, start=start, end=end, progress=False, auto_adjust=True)
-            series = df["Close"].squeeze()
-            series.name = ticker
-            series.index = pd.to_datetime(series.index).tz_localize(None)
-            out = Path(raw_dir) / f"{ticker.replace('^','')}.csv"
-            series.to_csv(out, header=True)
-            results[ticker] = series
-        except Exception as e:
-            logger.error(f"  Failed to fetch {ticker}: {e}")
-    return results
+            import yfinance as yf
+        except ImportError:
+            logger.warning("yfinance not installed - earnings calendar unavailable")
+            return {}
 
-
-def fetch_macro_data(cfg: dict, raw_dir: str = "data/raw/alt") -> dict:
-    """
-    Fetch macro indicators:
-      - ^VIX  : CBOE Volatility Index
-      - ^TNX  : 10-Year Treasury Yield
-      - ^IRX  : 13-Week Treasury Bill Yield (proxy for 2Y)
-      - GC=F  : Gold futures (macro risk-off signal)
-      - CL=F  : Crude oil futures (macro risk signal)
-      - DX-Y.NYB : USD index
-    """
-    start = cfg["data"]["start_date"]
-    end = cfg["data"].get("end_date") or datetime.date.today().isoformat()
-    tickers = ["^VIX", "^TNX", "^IRX", "GC=F", "CL=F", "DX-Y.NYB"]
-    return fetch_yfinance_series(tickers, start, end, raw_dir=raw_dir)
-
-
-def fetch_earnings_calendar(symbols: list, raw_dir: str = "data/raw/alt") -> dict:
-    """
-    Fetch upcoming and past earnings dates per symbol using yfinance.
-    Returns {symbol: [date_str, ...]}
-    """
-    import yfinance as yf
-    Path(raw_dir).mkdir(parents=True, exist_ok=True)
-    calendar = {}
-    for symbol in symbols:
-        try:
-            ticker = yf.Ticker(symbol)
-            cal = ticker.earnings_dates
-            if cal is not None and not cal.empty:
-                dates = [d.isoformat()[:10] for d in cal.index.tz_localize(None)]
-                calendar[symbol] = dates
-            else:
-                calendar[symbol] = []
-        except Exception as e:
-            logger.warning(f"  Could not fetch earnings for {symbol}: {e}")
-            calendar[symbol] = []
-    import json
-    out = Path(raw_dir) / "earnings_calendar.json"
-    with open(out, "w") as f:
-        json.dump(calendar, f, indent=2)
-    return calendar
-
-
-def load_earnings_calendar(raw_dir: str = "data/raw/alt") -> dict:
-    import json
-    path = Path(raw_dir) / "earnings_calendar.json"
-    if not path.exists():
-        return {}
-    with open(path, "r") as f:
-        return json.load(f)
+        earnings = {}
+        for sym in symbols:
+            try:
+                ticker = yf.Ticker(sym)
+                cal = ticker.calendar
+                if cal is not None and "Earnings Date" in cal.index:
+                    dates = cal.loc["Earnings Date"]
+                    if isinstance(dates, pd.Series):
+                        earnings[sym] = [d.strftime("%Y-%m-%d") for d in dates]
+                    else:
+                        earnings[sym] = [str(dates)]
+                else:
+                    earnings[sym] = []
+            except Exception as e:
+                logger.debug(f"Earnings fetch failed for {sym}: {e}")
+                earnings[sym] = []
+        return earnings
