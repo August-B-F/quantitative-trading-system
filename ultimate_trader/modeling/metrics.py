@@ -1,50 +1,86 @@
-"""Evaluation metrics for model + strategy performance."""
+"""
+metrics.py
+
+Evaluation metrics for both ML quality and trading quality.
+
+ML metrics:
+  - accuracy, precision, recall per class
+  - directional accuracy (did we get up/down right?)
+
+Trading metrics:
+  - Sharpe ratio
+  - Sortino ratio
+  - Max drawdown
+  - Hit rate (% profitable trades)
+  - Average return per trade
+"""
+
 import numpy as np
 import pandas as pd
+from typing import List, Optional
 
 
-def sharpe_ratio(returns: pd.Series | np.ndarray, periods_per_year: int = 252) -> float:
-    """Annualised Sharpe ratio."""
-    r = np.asarray(returns)
-    if r.std() == 0:
+def directional_accuracy(preds: np.ndarray, labels: np.ndarray) -> float:
+    """
+    For ordinal 5-class labels:
+    Label 0,1 = sell direction; 2 = hold; 3,4 = buy direction.
+    Measures whether predicted direction matches true direction.
+    """
+    pred_dir = np.where(preds > 2, 1, np.where(preds < 2, -1, 0))
+    true_dir = np.where(labels > 2, 1, np.where(labels < 2, -1, 0))
+    mask = true_dir != 0  # ignore holds
+    if mask.sum() == 0:
         return 0.0
-    return float((r.mean() / r.std()) * np.sqrt(periods_per_year))
+    return float((pred_dir[mask] == true_dir[mask]).mean())
 
 
-def sortino_ratio(returns: pd.Series | np.ndarray, periods_per_year: int = 252) -> float:
-    """Annualised Sortino ratio (downside std only)."""
-    r = np.asarray(returns)
-    downside = r[r < 0]
-    if len(downside) == 0 or downside.std() == 0:
+def sharpe_ratio(returns: np.ndarray, risk_free: float = 0.0, annualize: bool = True) -> float:
+    if len(returns) < 2:
         return 0.0
-    return float((r.mean() / downside.std()) * np.sqrt(periods_per_year))
+    excess = returns - risk_free / 252
+    mean = excess.mean()
+    std = excess.std() + 1e-10
+    sr = mean / std
+    if annualize:
+        sr *= np.sqrt(252)
+    return float(sr)
 
 
-def max_drawdown(equity_curve: pd.Series | np.ndarray) -> float:
-    """Maximum drawdown as a positive fraction."""
-    eq = np.asarray(equity_curve, dtype=float)
-    peak = np.maximum.accumulate(eq)
-    dd = (eq - peak) / np.where(peak == 0, 1, peak)
-    return float(-dd.min())
-
-
-def win_rate(pnl_series: pd.Series | np.ndarray) -> float:
-    r = np.asarray(pnl_series)
-    if len(r) == 0:
+def sortino_ratio(returns: np.ndarray, risk_free: float = 0.0, annualize: bool = True) -> float:
+    if len(returns) < 2:
         return 0.0
-    return float((r > 0).mean())
+    excess = returns - risk_free / 252
+    downside = excess[excess < 0]
+    if len(downside) == 0:
+        return float("inf")
+    downside_std = downside.std() + 1e-10
+    sr = excess.mean() / downside_std
+    if annualize:
+        sr *= np.sqrt(252)
+    return float(sr)
 
 
-def classification_report_dict(
-    y_true: np.ndarray,
-    y_pred: np.ndarray,
-    num_classes: int = 5
-) -> dict:
-    """Per-class precision, recall, F1."""
-    from sklearn.metrics import classification_report
-    labels = list(range(num_classes))
-    names = ["strong_sell", "sell", "hold", "buy", "strong_buy"]
-    report = classification_report(y_true, y_pred, labels=labels,
-                                   target_names=names, output_dict=True,
-                                   zero_division=0)
-    return report
+def max_drawdown(equity_curve: np.ndarray) -> float:
+    """Maximum peak-to-trough drawdown as a positive fraction."""
+    peak = np.maximum.accumulate(equity_curve)
+    drawdown = (equity_curve - peak) / (peak + 1e-10)
+    return float(-drawdown.min())
+
+
+def hit_rate(pnl_per_trade: np.ndarray) -> float:
+    """Fraction of trades that were profitable."""
+    if len(pnl_per_trade) == 0:
+        return 0.0
+    return float((pnl_per_trade > 0).mean())
+
+
+def compute_all_metrics(returns: np.ndarray, equity_curve: Optional[np.ndarray] = None) -> dict:
+    eq = equity_curve if equity_curve is not None else np.cumprod(1 + returns)
+    return {
+        "sharpe": sharpe_ratio(returns),
+        "sortino": sortino_ratio(returns),
+        "max_drawdown": max_drawdown(eq),
+        "total_return": float(eq[-1] / eq[0] - 1) if len(eq) > 0 else 0.0,
+        "ann_return": float(np.mean(returns) * 252),
+        "ann_vol": float(np.std(returns) * np.sqrt(252)),
+    }

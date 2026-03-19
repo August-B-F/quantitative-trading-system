@@ -1,87 +1,102 @@
-"""Walk-forward hyperparameter optimisation using Optuna.
-
-The objective function:
-  1. Trains a model on the training fold
-  2. Runs a simplified backtest on the validation fold
-  3. Returns the walk-forward Sharpe ratio as objective
 """
+hyperparam_search.py
+
+Optuna-based hyperparameter search over walk-forward windows.
+
+Objective: maximize walk-forward Sharpe ratio.
+Search space covers: model architecture, training params, AND trading filters.
+This is the correct way to optimize trading filters — walk-forward prevents
+the curve-fitting problem that pure historical optimization (like the 1B-sim
+approach) has.
+"""
+
+import os
+import json
 import optuna
 import numpy as np
-from typing import Callable
+from typing import Callable, Dict
 
 from ultimate_trader.utils.logging import get_logger
 
-log = get_logger(__name__)
+logger = get_logger("hyperparam_search")
+
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
-def run_hyperparam_search(
-    train_fn: Callable,      # fn(trial_cfg) -> trained model
-    eval_fn: Callable,       # fn(model, trial_cfg) -> sharpe float
-    base_cfg: dict,
-    n_trials: int = 80,
-    objective_metric: str = "sharpe"
-) -> dict:
+def build_search_space(trial: optuna.Trial, search_cfg: dict) -> dict:
     """
-    Run Optuna search over hyperparameter space defined in training.yaml.
-
-    Args:
-        train_fn: function that takes a cfg dict, trains a model, returns it
-        eval_fn: function that takes (model, cfg) and returns a float metric
-        base_cfg: base config dict (will be overridden per trial)
-        n_trials: number of Optuna trials
-        objective_metric: 'sharpe' | 'sortino' | 'total_return'
-
-    Returns:
-        best_params dict
+    Builds a hyperparameter dict from an Optuna trial.
+    Supports float ranges (2-element list) and categorical (list of >2 discrete values).
     """
-    search_space = base_cfg["hyperparam_search"]["search_space"]
+    params = {}
+    for key, spec in search_cfg.items():
+        if isinstance(spec, list) and len(spec) == 2 and all(isinstance(v, (int, float)) for v in spec):
+            lo, hi = spec
+            if isinstance(lo, int) and isinstance(hi, int):
+                params[key] = trial.suggest_int(key, lo, hi)
+            else:
+                params[key] = trial.suggest_float(key, lo, hi, log=(lo > 0 and hi / lo > 10))
+        elif isinstance(spec, list):
+            params[key] = trial.suggest_categorical(key, spec)
+        else:
+            params[key] = spec
+    return params
 
-    def objective(trial: optuna.Trial) -> float:
-        import copy
-        trial_cfg = copy.deepcopy(base_cfg)
 
-        # Sample hyperparameters from defined search space
-        lr_range = search_space["lr"]
-        trial_cfg["training"]["lr"] = trial.suggest_float("lr", *lr_range, log=True)
+class WalkForwardSearch:
+    """
+    Runs Optuna hyperparameter search where each trial:
+      1. Builds model with candidate params
+      2. Trains on train window
+      3. Evaluates on val window using a backtester
+      4. Returns objective metric (Sharpe by default)
 
-        dropout_range = search_space["dropout"]
-        trial_cfg["model"]["dropout"] = trial.suggest_float("dropout", *dropout_range)
+    Usage:
+      searcher = WalkForwardSearch(train_fn, eval_fn, search_cfg)
+      best_params = searcher.run(n_trials=60)
+    """
 
-        hidden_range = search_space["hidden_dim"]
-        trial_cfg["model"]["hidden_dim"] = trial.suggest_int("hidden_dim", *hidden_range, step=32)
+    def __init__(
+        self,
+        train_fn: Callable,    # fn(params) -> trained model
+        eval_fn: Callable,     # fn(model, params) -> float (metric)
+        search_cfg: dict,
+        study_name: str = "wf_search",
+        results_dir: str = "data/models",
+    ):
+        self.train_fn = train_fn
+        self.eval_fn = eval_fn
+        self.search_cfg = search_cfg
+        self.study_name = study_name
+        self.results_dir = results_dir
+        os.makedirs(results_dir, exist_ok=True)
 
-        window_range = search_space["price_window"]
-        trial_cfg["model"]["price_window"] = trial.suggest_int("price_window", *window_range, step=5)
-
-        r_hi_range = search_space["r_hi"]
-        trial_cfg["targets"]["r_hi"] = trial.suggest_float("r_hi", *r_hi_range)
-
-        r_lo_range = search_space["r_lo"]
-        trial_cfg["targets"]["r_lo"] = trial.suggest_float("r_lo", *r_lo_range)
-
-        kelly_range = search_space["kelly_fraction"]
-        trial_cfg["trading"]["kelly_fraction"] = trial.suggest_float("kelly_fraction", *kelly_range)
-
-        conf_range = search_space["confidence_threshold"]
-        trial_cfg["trading"]["confidence_threshold"] = trial.suggest_float("confidence_threshold", *conf_range)
-
-        div_range = search_space["diversification"]
-        trial_cfg["trading"]["diversification"] = trial.suggest_int("diversification", *div_range)
-
+    def _objective(self, trial: optuna.Trial) -> float:
+        params = build_search_space(trial, self.search_cfg)
         try:
-            model = train_fn(trial_cfg)
-            metric = eval_fn(model, trial_cfg)
-            return float(metric)
+            model = self.train_fn(params)
+            score = self.eval_fn(model, params)
+            return score if np.isfinite(score) else -999.0
         except Exception as e:
-            log.warning(f"Trial failed: {e}")
+            logger.warning(f"Trial failed: {e}")
             return -999.0
 
-    study = optuna.create_study(direction="maximize",
-                                study_name=f"stock_trader_{objective_metric}")
-    study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
+    def run(self, n_trials: int = 60, objective: str = "sharpe") -> Dict:
+        direction = "maximize"
+        study = optuna.create_study(
+            study_name=self.study_name,
+            direction=direction,
+            sampler=optuna.samplers.TPESampler(seed=42),
+        )
+        study.optimize(self._objective, n_trials=n_trials, show_progress_bar=True)
 
-    log.info(f"Best {objective_metric}: {study.best_value:.4f}")
-    log.info(f"Best params: {study.best_params}")
+        best = study.best_params
+        logger.info(f"Best params ({objective}={study.best_value:.4f}): {best}")
 
-    return study.best_params
+        # Save results
+        out_path = os.path.join(self.results_dir, f"{self.study_name}_best_params.json")
+        with open(out_path, "w") as f:
+            json.dump({"best_params": best, "best_value": study.best_value}, f, indent=2)
+        logger.info(f"Best params saved to {out_path}")
+
+        return best
