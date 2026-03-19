@@ -1,92 +1,81 @@
-"""SHAP-based feature importance analysis for the trading model."""
+"""SHAP-based feature importance analysis."""
 import numpy as np
 import torch
-from pathlib import Path
-from typing import Optional
 from ultimate_trader.utils.logging import get_logger
 
 log = get_logger(__name__)
 
 
-def explain_model(
+def compute_shap_importances(
     model,
-    sample_price_seqs:     np.ndarray,
-    sample_sent_seqs:      np.ndarray,
-    sample_macro_seqs:     np.ndarray,
-    sample_company_ids:    np.ndarray,
-    price_feature_names:   list,
-    sent_feature_names:    list,
-    macro_feature_names:   list,
-    output_dir:            str = "data/explainability",
-    n_background_samples:  int = 100,
-    n_explain_samples:     int = 50,
-    device:                str = "cpu",
-):
+    sample_batch: dict,
+    feature_names_price: list[str],
+    feature_names_sent: list[str],
+    feature_names_macro: list[str],
+    n_background: int = 50,
+    n_test: int = 20
+) -> dict:
     """
-    Compute SHAP values for the flattened price, sentiment, and macro inputs.
-    Saves a CSV of mean absolute SHAP per feature to output_dir.
-    Requires shap >= 0.44 installed.
+    Use SHAP DeepExplainer to compute feature importances for the model.
 
-    Returns: dict of feature_name -> mean_abs_shap
+    sample_batch keys: price_seq, sentiment_seq, macro_seq,
+                       symbol_idx, regime (all torch tensors)
+
+    Returns dict with:
+      'price': array (n_features,) mean abs SHAP for price branch
+      'sentiment': array (n_features,) for sentiment branch
+      'macro': array (n_features,) for macro branch
     """
     try:
         import shap
     except ImportError:
-        log.warning("shap not installed. Skipping explainability analysis.")
+        log.error("SHAP not installed. Run: pip install shap")
         return {}
 
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
-
-    # flatten the 3D inputs to 2D for SHAP DeepExplainer
-    B = sample_price_seqs.shape[0]
-    price_flat = sample_price_seqs.reshape(B, -1)
-    sent_flat  = sample_sent_seqs.reshape(B, -1)
-    macro_flat = sample_macro_seqs.reshape(B, -1)
-    combined   = np.concatenate([price_flat, sent_flat, macro_flat], axis=1)
-
-    # build feature names
-    Tp = sample_price_seqs.shape[1]
-    Ts = sample_sent_seqs.shape[1]
-    Tm = sample_macro_seqs.shape[1]
-    feat_names = (
-        [f"price_t{-Tp+i}_{n}" for i in range(Tp) for n in price_feature_names] +
-        [f"sent_t{-Ts+i}_{n}"  for i in range(Ts) for n in sent_feature_names] +
-        [f"macro_t{-Tm+i}_{n}" for i in range(Tm) for n in macro_feature_names]
-    )
-
     model.eval()
-    model.to(device)
 
-    # wrapper to take flat input and return logits for class 3+4 (bullish)
-    def model_fn(x_flat):
-        x = torch.tensor(x_flat, dtype=torch.float32, device=device)
-        p = x[:, :Tp * len(price_feature_names)].reshape(-1, Tp, len(price_feature_names))
-        s = x[:, Tp*len(price_feature_names): Tp*len(price_feature_names) + Ts*len(sent_feature_names)]
-        s = s.reshape(-1, Ts, len(sent_feature_names))
-        m = x[:, -Tm*len(macro_feature_names):].reshape(-1, Tm, len(macro_feature_names))
-        cids = torch.zeros(x.shape[0], dtype=torch.long, device=device)
+    # Wrap the model's forward in a function that takes a single concatenated tensor
+    # SHAP works best on single-input models, so we explain the price branch in isolation
+    bg_price = sample_batch["price_seq"][:n_background]  # (N, T, F)
+    test_price = sample_batch["price_seq"][n_background:n_background + n_test]
+
+    # Fixed other inputs (use their means as "baseline")
+    bg_sent = sample_batch["sentiment_seq"][:n_background].mean(0, keepdim=True).expand(n_background, -1, -1)
+    bg_macro = sample_batch["macro_seq"][:n_background].mean(0, keepdim=True).expand(n_background, -1, -1)
+    bg_sym = sample_batch["symbol_idx"][:n_background]
+    bg_reg = sample_batch["regime"][:n_background]
+
+    def model_fn(price_input):
+        """Forward with price branch varying, others fixed."""
         with torch.no_grad():
-            logits = model(p, s, m, cids)
-            probs = torch.softmax(logits, dim=-1)
-        # return bullish probability (class 3 + 4)
-        return (probs[:, 3] + probs[:, 4]).unsqueeze(1).cpu().numpy()
+            inp = torch.tensor(price_input, dtype=torch.float32)
+            logits = model(inp, bg_sent[:len(inp)], bg_macro[:len(inp)],
+                           bg_sym[:len(inp)], bg_reg[:len(inp)])
+            return torch.softmax(logits, dim=-1).numpy()
 
-    background = combined[:n_background_samples]
-    explainer  = shap.KernelExplainer(model_fn, background)
-    shap_values = explainer.shap_values(combined[:n_explain_samples], nsamples=100)
+    # Flatten time x features for SHAP
+    bg_flat = bg_price.numpy().reshape(n_background, -1)
+    test_flat = test_price.numpy().reshape(n_test, -1)
 
-    mean_abs_shap = np.abs(shap_values).mean(axis=0).flatten()
+    explainer = shap.KernelExplainer(model_fn, bg_flat)
+    shap_values = explainer.shap_values(test_flat, nsamples=100)
 
-    import pandas as pd
-    df = pd.DataFrame({
-        "feature":       feat_names[:len(mean_abs_shap)],
-        "mean_abs_shap": mean_abs_shap,
-    }).sort_values("mean_abs_shap", ascending=False)
+    # shap_values is list of arrays (one per class) or single array
+    if isinstance(shap_values, list):
+        combined = np.abs(np.array(shap_values)).mean(axis=0)  # avg over classes
+    else:
+        combined = np.abs(shap_values)
 
-    out_path = Path(output_dir) / "feature_importance.csv"
-    df.to_csv(out_path, index=False)
-    log.info(f"Feature importance saved to {out_path}")
+    mean_abs_shap = combined.mean(axis=0)  # (T*F,)
 
-    # log top 20
-    log.info("Top 20 features by SHAP:\n" + df.head(20).to_string(index=False))
-    return dict(zip(df["feature"], df["mean_abs_shap"]))
+    T = bg_price.shape[1]
+    F = bg_price.shape[2]
+    shap_per_feature = mean_abs_shap.reshape(T, F).mean(axis=0)  # avg over time steps
+
+    result = {
+        "price": dict(zip(feature_names_price, shap_per_feature.tolist()))
+    }
+
+    log.info("SHAP top-5 price features: " +
+             str(sorted(result["price"].items(), key=lambda x: -x[1])[:5]))
+    return result
