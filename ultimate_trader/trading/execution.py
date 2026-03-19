@@ -1,132 +1,191 @@
-"""Order execution: bracket orders, reconciliation, position management."""
-from datetime import datetime
+"""Order execution layer.
+
+Key design principles:
+  - All stops and take-profits are SERVER-SIDE bracket orders on Alpaca.
+  - No local stop-loss checking loop.
+  - Portfolio state reconciled from Alpaca before every decision.
+  - Earnings calendar checked before entry.
+  - Regime-aware sizing via risk.py.
+"""
+import datetime
+import time
 from alpaca.trading.client import TradingClient
-from alpaca.trading.requests import MarketOrderRequest, LimitOrderRequest
+from alpaca.trading.requests import (
+    MarketOrderRequest, LimitOrderRequest,
+    TakeProfitRequest, StopLossRequest,
+)
 from alpaca.trading.enums import OrderSide, TimeInForce, OrderClass
+from ultimate_trader.utils.logging import get_logger
+from ultimate_trader.trading.risk import (
+    kelly_position_size, get_regime_params, check_earnings_buffer, check_kill_switch
+)
 
-from ultimate_trader.utils.logging import get_logger, log_trade
-from ultimate_trader.trading.portfolio import Portfolio
-from ultimate_trader.trading.risk import compute_position_sizes, kill_switch_triggered
-
-log = get_logger(__name__)
+logger = get_logger("execution")
 
 
-class OrderExecutor:
-    def __init__(self, cfg: dict, portfolio: Portfolio):
-        self.cfg = cfg
-        self.portfolio = portfolio
-        self.client = portfolio.client
+def place_bracket_order(
+    client: TradingClient,
+    symbol: str,
+    dollar_size: float,
+    current_price: float,
+    side: OrderSide,
+    stop_loss_pct: float = 0.07,
+    take_profit_pct: float = 0.12,
+) -> bool:
+    """
+    Place a bracket market order with server-side stop-loss and take-profit.
+    Returns True if successful.
+    """
+    qty = round(abs(dollar_size) / current_price, 2)
+    if qty < 1:
+        logger.info(f"  {symbol}: qty {qty} < 1, skipping")
+        return False
 
-    def execute(
-        self,
-        signals: list[dict],
-        current_prices: dict[str, float],
-        current_regime: int = 1
-    ) -> dict:
-        """
-        Main execution loop.
-        1. Check kill-switch
-        2. Reconcile existing positions
-        3. Close positions no longer in signal set or with exit signals
-        4. Open new positions with bracket orders
+    if side == OrderSide.BUY:
+        sl_price = round(current_price * (1 - stop_loss_pct), 2)
+        tp_price = round(current_price * (1 + take_profit_pct), 2)
+    else:
+        sl_price = round(current_price * (1 + stop_loss_pct), 2)
+        tp_price = round(current_price * (1 - take_profit_pct), 2)
 
-        signals: list of dicts with keys:
-          symbol, action ('buy'|'sell'|'hold'), confidence, prob_win,
-          expected_win, expected_loss
-        current_prices: dict symbol->float (live last trade price)
-        """
-        account = self.portfolio.get_account()
-        equity = account["equity"]
-        positions = self.portfolio.get_positions()
+    try:
+        req = MarketOrderRequest(
+            symbol=symbol,
+            qty=qty,
+            side=side,
+            time_in_force=TimeInForce.DAY,
+            order_class=OrderClass.BRACKET,
+            take_profit=TakeProfitRequest(limit_price=tp_price),
+            stop_loss=StopLossRequest(stop_price=sl_price),
+        )
+        order = client.submit_order(req)
+        logger.info(
+            f"  BRACKET ORDER: {side.value} {qty} {symbol} "
+            f"@ ~{current_price:.2f} | SL={sl_price} | TP={tp_price} | id={order.id}"
+        )
+        return True
+    except Exception as e:
+        logger.error(f"  Order failed for {symbol}: {e}")
+        return False
 
-        # --- Kill switch
-        total_position_value = sum(p["market_value"] for p in positions.values())
-        portfolio_start_value = equity  # simplified; ideally track from day start
-        daily_pnl_pct = sum(
-            p["unrealized_plpc"] * (p["market_value"] / equity)
-            for p in positions.values()
-        ) if positions else 0.0
 
-        if kill_switch_triggered(daily_pnl_pct, max_daily_loss=-0.05):
-            self.portfolio.close_all_positions()
-            return {"status": "kill_switch", "closed": list(positions.keys())}
+def close_position(client: TradingClient, symbol: str):
+    """Close an open position entirely."""
+    try:
+        client.close_position(symbol)
+        logger.info(f"  Closed position: {symbol}")
+    except Exception as e:
+        logger.warning(f"  Could not close {symbol}: {e}")
 
-        # --- Build signal lookup
-        signal_map = {s["symbol"]: s for s in signals}
 
-        # --- Close positions not in signal set or with sell signal
-        closed = []
-        for symbol, pos in positions.items():
-            signal = signal_map.get(symbol)
-            should_close = (
-                signal is None or                          # no signal -> exit
-                signal["action"] == "hold" or             # model says hold, we exit for safety
-                (signal["action"] == "sell" and pos["side"] == "long") or
-                (signal["action"] == "buy" and pos["side"] == "short")
-            )
-            if should_close:
-                if self.portfolio.close_position(symbol):
-                    closed.append(symbol)
+def run_trading_session(
+    predictions: dict,
+    current_prices: dict,
+    positions: dict,
+    account: dict,
+    client: TradingClient,
+    current_regime: int,
+    earnings_calendar: dict,
+    cfg: dict,
+):
+    """
+    Main execution loop for a single trading session.
 
-        # Refresh after closes
-        account = self.portfolio.get_account()
-        equity = account["equity"]
+    Args:
+        predictions:       {symbol: {mean_probs, confidence, predicted_class}}
+        current_prices:    {symbol: float}
+        positions:         current open positions from reconcile_positions()
+        account:           account info from get_account_info()
+        client:            TradingClient
+        current_regime:    int (0/1/2)
+        earnings_calendar: {symbol: [date_str]}
+        cfg:               merged config dict
+    """
+    # Kill switch check
+    if check_kill_switch(account):
+        logger.warning("Kill switch active. No trades will be placed.")
+        return
 
-        # --- Size new positions
-        new_signals = [
-            s for s in signals
-            if s["symbol"] not in positions
-            and s["action"] in ("buy", "sell")
-        ]
-        sized = compute_position_sizes(new_signals, equity, self.cfg, current_regime)
+    regime_params = get_regime_params(current_regime, cfg)
+    equity = account.get("equity", 0)
+    earnings_buffer = cfg.get("trading", {}).get("earnings_buffer_days", 1)
+    allow_short = cfg.get("trading", {}).get("allow_short", True) and regime_params["allow_short"]
 
-        # --- Submit bracket orders
-        opened = []
-        for sig in sized:
-            symbol = sig["symbol"]
-            price = current_prices.get(symbol)
-            if price is None or price <= 0:
-                log.warning(f"No price for {symbol}, skipping")
-                continue
+    actions = []
 
-            shares = round(sig["dollar_size"] / price, 2)
-            if shares < self.cfg["trading"].get("min_shares", 0.01):
-                continue
+    for symbol, pred in predictions.items():
+        price = current_prices.get(symbol)
+        if not price or price <= 0:
+            logger.warning(f"  No price for {symbol}, skipping")
+            continue
 
-            side = OrderSide.BUY if sig["action"] == "buy" else OrderSide.SELL
-            stop_loss_pct = self.cfg["trading"].get("stop_loss", 0.08)
-            take_profit_pct = self.cfg["trading"].get("take_profit", 0.12)
+        confidence = float(pred["confidence"])
+        predicted_class = int(pred["predicted_class"])
 
-            stop_price = round(price * (1 - stop_loss_pct) if side == OrderSide.BUY
-                               else price * (1 + stop_loss_pct), 2)
-            limit_price = round(price * (1 + take_profit_pct) if side == OrderSide.BUY
-                                else price * (1 - take_profit_pct), 2)
+        # Skip hold predictions
+        if predicted_class == 2:
+            continue
 
-            try:
-                order = MarketOrderRequest(
-                    symbol=symbol,
-                    qty=shares,
-                    side=side,
-                    time_in_force=TimeInForce.DAY,
-                    order_class=OrderClass.BRACKET,
-                    stop_loss={"stop_price": stop_price},
-                    take_profit={"limit_price": limit_price}
-                )
-                submitted = self.client.submit_order(order)
-                log_trade(
-                    f"{side.value.upper()} {shares} x {symbol} @ ~${price:.2f} | "
-                    f"SL=${stop_price} TP=${limit_price} | "
-                    f"confidence={sig['confidence']:.3f} | "
-                    f"order_id={submitted.id} | {datetime.now()}"
-                )
-                opened.append(symbol)
+        # Skip if below confidence threshold
+        if confidence < regime_params["min_confidence"]:
+            logger.info(f"  {symbol}: confidence {confidence:.3f} below threshold, skip")
+            continue
 
-            except Exception as e:
-                log.error(f"Order failed for {symbol}: {e}")
+        # Skip if earnings are imminent
+        if check_earnings_buffer(symbol, earnings_calendar, earnings_buffer):
+            logger.info(f"  {symbol}: earnings buffer active, skip")
+            # also close any open position
+            if symbol in positions:
+                close_position(client, symbol)
+            continue
 
-        return {
-            "status": "ok",
-            "closed": closed,
-            "opened": opened,
-            "equity": equity
-        }
+        # Determine side
+        is_long = predicted_class in (3, 4)
+        is_short = predicted_class in (0, 1)
+
+        if is_short and not allow_short:
+            continue
+
+        side = OrderSide.BUY if is_long else OrderSide.SELL
+
+        # Kelly sizing
+        dollar_size = kelly_position_size(
+            confidence=confidence,
+            predicted_class=predicted_class,
+            current_price=price,
+            equity=equity,
+            kelly_fraction=regime_params["kelly_fraction"],
+            max_position_fraction=regime_params["max_single_position"],
+        )
+
+        if abs(dollar_size) < price:  # less than 1 share worth
+            continue
+
+        # Check gross exposure
+        current_exposure = sum(
+            abs(p["market_value"]) for p in positions.values()
+        ) / equity if equity > 0 else 0
+        if current_exposure >= regime_params["max_gross_exposure"]:
+            logger.info(f"  Max gross exposure reached ({current_exposure:.1%}), skipping new trades")
+            break
+
+        actions.append((symbol, side, dollar_size, price, confidence, predicted_class))
+
+    # Sort by confidence descending
+    actions.sort(key=lambda x: -x[4])
+
+    placed = 0
+    for symbol, side, dollar_size, price, confidence, pred_class in actions:
+        logger.info(f"  Placing: {side.value} {symbol} ${dollar_size:.0f} conf={confidence:.3f} class={pred_class}")
+        success = place_bracket_order(
+            client=client,
+            symbol=symbol,
+            dollar_size=dollar_size,
+            current_price=price,
+            side=side,
+        )
+        if success:
+            placed += 1
+        time.sleep(0.2)  # rate limit buffer
+
+    logger.info(f"Trading session complete: {placed}/{len(actions)} orders placed | regime={current_regime}")
