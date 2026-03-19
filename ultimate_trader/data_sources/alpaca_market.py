@@ -1,132 +1,94 @@
-"""Fetch OHLCV bars and account info from Alpaca Markets Data API v2."""
-import os
+"""Fetch OHLCV bars, benchmark, and sector ETF data from Alpaca Market Data v2."""
 import time
-import pandas as pd
 from pathlib import Path
 from datetime import datetime, timedelta
-from typing import List, Optional
+
+import pandas as pd
+from alpaca.data.historical import StockHistoricalDataClient
+from alpaca.data.requests import StockBarsRequest
+from alpaca.data.timeframe import TimeFrame
 
 from ultimate_trader.utils.logging import get_logger
+from ultimate_trader.utils.time_utils import today_str
 
 log = get_logger(__name__)
 
-try:
-    from alpaca.data.historical import StockHistoricalDataClient
-    from alpaca.data.requests import StockBarsRequest
-    from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
-    _USE_ALPACA_PY = True
-except ImportError:
-    import alpaca_trade_api as tradeapi
-    _USE_ALPACA_PY = False
 
+class MarketDataFetcher:
+    def __init__(self, cfg: dict):
+        self.cfg = cfg
+        self.client = StockHistoricalDataClient(
+            api_key=cfg["alpaca"]["key_id"],
+            secret_key=cfg["alpaca"]["secret_key"]
+        )
+        self.raw_dir = Path(cfg["paths"]["raw_dir"]) / "market"
+        self.raw_dir.mkdir(parents=True, exist_ok=True)
 
-def _get_client(api_key: str, secret_key: str):
-    if _USE_ALPACA_PY:
-        return StockHistoricalDataClient(api_key, secret_key)
-    return tradeapi.REST(api_key, secret_key, base_url="https://data.alpaca.markets", api_version="v2")
+    def fetch_bars(
+        self,
+        symbols: list[str],
+        start: str,
+        end: str | None = None,
+        timeframe: str = "1Day",
+        save: bool = True
+    ) -> dict[str, pd.DataFrame]:
+        """Fetch OHLCV bars for a list of symbols. Returns dict symbol->DataFrame."""
+        end = end or today_str()
+        tf = TimeFrame.Day if timeframe == "1Day" else TimeFrame.Hour
 
+        log.info(f"Fetching bars for {len(symbols)} symbols from {start} to {end}")
 
-def fetch_bars(
-    symbols: List[str],
-    start: str,
-    end: Optional[str],
-    api_key: str,
-    secret_key: str,
-    timeframe: str = "1Day",
-    raw_dir: str = "data/raw/bars",
-    force_refresh: bool = False,
-) -> dict:
-    """
-    Download OHLCV bars for each symbol from Alpaca.
-    Saves per-symbol CSV to raw_dir.
-    Returns dict of symbol -> pd.DataFrame with columns:
-        date, open, high, low, close, volume, vwap, trade_count
-    """
-    Path(raw_dir).mkdir(parents=True, exist_ok=True)
-    end = end or datetime.now().strftime("%Y-%m-%d")
-    result = {}
+        request = StockBarsRequest(
+            symbol_or_symbols=symbols,
+            timeframe=tf,
+            start=start,
+            end=end,
+            adjustment="all",       # split + dividend adjusted
+            feed="sip"             # consolidated tape
+        )
 
-    client = _get_client(api_key, secret_key)
+        bars = self.client.get_stock_bars(request).df
 
-    for symbol in symbols:
-        fpath = Path(raw_dir) / f"{symbol}.csv"
-
-        if fpath.exists() and not force_refresh:
-            df = pd.read_csv(fpath, parse_dates=["date"], index_col="date")
-            # only refresh data after the last saved date
-            last_saved = str(df.index.max().date())
-            if last_saved >= end:
+        # Alpaca returns multi-index (symbol, timestamp) — split into per-symbol dfs
+        result = {}
+        for symbol in symbols:
+            try:
+                df = bars.loc[symbol].copy()
+                df.index = pd.to_datetime(df.index).tz_localize(None)  # naive UTC dates
+                df.index.name = "date"
                 result[symbol] = df
-                continue
-            fetch_start = str((pd.Timestamp(last_saved) + timedelta(days=1)).date())
-        else:
-            fetch_start = start
 
-        try:
-            log.info(f"Fetching bars for {symbol} from {fetch_start} to {end}")
+                if save:
+                    out_path = self.raw_dir / f"{symbol}.csv"
+                    df.to_csv(out_path)
+                    log.debug(f"Saved {symbol} bars to {out_path}")
 
-            if _USE_ALPACA_PY:
-                req = StockBarsRequest(
-                    symbol_or_symbols=symbol,
-                    timeframe=TimeFrame.Day,
-                    start=fetch_start,
-                    end=end,
-                )
-                bars = client.get_stock_bars(req).df
-                if isinstance(bars.index, pd.MultiIndex):
-                    bars = bars.loc[symbol]
-                bars.index = pd.to_datetime(bars.index).normalize()
-                bars.index.name = "date"
-                bars = bars.rename(columns={
-                    "open": "open", "high": "high", "low": "low",
-                    "close": "close", "volume": "volume",
-                    "vwap": "vwap", "trade_count": "trade_count"
-                })
-            else:
-                raw = client.get_bars(symbol, "1Day", start=fetch_start, end=end).df
-                raw.index = pd.to_datetime(raw.index).normalize()
-                raw.index.name = "date"
-                bars = raw
+            except KeyError:
+                log.warning(f"No bar data returned for {symbol}")
 
-            if fpath.exists():
-                old = pd.read_csv(fpath, parse_dates=["date"], index_col="date")
-                bars = pd.concat([old, bars]).loc[~pd.concat([old, bars]).index.duplicated(keep="last")]
+        log.info(f"Fetched bars for {len(result)}/{len(symbols)} symbols")
+        return result
 
-            bars.sort_index(inplace=True)
-            bars.to_csv(fpath)
-            result[symbol] = bars
+    def load_bars(self, symbol: str) -> pd.DataFrame | None:
+        """Load cached bars for a symbol. Returns None if not found."""
+        path = self.raw_dir / f"{symbol}.csv"
+        if not path.exists():
+            return None
+        df = pd.read_csv(path, index_col="date", parse_dates=True)
+        return df
 
-        except Exception as e:
-            log.error(f"Failed to fetch bars for {symbol}: {e}")
-            if fpath.exists():
-                result[symbol] = pd.read_csv(fpath, parse_dates=["date"], index_col="date")
-
-        time.sleep(0.2)
-
-    return result
-
-
-def get_latest_prices(symbols: List[str], api_key: str, secret_key: str) -> dict:
-    """
-    Fetch real-time last trade price for each symbol from Alpaca.
-    Returns dict of symbol -> float price.
-    Always use this for live order sizing, NOT CSV data.
-    """
-    prices = {}
-    try:
-        if _USE_ALPACA_PY:
-            from alpaca.data.historical import StockHistoricalDataClient
-            from alpaca.data.requests import StockLatestTradeRequest
-            client = StockHistoricalDataClient(api_key, secret_key)
-            req = StockLatestTradeRequest(symbol_or_symbols=symbols)
-            trades = client.get_stock_latest_trade(req)
-            for sym, trade in trades.items():
-                prices[sym] = float(trade.price)
-        else:
-            client = _get_client(api_key, secret_key)
-            for sym in symbols:
-                prices[sym] = float(client.get_latest_trade(sym).price)
-                time.sleep(0.1)
-    except Exception as e:
-        log.error(f"Failed to get latest prices: {e}")
-    return prices
+    def fetch_all(self, save: bool = True) -> dict[str, pd.DataFrame]:
+        """Fetch bars for all symbols + benchmark + sector ETFs in config."""
+        symbols = (
+            self.cfg["universe"]["symbols"]
+            + [self.cfg["universe"]["benchmark"]]
+            + self.cfg["universe"]["sector_etfs"]
+        )
+        # Deduplicate
+        symbols = list(dict.fromkeys(symbols))
+        return self.fetch_bars(
+            symbols=symbols,
+            start=self.cfg["data"]["start_date"],
+            end=self.cfg["data"].get("end_date"),
+            save=save
+        )
