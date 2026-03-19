@@ -1,39 +1,32 @@
 training:
-  batch_size: 256
+  batch_size: 128
   num_epochs: 50
-  lr: 0.0003
+  lr: 0.0005
   weight_decay: 0.0001
-  early_stopping_patience: 8
+  patience: 8                        # early stopping patience
   grad_clip: 1.0
-  label_smoothing: 0.05
+  class_weights: true                # handle class imbalance
+  device: "auto"                     # auto | cpu | cuda
 
 walk_forward:
   enabled: true
-  train_months: 18
-  val_months: 3
-  test_months: 1
-  step_months: 1
-  min_windows: 3
+  train_months: 18                   # training window size
+  val_months: 3                      # validation window
+  test_months: 1                     # test / pseudo-live window
+  step_months: 1                     # how far to roll forward each fold
+  min_folds: 5                       # minimum folds before reporting results
 
 hyperparam_search:
   enabled: true
-  n_trials: 60
-  direction: "maximize"   # maximize walk-forward Sharpe
+  n_trials: 80                       # Optuna trials
+  objective: "sharpe"                # sharpe | sortino | total_return
   search_space:
     lr: [0.00005, 0.005]
     dropout: [0.1, 0.5]
-    price_hidden: [64, 256]
-    sentiment_hidden: [32, 128]
-    fusion_hidden: [128, 512]
+    hidden_dim: [64, 256]
     price_window: [20, 60]
-    sentiment_window: [10, 40]
-    r_hi: [0.015, 0.06]
-    r_lo: [0.002, 0.015]
+    r_hi: [0.01, 0.05]
+    r_lo: [0.003, 0.015]
     kelly_fraction: [0.1, 0.5]
-    confidence_threshold: [0.45, 0.75]
-    max_single_position: [0.05, 0.25]
-
-augmentation:
-  enabled: true
-  gaussian_noise_std: 0.005
-  time_shift_max: 2
+    confidence_threshold: [0.45, 0.85]
+    diversification: [5, 20]

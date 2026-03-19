@@ -17,57 +17,58 @@ universe:
     - V
     - UNH
     - XOM
-    - LLY
-    - AVGO
     - JNJ
     - WMT
-    - MA
     - PG
+    - MA
     - HD
-    - MRK
-    - COST
-    - ORCL
     - CVX
-    - BAC
+    - MRK
+    - LLY
     - ABBV
-    - KO
     - PEP
-    - ADBE
-    - CSCO
+    - KO
+    - AVGO
+    - COST
     - AMD
-    - NFLX
-    - CRM
-    - TMO
+    - ORCL
+    - CSCO
+    - ACN
     - MCD
-    - QCOM
-    - INTC
-    - DIS
-    - ABT
-    - INTU
+    - NFLX
     - TXN
-    - GE
+    - ADBE
+    - CRM
+    - INTC
+    - QCOM
     - AMGN
-    - HON
-    - SPGI
-    - LOW
-    - GS
     - IBM
-    - CAT
-    - AXP
+    - GS
+    - BAC
     - MS
     - BLK
+    - SPGI
+    - CAT
+    - DE
+    - BA
+    - GE
+    - RTX
+    - T
+    - VZ
+    - DIS
   benchmark: "SPY"
   sector_etfs:
-    - "XLK"
-    - "XLF"
-    - "XLE"
-    - "XLY"
-    - "XLV"
-    - "XLI"
-    - "XLP"
-    - "XLB"
-    - "XLRE"
-    - "XLU"
+    - XLK
+    - XLF
+    - XLE
+    - XLY
+    - XLV
+    - XLI
+    - XLB
+    - XLRE
+    - XLU
+    - XLC
+    - XLP
 
 data:
   start_date: "2018-01-01"
@@ -77,19 +78,8 @@ data:
 
 news:
   enabled: true
-  max_articles_per_symbol_per_day: 20
-  lookback_days: 365
-
-macro:
-  enabled: true
-  symbols:
-    - "VIXY"    # VIX proxy ETF
-    - "TLT"     # 20yr treasury
-    - "SHY"     # 1-3yr treasury (spread = TLT-SHY)
-    - "GLD"     # gold
-    - "USO"     # crude oil
-    - "DXY"     # USD index via UUP
-    - "UUP"     # USD bullish ETF
+  max_articles_per_day: 20
+  lookback_days: 730
 
 paths:
   raw_dir: "data/raw"
@@ -105,6 +95,5 @@ trading:
   max_gross_exposure: 0.95
   max_single_position: 0.15
   min_cash_buffer: 0.05
-  allow_short: false           # set true when ready
-  kelly_fraction: 0.25         # fractional Kelly multiplier
-  server_side_orders: true     # use bracket orders on Alpaca
+  allow_short: true
+  min_shares: 0.01
