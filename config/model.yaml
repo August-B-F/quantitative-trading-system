@@ -1,21 +1,32 @@
 model:
-  type: "lstm_transformer"         # lstm_transformer | lstm_only | transformer_only
-  price_window: 40                  # days of price/technical history fed to model
-  sentiment_window: 20              # days of sentiment history
-  macro_window: 20                  # days of macro/sector history
-  hidden_dim: 128                   # LSTM / attention hidden size
+  type: "lstm_transformer"
+
+  # time series branches
+  price_window: 40
+  sentiment_window: 20
+  macro_window: 20
+
+  # architecture
+  price_hidden_dim: 128
+  sentiment_hidden_dim: 64
+  macro_hidden_dim: 64
+  fusion_hidden_dim: 256
   num_lstm_layers: 2
   num_attention_heads: 4
-  dropout: 0.3                      # must be >0 for MC-Dropout to work
-  company_embedding_dim: 16         # learned per-ticker embedding
-  macro_hidden_dim: 64
-  fc_dims: [256, 128]               # fully-connected head dims
-  num_classes: 5                    # strong_sell / sell / hold / buy / strong_buy
+  dropout: 0.3
+
+  # company embedding
+  company_embedding_dim: 16
+  sector_embedding_dim: 8
+
+  # output classes: strong_sell, sell, hold, buy, strong_buy
+  num_classes: 5
 
 targets:
-  horizon_days: 3                   # predict return over next N days
-  r_hi: 0.025                       # threshold for strong buy/sell label
-  r_lo: 0.008                       # threshold for hold
+  horizon_days: 3
+  r_hi: 0.03       # threshold for strong buy/sell
+  r_lo: 0.005      # threshold for weak buy/sell vs hold
 
 uncertainty:
-  mc_dropout_samples: 50            # MC-Dropout forward passes at inference
+  mc_dropout_samples: 50
+  min_confidence: 0.55

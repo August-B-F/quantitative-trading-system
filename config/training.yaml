@@ -3,30 +3,35 @@ training:
   num_epochs: 50
   lr: 0.0005
   weight_decay: 0.0001
-  patience: 8                        # early stopping patience
+  lr_scheduler: "cosine"      # cosine, step, plateau
+  early_stopping_patience: 8
   grad_clip: 1.0
-  class_weights: true                # handle class imbalance
-  device: "auto"                     # auto | cpu | cuda
+  class_weight_method: "inverse_freq"  # handle class imbalance
 
 walk_forward:
   enabled: true
-  train_months: 18                   # training window size
-  val_months: 3                      # validation window
-  test_months: 1                     # test / pseudo-live window
-  step_months: 1                     # how far to roll forward each fold
-  min_folds: 5                       # minimum folds before reporting results
+  train_months: 18
+  val_months: 3
+  test_months: 1
+  step_months: 1
+  min_windows: 6
 
 hyperparam_search:
   enabled: true
-  n_trials: 80                       # Optuna trials
-  objective: "sharpe"                # sharpe | sortino | total_return
+  method: "optuna"            # optuna, random
+  n_trials: 60
+  objective: "sharpe"         # sharpe, sortino, total_return
   search_space:
-    lr: [0.00005, 0.005]
+    lr: [0.0001, 0.005]
     dropout: [0.1, 0.5]
-    hidden_dim: [64, 256]
+    price_hidden_dim: [64, 256]
     price_window: [20, 60]
     r_hi: [0.01, 0.05]
-    r_lo: [0.003, 0.015]
+    r_lo: [0.002, 0.01]
     kelly_fraction: [0.1, 0.5]
-    confidence_threshold: [0.45, 0.85]
-    diversification: [5, 20]
+    mc_dropout_samples: [20, 100]
+
+backtest:
+  slippage_bps: 5             # 5 basis points per trade
+  commission_per_share: 0.0   # Alpaca is commission-free
+  min_sharpe_to_promote: 0.5  # new model must beat this vs current

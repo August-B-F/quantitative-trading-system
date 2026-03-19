@@ -1,6 +1,6 @@
 alpaca:
-  key_id: "YOUR_ALPACA_KEY"
-  secret_key: "YOUR_ALPACA_SECRET"
+  key_id: "${ALPACA_KEY}"
+  secret_key: "${ALPACA_SECRET}"
   base_url: "https://paper-api.alpaca.markets"
   data_base_url: "https://data.alpaca.markets"
 
@@ -14,48 +14,48 @@ universe:
     - NVDA
     - TSLA
     - JPM
-    - V
-    - UNH
+    - BAC
+    - GS
     - XOM
-    - JNJ
-    - WMT
-    - PG
-    - MA
-    - HD
     - CVX
-    - MRK
-    - LLY
+    - JNJ
+    - UNH
+    - PFE
     - ABBV
-    - PEP
-    - KO
-    - AVGO
-    - COST
-    - AMD
-    - ORCL
-    - CSCO
-    - ACN
+    - HD
     - MCD
+    - NKE
+    - DIS
     - NFLX
-    - TXN
     - ADBE
     - CRM
+    - AMD
     - INTC
     - QCOM
-    - AMGN
-    - IBM
-    - GS
-    - BAC
-    - MS
-    - BLK
-    - SPGI
-    - CAT
-    - DE
+    - TXN
+    - AVGO
+    - MU
+    - AMAT
     - BA
+    - CAT
     - GE
-    - RTX
-    - T
-    - VZ
-    - DIS
+    - MMM
+    - LMT
+    - KO
+    - PEP
+    - WMT
+    - COST
+    - TGT
+    - AMGN
+    - GILD
+    - MRNA
+    - BRK.B
+    - V
+    - MA
+    - PYPL
+    - SQ
+    - COIN
+    - HOOD
   benchmark: "SPY"
   sector_etfs:
     - XLK
@@ -66,9 +66,9 @@ universe:
     - XLI
     - XLB
     - XLRE
-    - XLU
-    - XLC
     - XLP
+    - XLU
+  vix_symbol: "VIXY"
 
 data:
   start_date: "2018-01-01"
@@ -78,7 +78,7 @@ data:
 
 news:
   enabled: true
-  max_articles_per_day: 20
+  max_articles_per_day: 30
   lookback_days: 730
 
 paths:
@@ -96,4 +96,6 @@ trading:
   max_single_position: 0.15
   min_cash_buffer: 0.05
   allow_short: true
-  min_shares: 0.01
+  max_short_exposure: 0.3
+  kelly_fraction: 0.3
+  bracket_orders: true
