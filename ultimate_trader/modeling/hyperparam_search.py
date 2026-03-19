@@ -1,102 +1,85 @@
+"""Bayesian hyperparameter search using Optuna.
+
+Objective: maximise walk-forward out-of-sample Sharpe ratio.
+All search logic is in suggest_params() — easy to extend.
 """
-hyperparam_search.py
-
-Optuna-based hyperparameter search over walk-forward windows.
-
-Objective: maximize walk-forward Sharpe ratio.
-Search space covers: model architecture, training params, AND trading filters.
-This is the correct way to optimize trading filters — walk-forward prevents
-the curve-fitting problem that pure historical optimization (like the 1B-sim
-approach) has.
-"""
-
-import os
-import json
 import optuna
+import torch
 import numpy as np
-from typing import Callable, Dict
-
 from ultimate_trader.utils.logging import get_logger
 
 logger = get_logger("hyperparam_search")
 
+# Suppress Optuna's noisy logs unless debugging
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 
-def build_search_space(trial: optuna.Trial, search_cfg: dict) -> dict:
+def suggest_params(trial: optuna.Trial, search_space: dict) -> dict:
     """
-    Builds a hyperparameter dict from an Optuna trial.
-    Supports float ranges (2-element list) and categorical (list of >2 discrete values).
+    Sample a parameter configuration from the search space defined in training.yaml.
+    Handles list ranges [min, max] and categorical lists.
     """
     params = {}
-    for key, spec in search_cfg.items():
-        if isinstance(spec, list) and len(spec) == 2 and all(isinstance(v, (int, float)) for v in spec):
-            lo, hi = spec
+    for name, bounds in search_space.items():
+        if isinstance(bounds, list) and len(bounds) == 2:
+            lo, hi = bounds
             if isinstance(lo, int) and isinstance(hi, int):
-                params[key] = trial.suggest_int(key, lo, hi)
+                params[name] = trial.suggest_int(name, lo, hi)
             else:
-                params[key] = trial.suggest_float(key, lo, hi, log=(lo > 0 and hi / lo > 10))
-        elif isinstance(spec, list):
-            params[key] = trial.suggest_categorical(key, spec)
+                params[name] = trial.suggest_float(name, lo, hi, log=(lo > 0 and hi / lo > 10))
+        elif isinstance(bounds, list):
+            params[name] = trial.suggest_categorical(name, bounds)
         else:
-            params[key] = spec
+            params[name] = bounds
     return params
 
 
-class WalkForwardSearch:
+def run_search(
+    train_fn,
+    cfg: dict,
+    all_features: dict,
+    n_trials: int = 80,
+):
     """
-    Runs Optuna hyperparameter search where each trial:
-      1. Builds model with candidate params
-      2. Trains on train window
-      3. Evaluates on val window using a backtester
-      4. Returns objective metric (Sharpe by default)
+    Run Optuna hyperparameter search.
 
-    Usage:
-      searcher = WalkForwardSearch(train_fn, eval_fn, search_cfg)
-      best_params = searcher.run(n_trials=60)
+    Args:
+        train_fn: callable(cfg, all_features, params) -> sharpe_ratio (float)
+        cfg:      merged config dict
+        all_features: {symbol: pd.DataFrame}
+        n_trials: number of Optuna trials
+
+    Returns:
+        best_params (dict), study (optuna.Study)
     """
+    search_space = cfg.get("hyperparam_search", {}).get("search_space", {})
+    sampler_name = cfg.get("hyperparam_search", {}).get("sampler", "tpe")
+    pruner_name = cfg.get("hyperparam_search", {}).get("pruner", "median")
 
-    def __init__(
-        self,
-        train_fn: Callable,    # fn(params) -> trained model
-        eval_fn: Callable,     # fn(model, params) -> float (metric)
-        search_cfg: dict,
-        study_name: str = "wf_search",
-        results_dir: str = "data/models",
-    ):
-        self.train_fn = train_fn
-        self.eval_fn = eval_fn
-        self.search_cfg = search_cfg
-        self.study_name = study_name
-        self.results_dir = results_dir
-        os.makedirs(results_dir, exist_ok=True)
+    sampler = optuna.samplers.TPESampler(seed=42) if sampler_name == "tpe" \
+        else optuna.samplers.RandomSampler(seed=42)
+    pruner = optuna.pruners.MedianPruner() if pruner_name == "median" \
+        else optuna.pruners.NopPruner()
 
-    def _objective(self, trial: optuna.Trial) -> float:
-        params = build_search_space(trial, self.search_cfg)
+    study = optuna.create_study(
+        direction="maximize",
+        sampler=sampler,
+        pruner=pruner,
+    )
+
+    def objective(trial):
+        params = suggest_params(trial, search_space)
+        logger.info(f"Trial {trial.number}: {params}")
         try:
-            model = self.train_fn(params)
-            score = self.eval_fn(model, params)
-            return score if np.isfinite(score) else -999.0
+            sharpe = train_fn(cfg, all_features, params, trial=trial)
+            return sharpe
+        except optuna.exceptions.TrialPruned:
+            raise
         except Exception as e:
-            logger.warning(f"Trial failed: {e}")
+            logger.warning(f"Trial {trial.number} failed: {e}")
             return -999.0
 
-    def run(self, n_trials: int = 60, objective: str = "sharpe") -> Dict:
-        direction = "maximize"
-        study = optuna.create_study(
-            study_name=self.study_name,
-            direction=direction,
-            sampler=optuna.samplers.TPESampler(seed=42),
-        )
-        study.optimize(self._objective, n_trials=n_trials, show_progress_bar=True)
-
-        best = study.best_params
-        logger.info(f"Best params ({objective}={study.best_value:.4f}): {best}")
-
-        # Save results
-        out_path = os.path.join(self.results_dir, f"{self.study_name}_best_params.json")
-        with open(out_path, "w") as f:
-            json.dump({"best_params": best, "best_value": study.best_value}, f, indent=2)
-        logger.info(f"Best params saved to {out_path}")
-
-        return best
+    study.optimize(objective, n_trials=n_trials, show_progress_bar=True)
+    logger.info(f"Best Sharpe: {study.best_value:.4f}")
+    logger.info(f"Best params: {study.best_params}")
+    return study.best_params, study

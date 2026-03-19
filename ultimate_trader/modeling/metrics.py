@@ -1,86 +1,51 @@
-"""
-metrics.py
-
-Evaluation metrics for both ML quality and trading quality.
-
-ML metrics:
-  - accuracy, precision, recall per class
-  - directional accuracy (did we get up/down right?)
-
-Trading metrics:
-  - Sharpe ratio
-  - Sortino ratio
-  - Max drawdown
-  - Hit rate (% profitable trades)
-  - Average return per trade
-"""
-
+"""Evaluation metrics for model and strategy performance."""
 import numpy as np
 import pandas as pd
-from typing import List, Optional
+from sklearn.metrics import classification_report, confusion_matrix
 
 
-def directional_accuracy(preds: np.ndarray, labels: np.ndarray) -> float:
-    """
-    For ordinal 5-class labels:
-    Label 0,1 = sell direction; 2 = hold; 3,4 = buy direction.
-    Measures whether predicted direction matches true direction.
-    """
-    pred_dir = np.where(preds > 2, 1, np.where(preds < 2, -1, 0))
-    true_dir = np.where(labels > 2, 1, np.where(labels < 2, -1, 0))
-    mask = true_dir != 0  # ignore holds
-    if mask.sum() == 0:
+def classification_metrics(y_true, y_pred) -> dict:
+    """Compute per-class precision/recall/F1 + accuracy."""
+    report = classification_report(
+        y_true, y_pred,
+        labels=[0, 1, 2, 3, 4],
+        target_names=["strong_sell", "weak_sell", "hold", "weak_buy", "strong_buy"],
+        output_dict=True,
+        zero_division=0,
+    )
+    return report
+
+
+def sharpe_ratio(returns: pd.Series, risk_free: float = 0.0, periods: int = 252) -> float:
+    """Annualised Sharpe ratio."""
+    excess = returns - risk_free / periods
+    if excess.std() == 0:
         return 0.0
-    return float((pred_dir[mask] == true_dir[mask]).mean())
+    return float(excess.mean() / excess.std() * np.sqrt(periods))
 
 
-def sharpe_ratio(returns: np.ndarray, risk_free: float = 0.0, annualize: bool = True) -> float:
-    if len(returns) < 2:
-        return 0.0
-    excess = returns - risk_free / 252
-    mean = excess.mean()
-    std = excess.std() + 1e-10
-    sr = mean / std
-    if annualize:
-        sr *= np.sqrt(252)
-    return float(sr)
-
-
-def sortino_ratio(returns: np.ndarray, risk_free: float = 0.0, annualize: bool = True) -> float:
-    if len(returns) < 2:
-        return 0.0
-    excess = returns - risk_free / 252
+def sortino_ratio(returns: pd.Series, risk_free: float = 0.0, periods: int = 252) -> float:
+    """Annualised Sortino ratio."""
+    excess = returns - risk_free / periods
     downside = excess[excess < 0]
-    if len(downside) == 0:
-        return float("inf")
-    downside_std = downside.std() + 1e-10
-    sr = excess.mean() / downside_std
-    if annualize:
-        sr *= np.sqrt(252)
-    return float(sr)
-
-
-def max_drawdown(equity_curve: np.ndarray) -> float:
-    """Maximum peak-to-trough drawdown as a positive fraction."""
-    peak = np.maximum.accumulate(equity_curve)
-    drawdown = (equity_curve - peak) / (peak + 1e-10)
-    return float(-drawdown.min())
-
-
-def hit_rate(pnl_per_trade: np.ndarray) -> float:
-    """Fraction of trades that were profitable."""
-    if len(pnl_per_trade) == 0:
+    if downside.std() == 0:
         return 0.0
-    return float((pnl_per_trade > 0).mean())
+    return float(excess.mean() / downside.std() * np.sqrt(periods))
 
 
-def compute_all_metrics(returns: np.ndarray, equity_curve: Optional[np.ndarray] = None) -> dict:
-    eq = equity_curve if equity_curve is not None else np.cumprod(1 + returns)
-    return {
-        "sharpe": sharpe_ratio(returns),
-        "sortino": sortino_ratio(returns),
-        "max_drawdown": max_drawdown(eq),
-        "total_return": float(eq[-1] / eq[0] - 1) if len(eq) > 0 else 0.0,
-        "ann_return": float(np.mean(returns) * 252),
-        "ann_vol": float(np.std(returns) * np.sqrt(252)),
-    }
+def max_drawdown(returns: pd.Series) -> float:
+    """Maximum drawdown from a returns series."""
+    cumulative = (1 + returns).cumprod()
+    rolling_max = cumulative.cummax()
+    drawdown = (cumulative - rolling_max) / rolling_max
+    return float(drawdown.min())
+
+
+def win_rate(returns: pd.Series) -> float:
+    return float((returns > 0).mean())
+
+
+def calmar_ratio(returns: pd.Series, periods: int = 252) -> float:
+    ann_return = (1 + returns).prod() ** (periods / len(returns)) - 1
+    mdd = abs(max_drawdown(returns))
+    return float(ann_return / mdd) if mdd > 0 else 0.0
