@@ -1,70 +1,65 @@
+"""Date/time helpers for market-aware operations."""
 import pandas as pd
-import datetime
-from typing import Optional
+from datetime import date, timedelta
+from typing import List
+
+try:
+    import pandas_market_calendars as mcal
+    _NYSE = mcal.get_calendar("NYSE")
+except ImportError:
+    _NYSE = None
 
 
-def today_str() -> str:
-    """Return today's date as YYYY-MM-DD string."""
-    return datetime.datetime.now().strftime("%Y-%m-%d")
+def trading_days_between(start: str, end: str) -> List[str]:
+    """Return list of NYSE trading day strings (YYYY-MM-DD) between start and end."""
+    if _NYSE is None:
+        dates = pd.bdate_range(start, end)
+        return [str(d.date()) for d in dates]
+    schedule = _NYSE.schedule(start_date=start, end_date=end)
+    return [str(d.date()) for d in schedule.index]
 
 
-def to_eastern(dt: datetime.datetime) -> datetime.datetime:
-    """Convert any datetime to US Eastern time."""
-    import pytz
-    eastern = pytz.timezone("America/New_York")
-    if dt.tzinfo is None:
-        return eastern.localize(dt)
-    return dt.astimezone(eastern)
+def last_n_trading_days(n: int, reference_date: str = None) -> List[str]:
+    """Return the last n trading days ending on reference_date (or today)."""
+    end = reference_date or str(date.today())
+    # start far enough back to guarantee n trading days
+    start = str((pd.Timestamp(end) - pd.DateOffset(days=n * 2)).date())
+    days = trading_days_between(start, end)
+    return days[-n:]
 
 
-def is_market_open() -> bool:
-    """Rough check if NYSE market is currently open."""
-    now = to_eastern(datetime.datetime.now())
-    if now.weekday() >= 5:  # Saturday / Sunday
-        return False
-    open_time = now.replace(hour=9, minute=30, second=0, microsecond=0)
-    close_time = now.replace(hour=16, minute=0, second=0, microsecond=0)
-    return open_time <= now <= close_time
-
-
-def walk_forward_splits(
-    start: str,
-    end: str,
-    train_months: int,
-    val_months: int,
-    test_months: int,
-    step_months: int,
-) -> list[dict]:
+def walk_forward_windows(start: str, end: str,
+                         train_months: int = 18,
+                         val_months: int = 3,
+                         test_months: int = 1,
+                         step_months: int = 1) -> List[dict]:
     """
-    Generate walk-forward time splits.
-
-    Returns:
-        List of dicts with keys: train_start, train_end, val_start,
-        val_end, test_start, test_end  (all as pandas Timestamps)
+    Generate walk-forward windows as list of dicts with keys:
+        train_start, train_end, val_start, val_end, test_start, test_end
     """
-    splits = []
+    windows = []
     cursor = pd.Timestamp(start)
-    end_ts = pd.Timestamp(end) if end else pd.Timestamp(today_str())
+    end_ts = pd.Timestamp(end)
 
     while True:
         train_start = cursor
-        train_end = train_start + pd.DateOffset(months=train_months)
-        val_start = train_end
-        val_end = val_start + pd.DateOffset(months=val_months)
-        test_start = val_end
-        test_end = test_start + pd.DateOffset(months=test_months)
+        train_end   = cursor + pd.DateOffset(months=train_months) - pd.DateOffset(days=1)
+        val_start   = train_end + pd.DateOffset(days=1)
+        val_end     = val_start + pd.DateOffset(months=val_months) - pd.DateOffset(days=1)
+        test_start  = val_end + pd.DateOffset(days=1)
+        test_end    = test_start + pd.DateOffset(months=test_months) - pd.DateOffset(days=1)
 
         if test_end > end_ts:
             break
 
-        splits.append({
-            "train_start": train_start,
-            "train_end": train_end,
-            "val_start": val_start,
-            "val_end": val_end,
-            "test_start": test_start,
-            "test_end": test_end,
+        windows.append({
+            "train_start": str(train_start.date()),
+            "train_end":   str(train_end.date()),
+            "val_start":   str(val_start.date()),
+            "val_end":     str(val_end.date()),
+            "test_start":  str(test_start.date()),
+            "test_end":    str(test_end.date()),
         })
         cursor += pd.DateOffset(months=step_months)
 
-    return splits
+    return windows

@@ -1,2 +1,2 @@
-"""Ultimate AI Stock Trader"""
-__version__ = "1.0.0"
+"""Ultimate AI Stock Trader package."""
+__version__ = "2.0.0"
