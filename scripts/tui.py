@@ -1,4 +1,4 @@
-"""Ultimate AI Stock Trader - Terminal UI
+"""iStock - Terminal UI
 
 A rich, animated terminal dashboard for monitoring and controlling the bot.
 
@@ -240,7 +240,6 @@ class SparklineWidget(Static):
         if not vals:
             return f"[dim]{self._title}\n\nNo data yet — run the bot or a backtest first.[/]"
 
-        # plotext chart if available
         if HAS_PLOTEXT:
             plt.clf()
             plt.plot(list(range(len(vals))), vals, color="green")
@@ -252,7 +251,6 @@ class SparklineWidget(Static):
             chart = plt.build()
             return chart
 
-        # Fallback: Unicode sparkline
         spark = sparkline(vals, width=self.size.width - 6)
         start = vals[0]
         end = vals[-1]
@@ -312,7 +310,6 @@ class DailyPnLChart(Static):
             plt.title("Daily P&L (last 20 days)")
             return plt.build()
 
-        # Fallback text bars
         lines = ["[bold]Daily P&L[/]"]
         mx = max(abs(v) for v in self.pnl_data[-15:]) or 1
         for i, v in enumerate(self.pnl_data[-15:]):
@@ -346,12 +343,12 @@ class DashboardTab(Widget):
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="metric-row"):
-            yield MetricCard("💰 Equity",     "—", id="card-equity")
-            yield MetricCard("📈 Total Return","—", id="card-return")
-            yield MetricCard("⚡ Sharpe",     "—", id="card-sharpe")
-            yield MetricCard("📉 Max Drawdown","—", id="card-drawdown")
-            yield MetricCard("🎯 Win Rate",   "—", id="card-winrate")
-            yield MetricCard("🔢 Trades",     "—", id="card-trades")
+            yield MetricCard("💰 Equity",      "—", id="card-equity")
+            yield MetricCard("📈 Total Return", "—", id="card-return")
+            yield MetricCard("⚡ Sharpe",      "—", id="card-sharpe")
+            yield MetricCard("📉 Max Drawdown", "—", id="card-drawdown")
+            yield MetricCard("🎯 Win Rate",    "—", id="card-winrate")
+            yield MetricCard("🔢 Trades",      "—", id="card-trades")
         with Horizontal(id="chart-row"):
             yield SparklineWidget("📊 Equity Curve", id="sparkline")
         with Horizontal(id="info-row"):
@@ -366,11 +363,9 @@ class DashboardTab(Widget):
         self._load_live_data()
 
     def _load_live_data(self) -> None:
-        # Try to load from backtest results first, then live DB
         bt = load_backtest_results()
         metrics = bt.get("metrics", {})
 
-        # Equity curve
         eq_vals = []
         if "equity_curve" in bt:
             eq_vals = bt["equity_curve"]["equity"].tolist()
@@ -380,7 +375,6 @@ class DashboardTab(Widget):
         if eq_vals:
             self.query_one("#sparkline", SparklineWidget).values = eq_vals
 
-        # Metric cards
         if metrics:
             eq = metrics.get("final_equity", 0)
             ret = metrics.get("total_return", 0)
@@ -392,14 +386,13 @@ class DashboardTab(Widget):
             ret_style = "bold green" if ret >= 0 else "bold red"
             dd_style  = "bold red" if dd < -0.1 else "bold yellow"
 
-            self.query_one("#card-equity",    MetricCard).update_value(f"${eq:,.0f}")
-            self.query_one("#card-return",    MetricCard).update_value(f"{ret:+.2%}", ret_style)
-            self.query_one("#card-sharpe",    MetricCard).update_value(f"{sharpe:.3f}")
-            self.query_one("#card-drawdown",  MetricCard).update_value(f"{dd:.2%}", dd_style)
-            self.query_one("#card-winrate",   MetricCard).update_value(f"{wr:.1%}")
-            self.query_one("#card-trades",    MetricCard).update_value(str(ntrades))
+            self.query_one("#card-equity",   MetricCard).update_value(f"${eq:,.0f}")
+            self.query_one("#card-return",   MetricCard).update_value(f"{ret:+.2%}", ret_style)
+            self.query_one("#card-sharpe",   MetricCard).update_value(f"{sharpe:.3f}")
+            self.query_one("#card-drawdown", MetricCard).update_value(f"{dd:.2%}", dd_style)
+            self.query_one("#card-winrate",  MetricCard).update_value(f"{wr:.1%}")
+            self.query_one("#card-trades",   MetricCard).update_value(str(ntrades))
 
-        # Regime from DB or default
         regime = "unknown"
         if self.db:
             try:
@@ -456,7 +449,6 @@ class PerformanceTab(Widget):
         bt = load_backtest_results()
         metrics = bt.get("metrics", {})
 
-        # Daily P&L chart
         if self.db:
             try:
                 pnl_df = self.db.get_daily_pnl()
@@ -474,7 +466,6 @@ class PerformanceTab(Widget):
             chart.pnl_data = pnl
             chart.date_labels = dates
 
-        # Summary text
         if metrics:
             lines = [
                 "[bold underline]Strategy Metrics[/]",
@@ -488,7 +479,6 @@ class PerformanceTab(Widget):
             ]
             self.query_one("#perf-summary", Static).update("\n".join(lines))
 
-        # Trade table
         t = self.query_one("#trades-table", DataTable)
         t.clear()
 
@@ -535,10 +525,10 @@ class PositionsTab(Widget):
 
     def compose(self) -> ComposeResult:
         with Horizontal(id="account-row"):
-            yield MetricCard("💵 Equity",     "—", id="pos-equity")
-            yield MetricCard("💴 Cash",        "—", id="pos-cash")
-            yield MetricCard("📊 Exposure",   "—", id="pos-exposure")
-            yield MetricCard("🔢 Positions",  "—", id="pos-count")
+            yield MetricCard("💵 Equity",    "—", id="pos-equity")
+            yield MetricCard("💴 Cash",       "—", id="pos-cash")
+            yield MetricCard("📊 Exposure",  "—", id="pos-exposure")
+            yield MetricCard("🔢 Positions", "—", id="pos-count")
         yield Label("[bold]Open Positions[/]")
         yield DataTable(id="pos-table")
         yield Button("🔄 Refresh", id="btn-refresh-pos", variant="primary")
@@ -569,10 +559,10 @@ class PositionsTab(Widget):
             invested = sum(float(p.market_value) for p in positions)
             exposure = invested / max(equity, 1)
 
-            self.query_one("#pos-equity",   MetricCard).update_value(f"${equity:,.2f}")
-            self.query_one("#pos-cash",      MetricCard).update_value(f"${cash:,.2f}")
-            self.query_one("#pos-exposure",  MetricCard).update_value(f"{exposure:.1%}")
-            self.query_one("#pos-count",     MetricCard).update_value(str(len(positions)))
+            self.query_one("#pos-equity",  MetricCard).update_value(f"${equity:,.2f}")
+            self.query_one("#pos-cash",    MetricCard).update_value(f"${cash:,.2f}")
+            self.query_one("#pos-exposure",MetricCard).update_value(f"{exposure:.1%}")
+            self.query_one("#pos-count",   MetricCard).update_value(str(len(positions)))
 
         for pos in positions:
             qty = float(pos.qty)
@@ -642,7 +632,6 @@ class SignalsTab(Widget):
             t.add_row("[dim]No predictions found[/]", "", "", "", "")
             return
 
-        # Filter to most recent date
         latest_date = df["date"].max()
         df = df[df["date"] == latest_date].sort_values("confidence", ascending=False)
 
@@ -698,7 +687,7 @@ class ControlTab(Widget):
         yield RichLog(id="ctrl-log", highlight=True, markup=True, max_lines=500)
 
     def on_mount(self) -> None:
-        self._log("[dim]Bot control ready. Use the buttons above to run pipeline steps.[/]")
+        self._log("[dim]iStock ready. Use the buttons above to run pipeline steps.[/]")
         self._log(f"[dim]Scripts dir: {self._scripts_dir}[/]")
 
     def _log(self, msg: str) -> None:
@@ -707,7 +696,6 @@ class ControlTab(Widget):
         log_widget.write(f"[dim]{ts}[/]  {msg}")
 
     def _run_script(self, script: str, extra_args: list[str] = None) -> None:
-        """Launch a script as a subprocess and stream its output to the log."""
         script_path = os.path.join(self._scripts_dir, script)
         cmd = [sys.executable, script_path] + (extra_args or [])
         self._log(f"[bold yellow]Running:[/] {' '.join(cmd)}")
@@ -765,7 +753,7 @@ class ControlTab(Widget):
         if self._bot_process and self._bot_process.poll() is None:
             self._log("[yellow]Bot is already running.[/]")
             return
-        self._log("[bold green]Starting live bot (paper mode)...[/]")
+        self._log("[bold green]Starting bot (paper mode)...[/]")
         self._run_script("run_live_bot.py", ["--now"])
 
     @on(Button.Pressed, "#btn-stop")
@@ -831,19 +819,19 @@ RegimeBadge {
 
 
 class TradingTUI(App):
-    """Ultimate AI Stock Trader Terminal UI"""
+    """iStock - Terminal UI"""
 
-    TITLE = "🤖 Ultimate AI Stock Trader"
+    TITLE = "iStock"
     CSS = APP_CSS
     BINDINGS = [
-        Binding("1", "switch_tab('dashboard')",   "Dashboard",   show=True),
-        Binding("2", "switch_tab('performance')",  "Performance", show=True),
-        Binding("3", "switch_tab('positions')",    "Positions",   show=True),
-        Binding("4", "switch_tab('signals')",      "Signals",     show=True),
-        Binding("5", "switch_tab('control')",      "Control",     show=True),
-        Binding("r", "refresh_all",                "Refresh",     show=True),
-        Binding("q", "quit",                       "Quit",        show=True),
-        Binding("ctrl+c", "quit",                  "Quit",        show=False),
+        Binding("1", "switch_tab('dashboard')",  "Dashboard",   show=True),
+        Binding("2", "switch_tab('performance')", "Performance", show=True),
+        Binding("3", "switch_tab('positions')",   "Positions",   show=True),
+        Binding("4", "switch_tab('signals')",     "Signals",     show=True),
+        Binding("5", "switch_tab('control')",     "Control",     show=True),
+        Binding("r", "refresh_all",               "Refresh",     show=True),
+        Binding("q", "quit",                      "Quit",        show=True),
+        Binding("ctrl+c", "quit",                 "Quit",        show=False),
     ]
 
     def __init__(self, config_dir: str = "config", **kwargs):
@@ -856,8 +844,8 @@ class TradingTUI(App):
             try:
                 self.cfg = load_config(config_dir)
                 self.db = load_db_safe(self.cfg)
-            except Exception as e:
-                pass  # will show gracefully in UI
+            except Exception:
+                pass
 
     def compose(self) -> ComposeResult:
         yield Header()
@@ -887,7 +875,6 @@ class TradingTUI(App):
         self.query_one("#tabs", TabbedContent).active = tab_id
 
     def action_refresh_all(self) -> None:
-        """Force refresh all data-bearing widgets."""
         for widget in self.query(DashboardTab):
             widget.refresh_data()
         for widget in self.query(PerformanceTab):
@@ -901,11 +888,10 @@ class TradingTUI(App):
 # ═══════════════════════════════════════════════════════
 
 def main():
-    p = argparse.ArgumentParser(description="Ultimate AI Stock Trader TUI")
+    p = argparse.ArgumentParser(description="iStock Terminal UI")
     p.add_argument("--config", default="config", help="Config directory")
     args = p.parse_args()
 
-    # Check textual is installed
     try:
         import textual
     except ImportError:
