@@ -1,204 +1,110 @@
-"""
-alpaca_news.py
-
-Fetches news articles from the Alpaca News API for every symbol.
-Scores each article with FinBERT (loaded ONCE globally).
-Saves daily aggregated sentiment per symbol as Parquet.
-
-Fixes vs old bot:
-  - No Selenium / Tor — pure REST API
-  - FinBERT loaded once, not per company
-  - Scores full article content, not just title
-  - Sentiment momentum computed here
-"""
-
+"""Fetch news articles from Alpaca News API and cache to disk."""
 import os
+import json
 import time
-from datetime import datetime, timedelta
-from typing import List, Optional
-
-import pandas as pd
-import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from alpaca.data.historical.news import NewsClient
+import datetime
+from pathlib import Path
+from alpaca.data.historical import StockHistoricalDataClient
 from alpaca.data.requests import NewsRequest
-
 from ultimate_trader.utils.logging import get_logger
-from ultimate_trader.utils.config_loader import Config
 
 logger = get_logger("alpaca_news")
 
-FINBERT_MODEL = "ProsusAI/finbert"
 
-
-class FinBERTScorer:
+def fetch_news_for_symbol(
+    client: StockHistoricalDataClient,
+    symbol: str,
+    start: str,
+    end: str,
+    limit: int = 50,
+    raw_dir: str = "data/raw/news",
+) -> list:
     """
-    Singleton-style FinBERT wrapper.
-    Load once, score many. Supports GPU if available.
+    Fetch news articles for a symbol between start and end dates.
+    Saves raw JSON and returns list of article dicts.
     """
-    _instance = None
+    Path(raw_dir).mkdir(parents=True, exist_ok=True)
+    cache_path = Path(raw_dir) / f"{symbol}.json"
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._loaded = False
-        return cls._instance
+    # load existing cache
+    if cache_path.exists():
+        with open(cache_path, "r") as f:
+            cache = json.load(f)
+    else:
+        cache = {}
 
-    def load(self):
-        if self._loaded:
-            return
-        logger.info("Loading FinBERT model...")
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.tokenizer = AutoTokenizer.from_pretrained(FINBERT_MODEL)
-        self.model = AutoModelForSequenceClassification.from_pretrained(FINBERT_MODEL).to(self.device)
-        self.model.eval()
-        self.labels = ["positive", "negative", "neutral"]
-        self._loaded = True
-        logger.info(f"FinBERT loaded on {self.device}")
+    start_dt = datetime.date.fromisoformat(start)
+    end_dt = datetime.date.fromisoformat(end)
+    delta = datetime.timedelta(days=1)
+    current = start_dt
+    new_dates = []
 
-    def score(self, text: str) -> dict:
-        """
-        Returns {positive, negative, neutral} probabilities and a scalar score:
-        score = P(positive) - P(negative), range [-1, 1]
-        """
-        if not text or len(text.strip()) < 5:
-            return {"positive": 0.33, "negative": 0.33, "neutral": 0.34, "score": 0.0}
+    while current <= end_dt:
+        date_str = current.isoformat()
+        if date_str not in cache:
+            new_dates.append(date_str)
+        current += delta
 
-        # Truncate to model max
-        text = text[:2000]
-        tokens = self.tokenizer(
-            text, return_tensors="pt", truncation=True,
-            max_length=512, padding=True
-        ).to(self.device)
+    if not new_dates:
+        logger.info(f"  News cache up to date for {symbol}")
+        return _flatten_cache(cache)
 
-        with torch.no_grad():
-            logits = self.model(**tokens).logits
-            probs = torch.softmax(logits, dim=-1).squeeze().cpu().tolist()
+    logger.info(f"  Fetching news for {symbol}: {len(new_dates)} new dates")
 
-        result = dict(zip(self.labels, probs))
-        result["score"] = result["positive"] - result["negative"]
-        return result
+    for date_str in new_dates:
+        try:
+            req = NewsRequest(
+                symbols=[symbol],
+                start=date_str + "T00:00:00Z",
+                end=date_str + "T23:59:59Z",
+                limit=limit,
+                sort="desc",
+            )
+            news = client.get_news(req)
+            articles = []
+            for item in news.news:
+                articles.append({
+                    "id": item.id,
+                    "headline": item.headline,
+                    "summary": item.summary,
+                    "content": item.content,
+                    "url": item.url,
+                    "author": item.author,
+                    "created_at": str(item.created_at),
+                    "updated_at": str(item.updated_at),
+                    "sentiment_score": None,
+                    "sentiment_label": None,
+                })
+            cache[date_str] = articles
+            time.sleep(0.15)
+        except Exception as e:
+            logger.warning(f"  Could not fetch news for {symbol} on {date_str}: {e}")
+            cache[date_str] = []
 
-    def score_batch(self, texts: List[str]) -> List[dict]:
-        return [self.score(t) for t in texts]
+    with open(cache_path, "w") as f:
+        json.dump(cache, f, indent=2)
+
+    return _flatten_cache(cache)
 
 
-# Global singleton
-finbert = FinBERTScorer()
+def _flatten_cache(cache: dict) -> list:
+    """Flatten date-keyed cache into flat list of article dicts with date field."""
+    articles = []
+    for date_str, arts in cache.items():
+        for a in arts:
+            a["date"] = date_str
+            articles.append(a)
+    return articles
 
 
-class NewsFetcher:
-    """
-    Fetches and scores news for all symbols via Alpaca News API.
-    Output: data/raw/news_{SYMBOL}.parquet
-      Columns: date, num_articles, avg_score, score_std, pos_ratio, neg_ratio,
-               sentiment_momentum_3d, sentiment_momentum_5d
-    """
-
-    def __init__(self, cfg: Config):
-        self.cfg = cfg
-        self.client = NewsClient(
-            api_key=cfg.alpaca.key_id,
-            secret_key=cfg.alpaca.secret_key,
-        )
-        self.raw_dir = cfg.paths.raw_dir
-        os.makedirs(self.raw_dir, exist_ok=True)
-        finbert.load()  # load once here
-
-    def fetch_all(self, symbols: List[str], start: str, end: Optional[str] = None) -> None:
-        end = end or datetime.today().strftime("%Y-%m-%d")
-        for sym in symbols:
-            try:
-                self._fetch_symbol(sym, start, end)
-            except Exception as e:
-                logger.error(f"News fetch failed for {sym}: {e}")
-
-    def get_sentiment(self, symbol: str) -> pd.DataFrame:
-        path = self._news_path(symbol)
-        if not os.path.exists(path):
-            raise FileNotFoundError(f"No news data for {symbol}. Run fetch_all first.")
-        df = pd.read_parquet(path)
-        df.index = pd.to_datetime(df.index)
-        return df.sort_index()
-
-    # ------------------------------------------------------------------
-
-    def _fetch_symbol(self, symbol: str, start: str, end: str) -> None:
-        path = self._news_path(symbol)
-        existing = None
-        fetch_start = start
-
-        if os.path.exists(path):
-            existing = pd.read_parquet(path)
-            existing.index = pd.to_datetime(existing.index)
-            last_date = existing.index.max()
-            fetch_start = (last_date + timedelta(days=1)).strftime("%Y-%m-%d")
-            if fetch_start > end:
-                logger.debug(f"{symbol} news: already up to date.")
-                return
-
-        logger.info(f"Fetching news for {symbol} from {fetch_start} to {end}")
-
-        req = NewsRequest(
-            symbols=[symbol],
-            start=datetime.strptime(fetch_start, "%Y-%m-%d"),
-            end=datetime.strptime(end, "%Y-%m-%d"),
-            limit=self.cfg.news.max_articles_per_day * 200,
-            include_content=True,
-        )
-        news_items = self.client.get_news(req)
-        articles = news_items.news if hasattr(news_items, 'news') else list(news_items)
-
-        if not articles:
-            logger.warning(f"{symbol}: no news articles found.")
-            return
-
-        # Score all articles
-        rows = []
-        for article in articles:
-            pub_date = article.created_at.strftime("%Y-%m-%d") if article.created_at else None
-            if not pub_date:
-                continue
-
-            # Prefer content > summary > headline
-            text = article.content or article.summary or article.headline or ""
-            scored = finbert.score(text)
-
-            rows.append({
-                "date": pub_date,
-                "positive": scored["positive"],
-                "negative": scored["negative"],
-                "neutral": scored["neutral"],
-                "score": scored["score"],
-            })
-
-        if not rows:
-            return
-
-        df_raw = pd.DataFrame(rows)
-        df_raw["date"] = pd.to_datetime(df_raw["date"])
-
-        # Aggregate to daily
-        daily = df_raw.groupby("date").agg(
-            num_articles=("score", "count"),
-            avg_score=("score", "mean"),
-            score_std=("score", "std"),
-            pos_ratio=("positive", "mean"),
-            neg_ratio=("negative", "mean"),
-        ).fillna(0)
-
-        # Sentiment momentum (change in avg_score)
-        daily["sentiment_momentum_3d"] = daily["avg_score"].diff(3)
-        daily["sentiment_momentum_5d"] = daily["avg_score"].diff(5)
-
-        if existing is not None:
-            daily = pd.concat([existing, daily])
-            daily = daily[~daily.index.duplicated(keep="last")]
-
-        daily.sort_index(inplace=True)
-        daily.to_parquet(path)
-        logger.info(f"{symbol} news: saved {len(daily)} daily rows.")
-        time.sleep(0.1)
-
-    def _news_path(self, symbol: str) -> str:
-        return os.path.join(self.raw_dir, f"news_{symbol}.parquet")
+def fetch_all_news(cfg: dict, raw_dir: str = "data/raw/news"):
+    """Fetch news for all symbols in config."""
+    from alpaca.data.historical import StockHistoricalDataClient
+    client = StockHistoricalDataClient(
+        cfg["alpaca"]["key_id"], cfg["alpaca"]["secret_key"]
+    )
+    start = cfg["data"]["start_date"]
+    end = cfg["data"].get("end_date") or datetime.date.today().isoformat()
+    for symbol in cfg["universe"]["symbols"]:
+        logger.info(f"Fetching news: {symbol}")
+        fetch_news_for_symbol(client, symbol, start, end, raw_dir=raw_dir)
