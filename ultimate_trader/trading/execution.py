@@ -1,191 +1,240 @@
-"""Order execution layer.
-
-Key design principles:
-  - All stops and take-profits are SERVER-SIDE bracket orders on Alpaca.
-  - No local stop-loss checking loop.
-  - Portfolio state reconciled from Alpaca before every decision.
-  - Earnings calendar checked before entry.
-  - Regime-aware sizing via risk.py.
-"""
-import datetime
+"""Order execution: translates model predictions into Alpaca bracket orders."""
 import time
+from datetime import datetime, date
+from typing import Dict, List, Optional
+import pandas as pd
 from alpaca.trading.client import TradingClient
 from alpaca.trading.requests import (
     MarketOrderRequest, LimitOrderRequest,
     TakeProfitRequest, StopLossRequest,
 )
 from alpaca.trading.enums import OrderSide, TimeInForce, OrderClass
-from ultimate_trader.utils.logging import get_logger
-from ultimate_trader.trading.risk import (
-    kelly_position_size, get_regime_params, check_earnings_buffer, check_kill_switch
-)
+from ultimate_trader.trading.portfolio import Portfolio
+from ultimate_trader.trading.risk import RiskManager
+from ultimate_trader.utils.logging import get_logger, PerformanceDB
+from ultimate_trader.utils.config_loader import Config
 
-logger = get_logger("execution")
+logger = get_logger(__name__)
+
+# Prediction class -> action mapping
+CLASS_TO_ACTION = {
+    0: "strong_sell",
+    1: "sell",
+    2: "hold",
+    3: "buy",
+    4: "strong_buy",
+}
 
 
-def place_bracket_order(
-    client: TradingClient,
-    symbol: str,
-    dollar_size: float,
-    current_price: float,
-    side: OrderSide,
-    stop_loss_pct: float = 0.07,
-    take_profit_pct: float = 0.12,
-) -> bool:
+class Executor:
     """
-    Place a bracket market order with server-side stop-loss and take-profit.
-    Returns True if successful.
+    Executes trades based on model predictions.
+    - Closes positions that hit exit criteria or have earnings upcoming
+    - Opens new positions using Kelly-sized bracket orders
+    - Respects all risk limits
     """
-    qty = round(abs(dollar_size) / current_price, 2)
-    if qty < 1:
-        logger.info(f"  {symbol}: qty {qty} < 1, skipping")
+
+    def __init__(self, cfg: Config, portfolio: Portfolio,
+                 risk: RiskManager, db: PerformanceDB):
+        self.cfg = cfg
+        self.portfolio = portfolio
+        self.risk = risk
+        self.db = db
+        self.client = TradingClient(
+            cfg.alpaca.key_id, cfg.alpaca.secret_key,
+            paper=not cfg.trading.live
+        )
+
+    def get_live_price(self, symbol: str) -> Optional[float]:
+        """Get latest trade price from Alpaca (real-time, not CSV)."""
+        try:
+            from alpaca.data.historical import StockHistoricalDataClient
+            from alpaca.data.requests import StockLatestTradeRequest
+            data_client = StockHistoricalDataClient(
+                self.cfg.alpaca.key_id, self.cfg.alpaca.secret_key
+            )
+            req = StockLatestTradeRequest(symbol_or_symbols=symbol)
+            trade = data_client.get_stock_latest_trade(req)
+            return float(trade[symbol].price)
+        except Exception as e:
+            logger.error(f"Could not get live price for {symbol}: {e}")
+            return None
+
+    def has_earnings_soon(self, symbol: str,
+                           earnings_dates: Dict[str, List[str]],
+                           days_ahead: int = 2) -> bool:
+        """Returns True if symbol has earnings within `days_ahead` market days."""
+        today = date.today()
+        for d_str in earnings_dates.get(symbol, []):
+            try:
+                d = datetime.strptime(d_str, "%Y-%m-%d").date()
+                delta = (d - today).days
+                if 0 <= delta <= days_ahead:
+                    return True
+            except Exception:
+                pass
         return False
 
-    if side == OrderSide.BUY:
-        sl_price = round(current_price * (1 - stop_loss_pct), 2)
-        tp_price = round(current_price * (1 + take_profit_pct), 2)
-    else:
-        sl_price = round(current_price * (1 + stop_loss_pct), 2)
-        tp_price = round(current_price * (1 - take_profit_pct), 2)
+    def close_position(self, symbol: str, reason: str):
+        """Close a position via Alpaca market order."""
+        try:
+            self.client.close_position(symbol)
+            logger.info(f"Closed {symbol}: {reason}")
+        except Exception as e:
+            logger.error(f"Failed to close {symbol}: {e}")
 
-    try:
-        req = MarketOrderRequest(
-            symbol=symbol,
-            qty=qty,
-            side=side,
-            time_in_force=TimeInForce.DAY,
-            order_class=OrderClass.BRACKET,
-            take_profit=TakeProfitRequest(limit_price=tp_price),
-            stop_loss=StopLossRequest(stop_price=sl_price),
-        )
-        order = client.submit_order(req)
-        logger.info(
-            f"  BRACKET ORDER: {side.value} {qty} {symbol} "
-            f"@ ~{current_price:.2f} | SL={sl_price} | TP={tp_price} | id={order.id}"
-        )
-        return True
-    except Exception as e:
-        logger.error(f"  Order failed for {symbol}: {e}")
-        return False
+    def run(
+        self,
+        predictions: Dict[str, Dict],  # {symbol: {pred_class, confidence, uncertainty, probs}}
+        regime: str,
+        earnings_dates: Dict[str, List[str]] = None,
+    ):
+        """
+        Main execution loop:
+        1. Reconcile portfolio from Alpaca
+        2. Exit any positions with signals to sell or upcoming earnings
+        3. Enter new positions for buy signals within risk limits
+        """
+        earnings_dates = earnings_dates or {}
 
+        # Step 1: Reconcile
+        self.portfolio.reconcile()
+        equity = self.portfolio.equity
+        min_conf = self.risk.min_confidence(regime)
 
-def close_position(client: TradingClient, symbol: str):
-    """Close an open position entirely."""
-    try:
-        client.close_position(symbol)
-        logger.info(f"  Closed position: {symbol}")
-    except Exception as e:
-        logger.warning(f"  Could not close {symbol}: {e}")
+        logger.info(f"Execution start | regime={regime} | equity=${equity:,.2f} | "
+                    f"min_confidence={min_conf:.2f}")
 
+        # Step 2: Exit logic
+        for symbol in list(self.portfolio.positions.keys()):
+            pos = self.portfolio.positions[symbol]
+            pred = predictions.get(symbol, {})
+            pred_class = pred.get("pred_class", 2)  # default hold
+            confidence = pred.get("confidence", 0.0)
 
-def run_trading_session(
-    predictions: dict,
-    current_prices: dict,
-    positions: dict,
-    account: dict,
-    client: TradingClient,
-    current_regime: int,
-    earnings_calendar: dict,
-    cfg: dict,
-):
-    """
-    Main execution loop for a single trading session.
+            should_exit = False
+            exit_reason = ""
 
-    Args:
-        predictions:       {symbol: {mean_probs, confidence, predicted_class}}
-        current_prices:    {symbol: float}
-        positions:         current open positions from reconcile_positions()
-        account:           account info from get_account_info()
-        client:            TradingClient
-        current_regime:    int (0/1/2)
-        earnings_calendar: {symbol: [date_str]}
-        cfg:               merged config dict
-    """
-    # Kill switch check
-    if check_kill_switch(account):
-        logger.warning("Kill switch active. No trades will be placed.")
-        return
+            # Exit if model says sell with confidence
+            if pred_class in (0, 1) and confidence >= min_conf:
+                should_exit = True
+                exit_reason = f"Model signal={CLASS_TO_ACTION[pred_class]}, conf={confidence:.2f}"
 
-    regime_params = get_regime_params(current_regime, cfg)
-    equity = account.get("equity", 0)
-    earnings_buffer = cfg.get("trading", {}).get("earnings_buffer_days", 1)
-    allow_short = cfg.get("trading", {}).get("allow_short", True) and regime_params["allow_short"]
+            # Exit before earnings
+            if self.has_earnings_soon(symbol, earnings_dates):
+                should_exit = True
+                exit_reason = "Earnings upcoming"
 
-    actions = []
+            # Exit if uncertainty too high (model is confused)
+            if pred.get("uncertainty", 0) > 0.85:
+                should_exit = True
+                exit_reason = f"High uncertainty={pred['uncertainty']:.2f}"
 
-    for symbol, pred in predictions.items():
-        price = current_prices.get(symbol)
-        if not price or price <= 0:
-            logger.warning(f"  No price for {symbol}, skipping")
-            continue
+            if should_exit:
+                self.close_position(symbol, exit_reason)
+                time.sleep(0.3)  # rate limit courtesy
 
-        confidence = float(pred["confidence"])
-        predicted_class = int(pred["predicted_class"])
+        # Step 3: Refresh after exits
+        self.portfolio.reconcile()
+        equity = self.portfolio.equity
 
-        # Skip hold predictions
-        if predicted_class == 2:
-            continue
+        # Step 4: Entry logic
+        # Sort by confidence, best first
+        buy_signals = [
+            (sym, pred) for sym, pred in predictions.items()
+            if pred.get("pred_class", 2) in (3, 4)
+            and pred.get("confidence", 0) >= min_conf
+            and pred.get("uncertainty", 1.0) < 0.75
+            and not self.portfolio.is_open(sym)
+        ]
+        buy_signals.sort(key=lambda x: x[1]["confidence"], reverse=True)
 
-        # Skip if below confidence threshold
-        if confidence < regime_params["min_confidence"]:
-            logger.info(f"  {symbol}: confidence {confidence:.3f} below threshold, skip")
-            continue
+        for symbol, pred in buy_signals:
+            # Check portfolio-level limits
+            if not self.risk.check_portfolio_limits(
+                self.portfolio.get_gross_exposure(), equity, regime
+            ):
+                logger.info("Portfolio exposure limit reached, stopping entries")
+                break
 
-        # Skip if earnings are imminent
-        if check_earnings_buffer(symbol, earnings_calendar, earnings_buffer):
-            logger.info(f"  {symbol}: earnings buffer active, skip")
-            # also close any open position
-            if symbol in positions:
-                close_position(client, symbol)
-            continue
+            # Get live price
+            price = self.get_live_price(symbol)
+            if price is None or price <= 0:
+                continue
 
-        # Determine side
-        is_long = predicted_class in (3, 4)
-        is_short = predicted_class in (0, 1)
+            # Skip earnings
+            if self.has_earnings_soon(symbol, earnings_dates):
+                logger.info(f"Skipping {symbol}: earnings soon")
+                continue
 
-        if is_short and not allow_short:
-            continue
+            confidence = pred["confidence"]
+            pred_class = pred["pred_class"]
 
-        side = OrderSide.BUY if is_long else OrderSide.SELL
+            # Compute stop/take
+            stop_price, take_price = self.risk.compute_stop_take(
+                price, regime,
+                base_stop=self.cfg.trading.get("base_stop_loss", 0.07),
+                base_take=self.cfg.trading.get("base_take_profit", 0.12),
+            )
+            stop_pct = (price - stop_price) / price
+            take_pct = (take_price - price) / price
 
-        # Kelly sizing
-        dollar_size = kelly_position_size(
-            confidence=confidence,
-            predicted_class=predicted_class,
-            current_price=price,
-            equity=equity,
-            kelly_fraction=regime_params["kelly_fraction"],
-            max_position_fraction=regime_params["max_single_position"],
-        )
+            # Kelly sizing
+            dollar_amount, shares = self.risk.kelly_size(
+                equity=equity,
+                confidence=confidence,
+                pred_class=pred_class,
+                current_price=price,
+                regime=regime,
+                stop_loss_pct=stop_pct,
+                take_profit_pct=take_pct,
+            )
 
-        if abs(dollar_size) < price:  # less than 1 share worth
-            continue
+            shares = round(shares, 2)
+            if shares < 0.01 or dollar_amount < 1.0:
+                logger.debug(f"Skipping {symbol}: position too small (${dollar_amount:.2f})")
+                continue
 
-        # Check gross exposure
-        current_exposure = sum(
-            abs(p["market_value"]) for p in positions.values()
-        ) / equity if equity > 0 else 0
-        if current_exposure >= regime_params["max_gross_exposure"]:
-            logger.info(f"  Max gross exposure reached ({current_exposure:.1%}), skipping new trades")
-            break
+            if dollar_amount > self.portfolio.cash * 0.9:
+                logger.warning(f"Skipping {symbol}: insufficient cash")
+                continue
 
-        actions.append((symbol, side, dollar_size, price, confidence, predicted_class))
+            # Submit bracket order (stop + take profit handled server-side by Alpaca)
+            try:
+                if self.cfg.trading.bracket_orders:
+                    order = MarketOrderRequest(
+                        symbol=symbol,
+                        qty=shares,
+                        side=OrderSide.BUY,
+                        time_in_force=TimeInForce.DAY,
+                        order_class=OrderClass.BRACKET,
+                        take_profit=TakeProfitRequest(limit_price=take_price),
+                        stop_loss=StopLossRequest(stop_price=stop_price),
+                    )
+                else:
+                    order = MarketOrderRequest(
+                        symbol=symbol, qty=shares,
+                        side=OrderSide.BUY,
+                        time_in_force=TimeInForce.DAY,
+                    )
 
-    # Sort by confidence descending
-    actions.sort(key=lambda x: -x[4])
+                self.client.submit_order(order)
 
-    placed = 0
-    for symbol, side, dollar_size, price, confidence, pred_class in actions:
-        logger.info(f"  Placing: {side.value} {symbol} ${dollar_size:.0f} conf={confidence:.3f} class={pred_class}")
-        success = place_bracket_order(
-            client=client,
-            symbol=symbol,
-            dollar_size=dollar_size,
-            current_price=price,
-            side=side,
-        )
-        if success:
-            placed += 1
-        time.sleep(0.2)  # rate limit buffer
+                logger.info(
+                    f"BUY {symbol}: {shares} shares @ ~${price:.2f} "
+                    f"| stop=${stop_price} take=${take_price} "
+                    f"| conf={confidence:.2f} regime={regime}"
+                )
+                self.db.log_trade(
+                    symbol=symbol, side="buy", qty=shares, price=price,
+                    confidence=confidence, regime=regime,
+                    stop_loss=stop_price, take_profit=take_price
+                )
 
-    logger.info(f"Trading session complete: {placed}/{len(actions)} orders placed | regime={current_regime}")
+                equity -= dollar_amount  # rough local tracking
+                time.sleep(0.3)
+
+            except Exception as e:
+                logger.error(f"Order failed for {symbol}: {e}")
+
+        logger.info("Execution complete")

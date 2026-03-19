@@ -1,125 +1,114 @@
-"""Risk management: regime-aware position limits, kill-switch, exposure checks.
-
-Regime mapping (from HMM):
-  0 = bear
-  1 = neutral / sideways
-  2 = bull
-"""
+"""Risk management: position sizing, exposure limits, regime-based adjustments."""
+import numpy as np
+from typing import Dict, Tuple
+from ultimate_trader.features.regimes import REGIME_BULL, REGIME_BEAR, REGIME_SIDEWAYS
 from ultimate_trader.utils.logging import get_logger
+from ultimate_trader.utils.config_loader import Config
 
-logger = get_logger("risk")
+logger = get_logger(__name__)
 
-# Regime-dependent parameters
-REGIME_PARAMS = {
-    0: {  # bear
-        "max_gross_exposure": 0.4,
-        "max_single_position": 0.08,
-        "min_confidence": 0.70,
-        "allow_long": True,
-        "allow_short": True,
-        "kelly_fraction": 0.15,
-    },
-    1: {  # neutral
-        "max_gross_exposure": 0.7,
-        "max_single_position": 0.12,
-        "min_confidence": 0.60,
-        "allow_long": True,
-        "allow_short": True,
-        "kelly_fraction": 0.25,
-    },
-    2: {  # bull
-        "max_gross_exposure": 1.0,
-        "max_single_position": 0.15,
-        "min_confidence": 0.55,
-        "allow_long": True,
-        "allow_short": False,
-        "kelly_fraction": 0.40,
-    },
+# Regime multipliers: how aggressively to deploy capital per regime
+REGIME_EXPOSURE_MULTIPLIER = {
+    REGIME_BULL:     1.0,   # full exposure allowed
+    REGIME_SIDEWAYS: 0.6,   # reduce exposure in choppy markets
+    REGIME_BEAR:     0.25,  # minimal exposure in bear regime
+}
+
+REGIME_CONFIDENCE_BOOST = {
+    REGIME_BULL:     0.0,    # keep normal confidence threshold
+    REGIME_SIDEWAYS: 0.05,   # require slightly higher confidence
+    REGIME_BEAR:     0.15,   # require much higher confidence
 }
 
 
-def get_regime_params(regime: int, cfg: dict = None) -> dict:
-    """Return risk parameters for the given regime."""
-    params = REGIME_PARAMS.get(regime, REGIME_PARAMS[1]).copy()
-    # Allow override from config
-    if cfg:
-        t = cfg.get("trading", {})
-        if "max_gross_exposure" in t:
-            params["max_gross_exposure"] = min(params["max_gross_exposure"], t["max_gross_exposure"])
-        if "max_single_position" in t:
-            params["max_single_position"] = min(params["max_single_position"], t["max_single_position"])
-    return params
-
-
-def kelly_position_size(
-    confidence: float,
-    predicted_class: int,
-    current_price: float,
-    equity: float,
-    kelly_fraction: float = 0.25,
-    max_position_fraction: float = 0.15,
-) -> float:
+class RiskManager:
     """
-    Fractional Kelly position sizing.
-
-    Maps model output to edge estimate:
-      - Class 4 (strong buy):  edge = confidence * 0.06
-      - Class 3 (weak buy):    edge = confidence * 0.03
-      - Class 1 (weak sell):   edge = confidence * 0.03  (short)
-      - Class 0 (strong sell): edge = confidence * 0.06  (short)
-
-    Returns dollar value to invest (positive = long, negative = short).
+    Computes per-trade position sizes and enforces portfolio-level risk limits.
+    Uses fractional Kelly Criterion for optimal sizing.
     """
-    edge_map = {4: 0.06, 3: 0.03, 2: 0.0, 1: 0.03, 0: 0.06}
-    edge = edge_map.get(predicted_class, 0.0) * confidence
 
-    if edge <= 0 or predicted_class == 2:
-        return 0.0
+    def __init__(self, cfg: Config):
+        self.cfg = cfg
+        self.kelly_fraction = cfg.trading.kelly_fraction
+        self.max_single = cfg.trading.max_single_position
+        self.max_exposure = cfg.trading.max_gross_exposure
+        self.min_cash = cfg.trading.min_cash_buffer
+        self.base_min_confidence = cfg.trading.min_confidence
 
-    # Kelly formula: f = edge / odds  (simplified with odds=1)
-    f = edge * kelly_fraction
-    dollar_size = f * equity
-    max_dollar = max_position_fraction * equity
-    dollar_size = min(dollar_size, max_dollar)
+    def min_confidence(self, regime: str) -> float:
+        """Returns regime-adjusted minimum confidence threshold."""
+        boost = REGIME_CONFIDENCE_BOOST.get(regime, 0.0)
+        return min(self.base_min_confidence + boost, 0.95)
 
-    if predicted_class in (0, 1):   # sell signal
-        return -dollar_size
-    return dollar_size
+    def max_deployable_equity(self, equity: float, regime: str) -> float:
+        """Max capital that can be deployed given regime."""
+        regime_mult = REGIME_EXPOSURE_MULTIPLIER.get(regime, 0.5)
+        return equity * self.max_exposure * regime_mult * (1 - self.min_cash)
 
+    def kelly_size(
+        self,
+        equity: float,
+        confidence: float,
+        pred_class: int,
+        current_price: float,
+        regime: str,
+        stop_loss_pct: float,
+        take_profit_pct: float,
+    ) -> Tuple[float, float]:
+        """
+        Compute optimal position size using fractional Kelly Criterion.
 
-def check_earnings_buffer(
-    symbol: str,
-    earnings_calendar: dict,
-    buffer_days: int = 1,
-) -> bool:
-    """
-    Returns True if the symbol has earnings within buffer_days.
-    If True, the bot should skip this symbol or close existing position.
-    """
-    import datetime
-    today = datetime.date.today()
-    dates = earnings_calendar.get(symbol, [])
-    for d_str in dates:
-        try:
-            d = datetime.date.fromisoformat(d_str[:10])
-            if abs((d - today).days) <= buffer_days:
-                return True
-        except Exception:
-            continue
-    return False
+        f* = (p * b - q) / b  where:
+          p = probability of win (confidence)
+          q = 1 - p
+          b = expected win/loss ratio (take_profit / stop_loss)
 
+        Returns (dollar_amount, num_shares).
+        """
+        p = float(np.clip(confidence, 0.01, 0.99))
+        q = 1.0 - p
+        b = take_profit_pct / max(stop_loss_pct, 1e-4)
 
-def check_kill_switch(account: dict, max_daily_loss: float = 0.05) -> bool:
-    """
-    Emergency kill switch: if unrealised P&L is below -max_daily_loss * equity,
-    return True (caller should halt all trading for the day).
-    """
-    equity = account.get("equity", 0)
-    portfolio_value = account.get("portfolio_value", equity)
-    if equity <= 0:
-        return False
-    daily_pnl_pct = (portfolio_value - equity) / equity
-    if daily_pnl_pct < -max_daily_loss:
-        logger.warning(f"KILL SWITCH TRIGGERED: daily P&L = {daily_pnl_pct:.2%}")
-        return True
-    return False
+        kelly_f = (p * b - q) / max(b, 1e-4)
+        kelly_f = max(kelly_f, 0.0)  # no negative sizing
+        fractional_f = kelly_f * self.kelly_fraction
+
+        # Cap at per-position limit
+        fractional_f = min(fractional_f, self.max_single)
+
+        # Scale by regime
+        regime_mult = REGIME_EXPOSURE_MULTIPLIER.get(regime, 0.5)
+        fractional_f *= regime_mult
+
+        dollar_amount = equity * fractional_f
+        shares = dollar_amount / max(current_price, 0.01)
+
+        return dollar_amount, shares
+
+    def compute_stop_take(
+        self, price: float, regime: str,
+        base_stop: float = 0.07, base_take: float = 0.12
+    ) -> Tuple[float, float]:
+        """
+        Compute stop loss and take profit prices.
+        In bear regimes, tighten stops; in bull regimes, widen takes.
+        """
+        if regime == REGIME_BEAR:
+            stop_pct = base_stop * 0.7   # tighter stop
+            take_pct = base_take * 0.8
+        elif regime == REGIME_BULL:
+            stop_pct = base_stop * 1.1
+            take_pct = base_take * 1.3   # let winners run more
+        else:
+            stop_pct = base_stop
+            take_pct = base_take
+
+        return round(price * (1 - stop_pct), 2), round(price * (1 + take_pct), 2)
+
+    def check_portfolio_limits(
+        self, current_exposure: float, equity: float, regime: str
+    ) -> bool:
+        """Returns True if there is room to open more positions."""
+        max_dep = self.max_deployable_equity(equity, regime)
+        current_invested = current_exposure * equity
+        return current_invested < max_dep
