@@ -1,79 +1,121 @@
-"""Market regime detection using a Hidden Markov Model on SPY returns."""
+"""
+regimes.py
+
+Market regime detection using Hidden Markov Model (HMM) on SPY daily returns.
+
+Regimes:
+  0 = low_vol_bull     (trending up, low volatility)
+  1 = high_vol_bear    (trending down, high volatility)
+  2 = sideways_chop    (mean-reverting, medium volatility)
+
+The regime label is a daily feature fed into the model AND
+used by risk.py to modulate position sizing / confidence thresholds.
+
+Fix vs old bot:
+  Previous bot had zero regime awareness. Position sizing and
+  confidence thresholds were static regardless of market environment.
+"""
+
+import os
 import numpy as np
 import pandas as pd
 import joblib
-from pathlib import Path
-from hmmlearn.hmm import GaussianHMM
+from typing import Optional
 
 from ultimate_trader.utils.logging import get_logger
 
-log = get_logger(__name__)
+logger = get_logger("regimes")
 
-N_REGIMES = 3  # 0=bear/high-vol, 1=sideways, 2=bull/low-vol
+N_STATES = 3
+REGIME_NAMES = {0: "low_vol_bull", 1: "high_vol_bear", 2: "sideways_chop"}
 
 
 class RegimeDetector:
-    def __init__(self, cfg: dict, n_regimes: int = N_REGIMES):
-        self.cfg = cfg
-        self.n_regimes = n_regimes
-        self.model: GaussianHMM | None = None
-        self.model_path = Path(cfg["paths"]["models_dir"]) / "regime_hmm.pkl"
-        Path(cfg["paths"]["models_dir"]).mkdir(parents=True, exist_ok=True)
+    """
+    Fits a Gaussian HMM on benchmark (SPY) returns + volatility.
+    Predicts regime labels for any date range.
+    """
 
-    def fit(self, benchmark_bars: pd.DataFrame) -> "RegimeDetector":
+    def __init__(self, n_states: int = N_STATES, scalers_dir: str = "data/scalers"):
+        self.n_states = n_states
+        self.scalers_dir = scalers_dir
+        self.model = None
+        self._state_map = None  # maps raw HMM state -> semantic regime
+        os.makedirs(scalers_dir, exist_ok=True)
+
+    def fit(self, spy_bars: pd.DataFrame) -> "RegimeDetector":
         """
-        Fit HMM on benchmark (SPY) daily returns + rolling volatility.
-        Features: [return_1d, vol_5d]
+        Fit HMM on SPY. Features: [daily_return, rolling_vol_10d, rolling_vol_20d].
         """
-        close = benchmark_bars["close"]
-        returns = close.pct_change().fillna(0)
-        vol5 = returns.rolling(5).std().fillna(method="bfill")
+        try:
+            from hmmlearn.hmm import GaussianHMM
+        except ImportError:
+            raise ImportError("Install hmmlearn: pip install hmmlearn")
 
-        X = np.column_stack([returns.values, vol5.values])
+        close = spy_bars["close"]
+        ret = close.pct_change().fillna(0)
+        vol10 = ret.rolling(10).std().fillna(0)
+        vol20 = ret.rolling(20).std().fillna(0)
 
-        log.info(f"Fitting HMM regime model with {self.n_regimes} states on {len(X)} observations")
+        X = np.column_stack([ret.values, vol10.values, vol20.values])
+        X = X[20:]  # drop NaN prefix
+
         self.model = GaussianHMM(
-            n_components=self.n_regimes,
-            covariance_type="full",
+            n_components=self.n_states,
+            covariance_type="diag",
             n_iter=200,
-            random_state=42
+            random_state=42,
         )
         self.model.fit(X)
 
-        # Save
-        joblib.dump(self.model, self.model_path)
-        log.info(f"Regime HMM saved to {self.model_path}")
+        # Map states to semantic labels by mean return of each state
+        mean_returns = self.model.means_[:, 0]  # first feature = daily return
+        sorted_states = np.argsort(mean_returns)  # ascending return
+        # State with lowest return = high_vol_bear (1)
+        # State with highest return = low_vol_bull (0)
+        # Middle = sideways (2)
+        self._state_map = {
+            sorted_states[0]: 1,  # worst returns -> bear
+            sorted_states[1]: 2,  # middle -> chop
+            sorted_states[2]: 0,  # best returns -> bull
+        }
+
+        path = os.path.join(self.scalers_dir, "regime_hmm.joblib")
+        joblib.dump((self.model, self._state_map), path)
+        logger.info(f"Regime HMM fitted and saved to {path}")
         return self
 
     def load(self) -> "RegimeDetector":
-        self.model = joblib.load(self.model_path)
-        log.info("Regime HMM loaded")
+        path = os.path.join(self.scalers_dir, "regime_hmm.joblib")
+        if not os.path.exists(path):
+            raise FileNotFoundError("Regime HMM not fitted yet. Call fit() first.")
+        self.model, self._state_map = joblib.load(path)
         return self
 
-    def predict(self, benchmark_bars: pd.DataFrame) -> pd.Series:
-        """Return a Series of regime labels aligned to benchmark_bars index."""
+    def predict(self, spy_bars: pd.DataFrame) -> pd.Series:
+        """
+        Predict regime for each trading day.
+        Returns Series indexed by date with values {0, 1, 2}.
+        """
         if self.model is None:
-            try:
-                self.load()
-            except FileNotFoundError:
-                log.warning("No regime model found, defaulting to regime 1 (neutral)")
-                return pd.Series(1, index=benchmark_bars.index, name="regime")
+            raise RuntimeError("Model not fitted. Call fit() or load() first.")
 
-        close = benchmark_bars["close"]
-        returns = close.pct_change().fillna(0)
-        vol5 = returns.rolling(5).std().fillna(method="bfill")
-        X = np.column_stack([returns.values, vol5.values])
-        labels = self.model.predict(X)
+        close = spy_bars["close"]
+        ret = close.pct_change().fillna(0)
+        vol10 = ret.rolling(10).std().fillna(0)
+        vol20 = ret.rolling(20).std().fillna(0)
 
-        # Sort regimes by mean return so regime 0 = lowest (bear), 2 = highest (bull)
-        means = [self.model.means_[i][0] for i in range(self.n_regimes)]
-        order = np.argsort(means)  # ascending mean return
-        remap = {old: new for new, old in enumerate(order)}
-        relabelled = np.array([remap[l] for l in labels])
+        X = np.column_stack([ret.values, vol10.values, vol20.values])
+        raw_states = self.model.predict(X)
+        semantic = np.array([self._state_map[s] for s in raw_states])
 
-        return pd.Series(relabelled, index=benchmark_bars.index, name="regime")
+        regimes = pd.Series(semantic, index=spy_bars.index, name="regime")
+        return regimes
 
-    def get_current_regime(self, benchmark_bars: pd.DataFrame) -> int:
-        """Return the most recent regime label as int."""
-        regimes = self.predict(benchmark_bars)
-        return int(regimes.iloc[-1])
+    def predict_latest(self, spy_bars: pd.DataFrame) -> int:
+        """Returns the regime label for the most recent bar."""
+        return int(self.predict(spy_bars).iloc[-1])
+
+    @staticmethod
+    def regime_name(regime_id: int) -> str:
+        return REGIME_NAMES.get(regime_id, "unknown")

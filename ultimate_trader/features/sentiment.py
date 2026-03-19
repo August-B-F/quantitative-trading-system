@@ -1,42 +1,60 @@
-"""Utilities for processing and aligning sentiment features."""
+"""
+sentiment.py
+
+Loads pre-computed FinBERT sentiment from data/raw/news_{SYMBOL}.parquet
+and builds the feature vectors used in the model.
+
+All scaling happens in feature_builder.py, not here.
+"""
+
+import os
 import pandas as pd
 import numpy as np
+from typing import List
+
+from ultimate_trader.utils.logging import get_logger
+
+logger = get_logger("sentiment")
 
 
-def fill_missing_sentiment_days(
-    daily_sentiment: pd.DataFrame,
-    full_date_index: pd.DatetimeIndex
-) -> pd.DataFrame:
+def load_sentiment(symbol: str, raw_dir: str) -> pd.DataFrame:
     """
-    Forward-fill sentiment over a complete business-day index.
-    Days with no news get the last known sentiment carried forward.
-    If no prior sentiment, fill with 0 (neutral).
+    Load daily aggregated sentiment for a symbol.
+    Returns DataFrame indexed by date with columns:
+      avg_score, score_std, pos_ratio, neg_ratio,
+      sentiment_momentum_3d, sentiment_momentum_5d, num_articles
     """
-    df = daily_sentiment.reindex(full_date_index)
-    df["article_count"] = df["article_count"].fillna(0)
-    df = df.ffill().fillna(0)
-    return df
+    path = os.path.join(raw_dir, f"news_{symbol}.parquet")
+    if not os.path.exists(path):
+        return pd.DataFrame()
+    df = pd.read_parquet(path)
+    df.index = pd.to_datetime(df.index)
+    return df.sort_index()
 
 
-def build_sentiment_features(
-    daily_sentiment: pd.DataFrame,
-    full_date_index: pd.DatetimeIndex
-) -> pd.DataFrame:
+def align_sentiment_to_bars(sentiment: pd.DataFrame, bars_index: pd.DatetimeIndex) -> pd.DataFrame:
     """
-    Returns a DataFrame aligned to full_date_index with these columns:
-      sentiment_mean, sentiment_std, sentiment_momentum_3d, sentiment_momentum_5d,
-      article_count, news_volume_anomaly, p_positive_mean, p_negative_mean,
-      sentiment_regime (high/neutral/low as 0/1/2)
+    Reindex sentiment to match bar dates.
+    Forward-fill up to 3 days to handle weekends/gaps.
+    Fill remaining NaN with neutral (0).
     """
-    df = fill_missing_sentiment_days(daily_sentiment, full_date_index)
+    if sentiment.empty:
+        return pd.DataFrame(
+            0.0,
+            index=bars_index,
+            columns=[
+                "avg_score", "score_std", "pos_ratio", "neg_ratio",
+                "sentiment_momentum_3d", "sentiment_momentum_5d", "num_articles"
+            ]
+        )
+    aligned = sentiment.reindex(bars_index).ffill(limit=3).fillna(0.0)
+    return aligned
 
-    # Sentiment regime: 20d percentile of sentiment
-    rolling_25 = df["sentiment_mean"].rolling(20, min_periods=5).quantile(0.25)
-    rolling_75 = df["sentiment_mean"].rolling(20, min_periods=5).quantile(0.75)
-    conditions = [
-        df["sentiment_mean"] >= rolling_75,
-        df["sentiment_mean"] <= rolling_25
-    ]
-    df["sentiment_regime"] = np.select(conditions, [2, 0], default=1).astype(float)
 
-    return df
+def compute_sentiment_features(symbol: str, raw_dir: str,
+                                bars_index: pd.DatetimeIndex) -> pd.DataFrame:
+    """
+    Full pipeline: load -> align -> return feature DataFrame.
+    """
+    raw = load_sentiment(symbol, raw_dir)
+    return align_sentiment_to_bars(raw, bars_index)
