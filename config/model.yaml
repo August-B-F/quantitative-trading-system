@@ -1,23 +1,24 @@
 model:
-  type: "multi_branch"           # multi_branch lstm+transformer
-  price_window: 40               # days of price/tech history
-  sentiment_window: 20           # days of sentiment history
-  macro_window: 20               # days of macro feature history
-  hidden_dim: 128
-  num_lstm_layers: 2
-  num_attn_heads: 4
-  transformer_layers: 2
-  dropout: 0.25                  # used for MC dropout too
+  type: "multi_branch_transformer"  # TransformerEncoder (was lstm+transformer)
+  price_window: 40                  # days of price/tech history
+  sentiment_window: 20              # days of sentiment history
+  macro_window: 20                  # days of macro feature history
+  hidden_dim: 256                   # was 128 — scaled up for RTX 4060 Ti
+  num_transformer_layers: 4         # transformer encoder layers per branch
+  num_attn_heads: 8                 # was 4 — scales with hidden_dim
+  transformer_ff_dim: 1024          # feedforward dim inside TransformerEncoderLayer
+  dropout: 0.25                     # used for MC dropout uncertainty too
   company_embedding_dim: 16
   sector_embedding_dim: 8
-  macro_hidden_dim: 64
-  final_hidden_dims: [256, 128]
-  num_classes: 5                 # strong_sell, sell, hold, buy, strong_buy
+  macro_hidden_dim: 128             # was 64 — scaled up
+  final_hidden_dims: [512, 256, 128]  # was [256, 128] — deeper head
+  num_classes: 5                    # strong_sell, sell, hold, buy, strong_buy
+  regime_embedding_dim: 8
 
 targets:
   horizon_days: 3
-  r_hi: 0.025                    # threshold for strong buy/sell label
-  r_lo: 0.005                    # threshold for hold label
+  r_hi: 0.025                       # threshold for strong buy/sell label
+  r_lo: 0.005                       # threshold for hold label
 
 uncertainty:
   mc_dropout_samples: 50

@@ -2,6 +2,7 @@
 import os
 import json
 import time
+import numpy as np
 from datetime import datetime, timedelta
 from typing import List, Dict
 import pandas as pd
@@ -139,6 +140,7 @@ class NewsFetcher:
                             "summary": item.summary or "",
                             "content": item.content or "",
                             "date": item.created_at.strftime("%Y-%m-%d"),
+                            "created_at": item.created_at.isoformat(),
                             "source": item.source,
                             "url": item.url,
                             "finbert": None,
@@ -162,10 +164,25 @@ class NewsFetcher:
 
         return aggregated
 
+    @staticmethod
+    def _recency_weight(created_at_str: str) -> float:
+        """
+        Exponential decay by time-of-day: exp(-hour / 6).
+        News published at midnight gets weight ~1.0; at 18:00 gets ~0.05.
+        Falls back to 1.0 if unparseable.
+        """
+        try:
+            ts = pd.Timestamp(created_at_str)
+            h = ts.hour + ts.minute / 60.0
+            return float(np.exp(-h / 6.0))
+        except Exception:
+            return 1.0
+
     def _aggregate_daily(self, articles: list, start_dt: datetime,
                           end_dt: datetime) -> pd.DataFrame:
         """
         Aggregates per-article sentiment into a daily feature DataFrame.
+        Uses recency-weighted aggregation when created_at timestamps are available.
         """
         if not articles:
             return pd.DataFrame()
@@ -181,13 +198,24 @@ class NewsFetcher:
         df["positive"] = df["finbert"].apply(lambda x: x["positive"] if x else 0.33)
         df["negative"] = df["finbert"].apply(lambda x: x["negative"] if x else 0.33)
 
-        daily = df.groupby("date").agg(
-            num_articles=("score", "count"),
-            avg_score=("score", "mean"),
-            score_std=("score", "std"),
-            pos_ratio=("positive", "mean"),
-            neg_ratio=("negative", "mean"),
-        ).fillna(0)
+        # Recency weights from time-of-day (exp decay, fallback to 1.0)
+        if "created_at" in df.columns:
+            df["_w"] = df["created_at"].apply(self._recency_weight)
+        else:
+            df["_w"] = 1.0
+
+        def _wm(g, col):
+            w = g["_w"].values
+            v = g[col].values
+            return float((v * w).sum() / (w.sum() + 1e-9))
+
+        daily = df.groupby("date").apply(lambda g: pd.Series({
+            "num_articles": len(g),
+            "avg_score":    _wm(g, "score"),
+            "score_std":    float(g["score"].std()),   # unweighted for stability
+            "pos_ratio":    _wm(g, "positive"),
+            "neg_ratio":    _wm(g, "negative"),
+        })).fillna(0)
 
         # Fill missing dates with 0
         date_range = pd.bdate_range(

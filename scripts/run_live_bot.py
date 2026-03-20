@@ -95,11 +95,14 @@ def is_market_day() -> bool:
 @torch.no_grad()
 def run_inference(model, fb, bars, sentiment, macro_df,
                   symbols, symbol_to_idx, symbol_to_sector,
-                  device, mc_samples):
+                  device, mc_samples, regime=None, fundamentals=None):
     """
     Run MC Dropout inference on all symbols using TODAY's data.
     Returns dict: {symbol: {pred_class, confidence, uncertainty, probs}}
     """
+    from ultimate_trader.modeling.model import REGIME_TO_IDX
+    regime_idx_val = REGIME_TO_IDX.get(regime, 0) if regime else 0
+
     features, _ = fb.build_features(
         bars=bars,
         sentiment=sentiment,
@@ -107,6 +110,7 @@ def run_inference(model, fb, bars, sentiment, macro_df,
         symbols=symbols,
         symbol_to_idx=symbol_to_idx,
         symbol_to_sector=symbol_to_sector,
+        fundamentals=fundamentals,
         fit=False,
     )
 
@@ -115,11 +119,14 @@ def run_inference(model, fb, bars, sentiment, macro_df,
         tech = torch.tensor(feat["tech"], dtype=torch.float32).unsqueeze(0).to(device)
         sent = torch.tensor(feat["sent"], dtype=torch.float32).unsqueeze(0).to(device)
         macro = torch.tensor(feat["macro"], dtype=torch.float32).unsqueeze(0).to(device)
+        fund = torch.tensor(feat.get("fund", [0.0] * 6), dtype=torch.float32).unsqueeze(0).to(device)
         sym_idx = torch.tensor([feat["sym_idx"]], dtype=torch.long).to(device)
         sec_idx = torch.tensor([feat["sec_idx"]], dtype=torch.long).to(device)
+        reg_idx = torch.tensor([regime_idx_val], dtype=torch.long).to(device)
 
         mean_probs, uncertainty = model.predict_with_uncertainty(
-            tech, sent, macro, sym_idx, sec_idx, n_samples=mc_samples
+            tech, sent, macro, fund, sym_idx, sec_idx, reg_idx,
+            n_samples=mc_samples,
         )
         probs = mean_probs.squeeze(0).cpu().numpy()
         pred_class = int(probs.argmax())
@@ -180,14 +187,20 @@ def main():
     symbol_to_idx = ckpt["symbol_to_idx"]
     symbol_to_sector = ckpt["symbol_to_sector"]
 
+    fund_dim = ckpt.get("fund_dim", 6)
     model = build_model(
         cfg,
         ckpt["n_symbols"], ckpt["n_sectors"],
-        ckpt["tech_dim"], ckpt["sent_dim"], ckpt["macro_dim"]
+        ckpt["tech_dim"], ckpt["sent_dim"], ckpt["macro_dim"],
+        fund_dim,
     ).to(device)
     model.load_state_dict(ckpt["model_state"])
+    if "temperature" in ckpt:
+        with torch.no_grad():
+            model.temperature.fill_(ckpt["temperature"])
     model.eval()
-    log.info(f"Model loaded (fold={ckpt.get('fold','?')}, val_acc={ckpt.get('val_acc',0):.4f})")
+    log.info(f"Model loaded (fold={ckpt.get('fold','?')}, val_acc={ckpt.get('val_acc',0):.4f}, "
+             f"T={model.temperature.item():.3f})")
 
     # ---- Symbol list ----
     symbols = args.symbols or list(cfg.universe.symbols)
@@ -246,7 +259,8 @@ def main():
     predictions = run_inference(
         model, fb, bars, sentiment, macro_df,
         valid_symbols, symbol_to_idx, symbol_to_sector,
-        device, mc_samples=args.mc_samples
+        device, mc_samples=args.mc_samples,
+        regime=regime,
     )
     log.info(f"Inference complete: {len(predictions)} symbols scored")
 

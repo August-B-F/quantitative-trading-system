@@ -54,3 +54,32 @@ class LabelSmoothingLoss(nn.Module):
         # Uniform smoothing
         smooth = -log_probs.mean(dim=-1).mean()
         return (1 - self.smoothing) * nll + self.smoothing * smooth
+
+
+class OrdinalReturnLoss(nn.Module):
+    """
+    FocalLoss + differentiable ordinal distance penalty.
+
+    Penalises predictions that are directionally far from the true class.
+    E.g., predicting strong_buy (4) when true is strong_sell (0) costs 16×
+    more ordinal penalty than predicting buy (3) when true is hold (2).
+
+    total_loss = focal_weight * focal_loss + ordinal_weight * ordinal_loss
+    ordinal_loss = mean( (E[class] - true_class)^2 )
+    where E[class] = sum(softmax * [0,1,2,3,4])  — differentiable expected class
+    """
+
+    def __init__(self, focal_weight: float = 0.7, ordinal_weight: float = 0.3,
+                 gamma: float = 2.0, weight: torch.Tensor = None):
+        super().__init__()
+        self.focal = FocalLoss(gamma=gamma, weight=weight)
+        self.focal_weight = focal_weight
+        self.ordinal_weight = ordinal_weight
+
+    def forward(self, logits: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        focal_loss = self.focal(logits, targets)
+        # Differentiable expected class index: E[k] = sum(softmax(logits) * k)
+        class_idx = torch.arange(logits.size(1), dtype=torch.float32, device=logits.device)
+        pred_expected = (torch.softmax(logits, dim=1) * class_idx).sum(dim=1)
+        ordinal_loss = ((pred_expected - targets.float()) ** 2).mean()
+        return self.focal_weight * focal_loss + self.ordinal_weight * ordinal_loss

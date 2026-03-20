@@ -24,6 +24,8 @@ import os
 import subprocess
 import sys
 import json
+import time
+import threading
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -37,7 +39,7 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Horizontal, Vertical, ScrollableContainer
 from textual.reactive import reactive
-from textual.screen import Screen
+from textual.screen import Screen, ModalScreen
 from textual.widgets import (
     Button,
     DataTable,
@@ -51,8 +53,10 @@ from textual.widgets import (
     Switch,
     TabbedContent,
     TabPane,
+    LoadingIndicator,
 )
 from textual.widget import Widget
+from textual.timer import Timer
 from rich.text import Text
 from rich.panel import Panel
 from rich.table import Table
@@ -66,6 +70,13 @@ try:
     HAS_PLOTEXT = True
 except ImportError:
     HAS_PLOTEXT = False
+
+# ---- optional GPU monitoring ----
+try:
+    import torch
+    HAS_TORCH = True
+except ImportError:
+    HAS_TORCH = False
 
 # ---- load config + DB lazily ----
 try:
@@ -81,9 +92,19 @@ except ImportError:
 # ═══════════════════════════════════════════════════════
 
 REGIME_STYLE = {
-    "bull": "bold green",
+    "bull":     "bold green",
     "sideways": "bold yellow",
-    "bear": "bold red",
+    "bear":     "bold red",
+    "crisis":   "bold magenta",
+    "unknown":  "dim white",
+}
+
+REGIME_ICON = {
+    "bull":     "🐂",
+    "bear":     "🐻",
+    "sideways": "↔",
+    "crisis":   "🚨",
+    "unknown":  "?",
 }
 
 CLASS_LABELS = {
@@ -95,6 +116,8 @@ CLASS_LABELS = {
 }
 
 CONF_BAR_WIDTH = 20
+
+SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
 
 
 def conf_bar(confidence: float, width: int = CONF_BAR_WIDTH) -> Text:
@@ -189,6 +212,50 @@ def load_predictions(output_dir="data/backtest_results") -> pd.DataFrame:
     return pd.DataFrame()
 
 
+def get_gpu_info() -> dict:
+    """Return GPU memory and utilization if available."""
+    if not HAS_TORCH:
+        return {}
+    try:
+        if not torch.cuda.is_available():
+            return {}
+        props = torch.cuda.get_device_properties(0)
+        used = torch.cuda.memory_allocated(0) / 1e9
+        total = props.total_memory / 1e9
+        reserved = torch.cuda.memory_reserved(0) / 1e9
+        return {
+            "name":     props.name,
+            "used_gb":  used,
+            "total_gb": total,
+            "reserved_gb": reserved,
+            "pct":      used / max(total, 0.01),
+        }
+    except Exception:
+        return {}
+
+
+def load_model_info(models_dir: str = "data/models") -> dict:
+    """Load metadata from best_model.pt checkpoint."""
+    ckpt_path = os.path.join(models_dir, "best_model.pt")
+    if not os.path.exists(ckpt_path):
+        return {}
+    try:
+        import torch
+        ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=True)
+        return {
+            "fold":       ckpt.get("fold", "?"),
+            "epoch":      ckpt.get("epoch", "?"),
+            "val_acc":    ckpt.get("val_acc", 0),
+            "val_sharpe": ckpt.get("val_sharpe", None),
+            "temperature": ckpt.get("temperature", 1.0),
+            "tech_dim":   ckpt.get("tech_dim", "?"),
+            "n_symbols":  ckpt.get("n_symbols", "?"),
+            "mtime":      os.path.getmtime(ckpt_path),
+        }
+    except Exception:
+        return {}
+
+
 # ═══════════════════════════════════════════════════════
 # Widgets
 # ═══════════════════════════════════════════════════════
@@ -269,7 +336,7 @@ class RegimeBadge(Static):
     DEFAULT_CSS = """
     RegimeBadge {
         height: 3;
-        width: 20;
+        width: 24;
         content-align: center middle;
         border: tall $accent;
     }
@@ -277,8 +344,8 @@ class RegimeBadge(Static):
     regime: reactive[str] = reactive("unknown")
 
     def render(self) -> Text:
-        style = REGIME_STYLE.get(self.regime, "white")
-        icon = {"bull": "🐂", "bear": "🐻", "sideways": "↔", "unknown": "?"}.get(self.regime, "?")
+        style = REGIME_STYLE.get(self.regime, "dim white")
+        icon = REGIME_ICON.get(self.regime, "?")
         return Text(f"{icon}  {self.regime.upper()}", style=style, justify="center")
 
 
@@ -321,6 +388,103 @@ class DailyPnLChart(Static):
         return "\n".join(lines)
 
 
+class GPUPanel(Static):
+    """Live GPU memory bar."""
+    DEFAULT_CSS = """
+    GPUPanel {
+        height: 5;
+        border: round $accent;
+        padding: 0 1;
+        width: 1fr;
+    }
+    """
+    gpu_info: reactive[dict] = reactive({})
+
+    def render(self) -> str:
+        info = self.gpu_info
+        if not info:
+            return "[dim]GPU\nN/A (CUDA not available)[/]"
+        name = info.get("name", "GPU")
+        used = info.get("used_gb", 0)
+        total = info.get("total_gb", 0)
+        pct = info.get("pct", 0)
+        bar_width = max(self.size.width - 12, 10)
+        filled = round(pct * bar_width)
+        colour = "red" if pct > 0.85 else ("yellow" if pct > 0.6 else "green")
+        bar = f"[{colour}]{'█' * filled}[/][dim]{'░' * (bar_width - filled)}[/]"
+        return (
+            f"[bold]GPU[/] {name}\n"
+            f"  VRAM  {bar}  [{colour}]{used:.1f}[/]/{total:.0f} GB  ({pct:.0%})"
+        )
+
+
+class ModelInfoPanel(Static):
+    """Shows checkpoint info: fold, val_sharpe, temperature, tech_dim."""
+    DEFAULT_CSS = """
+    ModelInfoPanel {
+        height: 5;
+        border: round $accent;
+        padding: 0 1;
+        width: 1fr;
+    }
+    """
+    model_info: reactive[dict] = reactive({})
+
+    def render(self) -> str:
+        info = self.model_info
+        if not info:
+            return "[dim]Model\nNo checkpoint found. Run [bold]Train[/] first.[/]"
+        fold    = info.get("fold", "?")
+        epoch   = info.get("epoch", "?")
+        acc     = info.get("val_acc", 0)
+        sharpe  = info.get("val_sharpe", None)
+        temp    = info.get("temperature", 1.0)
+        tdim    = info.get("tech_dim", "?")
+        mtime   = info.get("mtime")
+        age_str = ""
+        if mtime:
+            age_s = time.time() - mtime
+            age_str = f"  saved {int(age_s / 3600)}h ago"
+        sharpe_str = f"  sharpe=[bold cyan]{sharpe:.3f}[/]" if sharpe is not None else ""
+        return (
+            f"[bold]Model[/] fold={fold} ep={epoch}{age_str}\n"
+            f"  acc=[bold]{acc:.3f}[/]{sharpe_str}  T=[bold]{temp:.3f}[/]  tech_dim={tdim}"
+        )
+
+
+class PulsingDot(Static):
+    """Animated pulsing status dot."""
+    DEFAULT_CSS = """
+    PulsingDot {
+        width: 3;
+        height: 1;
+        content-align: center middle;
+    }
+    """
+    _frame: reactive[int] = reactive(0)
+    _active: reactive[bool] = reactive(False)
+
+    def on_mount(self) -> None:
+        self.set_interval(0.15, self._tick)
+
+    def _tick(self) -> None:
+        if self._active:
+            self._frame = (self._frame + 1) % len(SPINNER_FRAMES)
+            self.refresh()
+
+    def render(self) -> Text:
+        if not self._active:
+            return Text("●", style="dim")
+        return Text(SPINNER_FRAMES[self._frame], style="bold cyan")
+
+    def start(self) -> None:
+        self._active = True
+
+    def stop(self) -> None:
+        self._active = False
+        self.refresh()
+
+
 # ═══════════════════════════════════════════════════════
 # Tab: Dashboard
 # ═══════════════════════════════════════════════════════
@@ -331,9 +495,9 @@ class DashboardTab(Widget):
         layout: vertical;
         padding: 1 2;
     }
-    #metric-row { height: 9; layout: horizontal; }
-    #chart-row  { height: 14; layout: horizontal; }
-    #info-row   { height: 6;  layout: horizontal; }
+    #metric-row  { height: 9;  layout: horizontal; }
+    #chart-row   { height: 14; layout: horizontal; }
+    #status-row  { height: 6;  layout: horizontal; }
     """
 
     def __init__(self, cfg, db, **kwargs):
@@ -351,16 +515,24 @@ class DashboardTab(Widget):
             yield MetricCard("🔢 Trades",      "—", id="card-trades")
         with Horizontal(id="chart-row"):
             yield SparklineWidget("📊 Equity Curve", id="sparkline")
-        with Horizontal(id="info-row"):
+        with Horizontal(id="status-row"):
             yield RegimeBadge(id="regime-badge")
+            yield GPUPanel(id="gpu-panel")
+            yield ModelInfoPanel(id="model-info")
             yield Static(id="last-update", classes="dim")
 
     def on_mount(self) -> None:
         self.refresh_data()
         self.set_interval(30, self.refresh_data)
+        self.set_interval(5, self._refresh_gpu)
 
     def refresh_data(self) -> None:
         self._load_live_data()
+
+    def _refresh_gpu(self) -> None:
+        self.query_one("#gpu-panel", GPUPanel).gpu_info = get_gpu_info()
+        model_dir = getattr(getattr(self.cfg, "paths", None), "models_dir", "data/models")
+        self.query_one("#model-info", ModelInfoPanel).model_info = load_model_info(model_dir)
 
     def _load_live_data(self) -> None:
         bt = load_backtest_results()
@@ -404,8 +576,11 @@ class DashboardTab(Widget):
         self.query_one("#regime-badge", RegimeBadge).regime = regime
 
         self.query_one("#last-update", Static).update(
-            f"[dim]Last refreshed: {datetime.now().strftime('%H:%M:%S')}[/]"
+            f"[dim]Last refreshed: {datetime.now().strftime('%H:%M:%S')} · "
+            f"Auto-refresh every 30s · Press [bold]r[/] to force refresh[/]"
         )
+        # Also update GPU + model info immediately on full refresh
+        self._refresh_gpu()
 
 
 # ═══════════════════════════════════════════════════════
@@ -441,7 +616,7 @@ class PerformanceTab(Widget):
 
     def _init_table(self):
         t = self.query_one("#trades-table", DataTable)
-        t.add_columns("Symbol", "Entry", "Exit", "Side", "P&L %", "P&L $", "Reason", "Regime")
+        t.add_columns("Symbol", "Entry", "Exit", "P&L %", "P&L $", "Reason", "Regime")
         t.cursor_type = "row"
         t.zebra_stripes = True
 
@@ -467,10 +642,12 @@ class PerformanceTab(Widget):
             chart.date_labels = dates
 
         if metrics:
+            sr = metrics.get("sharpe", 0)
+            sharpe_colour = "bold green" if sr > 1.0 else ("yellow" if sr > 0 else "bold red")
             lines = [
                 "[bold underline]Strategy Metrics[/]",
                 f"  Return   : {pct_colour(metrics.get('total_return', 0))}",
-                f"  Sharpe   : [bold]{metrics.get('sharpe', 0):.3f}[/]",
+                f"  Sharpe   : [{sharpe_colour}]{sr:.3f}[/]",
                 f"  Sortino  : [bold]{metrics.get('sortino', 0):.3f}[/]",
                 f"  Max DD   : [bold red]{metrics.get('max_drawdown', 0):.2%}[/]",
                 f"  Win Rate : [bold]{metrics.get('win_rate', 0):.1%}[/]",
@@ -498,7 +675,6 @@ class PerformanceTab(Widget):
                     str(row.get("symbol", "")),
                     str(row.get("entry_date", ""))[:10],
                     str(row.get("exit_date",  ""))[:10],
-                    str(row.get("side", "buy")),
                     Text(f"{pnl_pct:+.2%}", style=pnl_style),
                     Text(f"${pnl_dollar:+,.2f}", style=pnl_style),
                     str(row.get("exit_reason", "")),
@@ -559,10 +735,10 @@ class PositionsTab(Widget):
             invested = sum(float(p.market_value) for p in positions)
             exposure = invested / max(equity, 1)
 
-            self.query_one("#pos-equity",  MetricCard).update_value(f"${equity:,.2f}")
-            self.query_one("#pos-cash",    MetricCard).update_value(f"${cash:,.2f}")
-            self.query_one("#pos-exposure",MetricCard).update_value(f"{exposure:.1%}")
-            self.query_one("#pos-count",   MetricCard).update_value(str(len(positions)))
+            self.query_one("#pos-equity",   MetricCard).update_value(f"${equity:,.2f}")
+            self.query_one("#pos-cash",     MetricCard).update_value(f"${cash:,.2f}")
+            self.query_one("#pos-exposure", MetricCard).update_value(f"{exposure:.1%}")
+            self.query_one("#pos-count",    MetricCard).update_value(str(len(positions)))
 
         for pos in positions:
             qty = float(pos.qty)
@@ -594,6 +770,7 @@ class SignalsTab(Widget):
         padding: 1 2;
     }
     #signals-filter { height: 3; layout: horizontal; }
+    #signals-info   { height: 3; }
     """
 
     def compose(self) -> ComposeResult:
@@ -602,11 +779,12 @@ class SignalsTab(Widget):
             yield Button("Buys only",  id="btn-buys",  variant="success")
             yield Button("Sells only", id="btn-sells", variant="error")
             yield Button("🔄 Reload",  id="btn-reload-signals")
+        yield Static(id="signals-info")
         yield DataTable(id="signals-table")
 
     def on_mount(self) -> None:
         t = self.query_one("#signals-table", DataTable)
-        t.add_columns("Symbol", "Signal", "Confidence", "Uncertainty", "Date")
+        t.add_columns("Symbol", "Signal", "Confidence", "Uncertainty", "Date", "Probs")
         t.cursor_type = "row"
         t.zebra_stripes = True
         self._load_signals(filter_mode="all")
@@ -629,29 +807,49 @@ class SignalsTab(Widget):
         t.clear()
 
         if df.empty:
-            t.add_row("[dim]No predictions found[/]", "", "", "", "")
+            t.add_row("[dim]No predictions found[/]", "", "", "", "", "")
+            self.query_one("#signals-info", Static).update("[dim]No predictions file found.[/]")
             return
 
         latest_date = df["date"].max()
-        df = df[df["date"] == latest_date].sort_values("confidence", ascending=False)
+        all_latest = df[df["date"] == latest_date]
+        n_buys  = len(all_latest[all_latest["pred_class"].isin([3, 4])])
+        n_sells = len(all_latest[all_latest["pred_class"].isin([0, 1])])
+        n_holds = len(all_latest[all_latest["pred_class"] == 2])
+        avg_conf = all_latest["confidence"].mean() if not all_latest.empty else 0
+        self.query_one("#signals-info", Static).update(
+            f"[dim]Date: [bold]{latest_date}[/]  "
+            f"[green]{n_buys} buys[/]  [red]{n_sells} sells[/]  [yellow]{n_holds} holds[/]  "
+            f"avg conf: [bold]{avg_conf:.1%}[/][/]"
+        )
 
+        df_show = all_latest.sort_values("confidence", ascending=False)
         if filter_mode == "buys":
-            df = df[df["pred_class"].isin([3, 4])]
+            df_show = df_show[df_show["pred_class"].isin([3, 4])]
         elif filter_mode == "sells":
-            df = df[df["pred_class"].isin([0, 1])]
+            df_show = df_show[df_show["pred_class"].isin([0, 1])]
 
-        for _, row in df.iterrows():
+        for _, row in df_show.iterrows():
             pc = int(row["pred_class"])
             label, sig_style = CLASS_LABELS.get(pc, ("HOLD", "yellow"))
             conf = float(row["confidence"])
             unc = float(row.get("uncertainty", 0))
             unc_style = "red" if unc > 0.7 else ("yellow" if unc > 0.4 else "green")
+            # Build mini prob bars from prob_0..prob_4 columns
+            prob_cols = [f"prob_{i}" for i in range(5)]
+            if all(c in row for c in prob_cols):
+                probs = [float(row[c]) for c in prob_cols]
+                pb = "".join("█" if p == max(probs) else ("▄" if p > 0.15 else "░")
+                             for p in probs)
+            else:
+                pb = ""
             t.add_row(
                 row["symbol"],
                 Text(label, style=sig_style),
                 conf_bar(conf),
                 Text(f"{unc:.2f}", style=unc_style),
                 str(row["date"])[:10],
+                Text(pb, style="dim cyan"),
             )
 
 
@@ -665,11 +863,14 @@ class ControlTab(Widget):
         layout: vertical;
         padding: 1 2;
     }
-    #ctrl-buttons { height: 5; layout: horizontal; }
-    #ctrl-log { height: 1fr; border: round $accent; }
+    #ctrl-top    { height: 6; layout: horizontal; }
+    #ctrl-status { height: 3; }
+    #ctrl-log    { height: 1fr; border: round $accent; }
     """
 
     _bot_process: Optional[subprocess.Popen] = None
+    _spinner_frame: reactive[int] = reactive(0)
+    _process_running: reactive[bool] = reactive(False)
 
     def __init__(self, cfg, **kwargs):
         super().__init__(**kwargs)
@@ -677,18 +878,44 @@ class ControlTab(Widget):
         self._scripts_dir = str(Path(__file__).parent)
 
     def compose(self) -> ComposeResult:
-        with Horizontal(id="ctrl-buttons"):
-            yield Button("▶  Download Data", id="btn-download", variant="default")
-            yield Button("🧠 Train Model",   id="btn-train",    variant="primary")
-            yield Button("📊 Run Backtest",  id="btn-backtest",  variant="default")
-            yield Button("🚀 Start Bot",     id="btn-start",    variant="success")
-            yield Button("⏹  Stop Bot",      id="btn-stop",     variant="error")
+        with Horizontal(id="ctrl-top"):
+            with Vertical():
+                yield Label("[bold]Pipeline[/]")
+                with Horizontal():
+                    yield Button("⬇  Data",      id="btn-download", variant="default")
+                    yield Button("🧠 Train",      id="btn-train",    variant="primary")
+                    yield Button("📊 Backtest",   id="btn-backtest", variant="default")
+            with Vertical():
+                yield Label("[bold]Bot[/]")
+                with Horizontal():
+                    yield Button("🚀 Start",  id="btn-start", variant="success")
+                    yield Button("⏹  Stop",   id="btn-stop",  variant="error")
+                    yield Button("🔄 Status", id="btn-status", variant="default")
+        with Horizontal(id="ctrl-status"):
+            yield Static(id="status-line")
         yield Label("[bold]Live Log[/]")
-        yield RichLog(id="ctrl-log", highlight=True, markup=True, max_lines=500)
+        yield RichLog(id="ctrl-log", highlight=True, markup=True, max_lines=1000)
 
     def on_mount(self) -> None:
-        self._log("[dim]iStock ready. Use the buttons above to run pipeline steps.[/]")
-        self._log(f"[dim]Scripts dir: {self._scripts_dir}[/]")
+        self._log(
+            "[dim cyan]iStock ready.[/]  "
+            "[dim]Tabs: [1] Dashboard  [2] Performance  [3] Positions  "
+            "[4] Signals  [5] Control[/]"
+        )
+        self.set_interval(0.5, self._update_status)
+
+    def _update_status(self) -> None:
+        running = self._bot_process and self._bot_process.poll() is None
+        self._process_running = bool(running)
+        if running:
+            self._spinner_frame = (self._spinner_frame + 1) % len(SPINNER_FRAMES)
+            sp = SPINNER_FRAMES[self._spinner_frame]
+            self.query_one("#status-line", Static).update(
+                f"[bold cyan]{sp} Process running...[/]  "
+                f"[dim]PID {self._bot_process.pid}[/]"
+            )
+        else:
+            self.query_one("#status-line", Static).update("[dim]No process running.[/]")
 
     def _log(self, msg: str) -> None:
         log_widget = self.query_one("#ctrl-log", RichLog)
@@ -696,9 +923,12 @@ class ControlTab(Widget):
         log_widget.write(f"[dim]{ts}[/]  {msg}")
 
     def _run_script(self, script: str, extra_args: list[str] = None) -> None:
+        if self._bot_process and self._bot_process.poll() is None:
+            self._log("[yellow]A process is already running. Stop it first.[/]")
+            return
         script_path = os.path.join(self._scripts_dir, script)
         cmd = [sys.executable, script_path] + (extra_args or [])
-        self._log(f"[bold yellow]Running:[/] {' '.join(cmd)}")
+        self._log(f"[bold yellow]▶ Running:[/] {' '.join(cmd)}")
         self._stream_process(cmd)
 
     @work(thread=True)
@@ -714,21 +944,29 @@ class ControlTab(Widget):
             self._bot_process = proc
             for line in iter(proc.stdout.readline, ""):
                 line = line.rstrip()
-                if line:
-                    if "ERROR" in line or "error" in line.lower():
-                        self.app.call_from_thread(self._log, f"[red]{line}[/]")
-                    elif "WARNING" in line or "warning" in line.lower():
-                        self.app.call_from_thread(self._log, f"[yellow]{line}[/]")
-                    elif any(k in line for k in ["complete", "done", "saved", "loaded"]):
-                        self.app.call_from_thread(self._log, f"[green]{line}[/]")
-                    else:
-                        self.app.call_from_thread(self._log, line)
+                if not line:
+                    continue
+                line_lower = line.lower()
+                if "error" in line_lower or "traceback" in line_lower:
+                    self.app.call_from_thread(self._log, f"[bold red]{line}[/]")
+                elif "warning" in line_lower:
+                    self.app.call_from_thread(self._log, f"[yellow]{line}[/]")
+                elif any(k in line_lower for k in ["complete", "done", "saved", "loaded", "finished"]):
+                    self.app.call_from_thread(self._log, f"[bold green]{line}[/]")
+                elif any(k in line_lower for k in ["epoch", "fold", "train", "val_sharpe"]):
+                    self.app.call_from_thread(self._log, f"[cyan]{line}[/]")
+                else:
+                    self.app.call_from_thread(self._log, line)
             proc.wait()
             code = proc.returncode
             if code == 0:
-                self.app.call_from_thread(self._log, f"[bold green]✓ Process finished (exit 0)[/]")
+                self.app.call_from_thread(
+                    self._log, f"[bold green]✓ Process finished successfully (exit 0)[/]"
+                )
             else:
-                self.app.call_from_thread(self._log, f"[bold red]✗ Process exited with code {code}[/]")
+                self.app.call_from_thread(
+                    self._log, f"[bold red]✗ Process exited with code {code}[/]"
+                )
             self._bot_process = None
         except Exception as e:
             self.app.call_from_thread(self._log, f"[bold red]Failed to run process: {e}[/]")
@@ -740,12 +978,12 @@ class ControlTab(Widget):
 
     @on(Button.Pressed, "#btn-train")
     def run_train(self) -> None:
-        self._log("[bold]Starting model training...[/]")
+        self._log("[bold]Starting model training (OrdinalReturnLoss + Sharpe checkpoint)...[/]")
         self._run_script("train.py")
 
     @on(Button.Pressed, "#btn-backtest")
     def run_backtest(self) -> None:
-        self._log("[bold]Starting backtest...[/]")
+        self._log("[bold]Starting backtest (ATR stops + trailing stops)...[/]")
         self._run_script("backtest.py")
 
     @on(Button.Pressed, "#btn-start")
@@ -760,9 +998,59 @@ class ControlTab(Widget):
     def stop_bot(self) -> None:
         if self._bot_process and self._bot_process.poll() is None:
             self._bot_process.terminate()
-            self._log("[bold red]Bot process terminated.[/]")
+            self._log("[bold red]⏹ Bot process terminated.[/]")
         else:
             self._log("[dim]No running bot process to stop.[/]")
+
+    @on(Button.Pressed, "#btn-status")
+    def check_status(self) -> None:
+        if self._bot_process and self._bot_process.poll() is None:
+            self._log(f"[cyan]Bot running (PID {self._bot_process.pid})[/]")
+        else:
+            self._log("[dim]No bot process running.[/]")
+        gpu = get_gpu_info()
+        if gpu:
+            self._log(
+                f"[cyan]GPU:[/] {gpu['name']}  "
+                f"VRAM: {gpu['used_gb']:.1f}/{gpu['total_gb']:.0f} GB  "
+                f"({gpu['pct']:.0%})"
+            )
+
+
+# ═══════════════════════════════════════════════════════
+# Loading Screen
+# ═══════════════════════════════════════════════════════
+
+class LoadingScreen(ModalScreen):
+    """Splash screen shown briefly at startup."""
+
+    DEFAULT_CSS = """
+    LoadingScreen {
+        align: center middle;
+    }
+    #loading-panel {
+        width: 50;
+        height: 12;
+        border: double $accent;
+        background: $surface;
+        padding: 2 4;
+        align: center middle;
+        content-align: center middle;
+    }
+    """
+
+    def compose(self) -> ComposeResult:
+        with Container(id="loading-panel"):
+            yield Static(
+                "[bold cyan]iStock[/]\n"
+                "[dim]Ultimate AI Stock Trader[/]\n\n"
+                "[dim]Loading...[/]",
+                id="loading-text"
+            )
+            yield LoadingIndicator()
+
+    def on_mount(self) -> None:
+        self.set_timer(1.8, self.dismiss)
 
 
 # ═══════════════════════════════════════════════════════
@@ -805,7 +1093,7 @@ MetricCard #card-value {
 Button {
     margin: 0 1;
 }
-#ctrl-buttons {
+#ctrl-top {
     padding: 1 0;
 }
 RegimeBadge {
@@ -814,14 +1102,23 @@ RegimeBadge {
 #last-update {
     content-align: left middle;
     padding: 0 2;
+    width: 1fr;
+}
+#status-line {
+    content-align: left middle;
+    padding: 0 1;
+    height: 3;
 }
 """
+
+HEADER_SUBTITLE = "AI Stock Trader · paper mode"
 
 
 class TradingTUI(App):
     """iStock - Terminal UI"""
 
     TITLE = "iStock"
+    SUB_TITLE = HEADER_SUBTITLE
     CSS = APP_CSS
     BINDINGS = [
         Binding("1", "switch_tab('dashboard')",  "Dashboard",   show=True),
@@ -832,6 +1129,7 @@ class TradingTUI(App):
         Binding("r", "refresh_all",               "Refresh",     show=True),
         Binding("q", "quit",                      "Quit",        show=True),
         Binding("ctrl+c", "quit",                 "Quit",        show=False),
+        Binding("f1", "show_help",                "Help",        show=False),
     ]
 
     def __init__(self, config_dir: str = "config", **kwargs):
@@ -847,14 +1145,20 @@ class TradingTUI(App):
             except Exception:
                 pass
 
+    def on_mount(self) -> None:
+        self.push_screen(LoadingScreen())
+
     def compose(self) -> ComposeResult:
-        yield Header()
+        yield Header(show_clock=True)
         with TabbedContent(initial="dashboard", id="tabs"):
             with TabPane("📊 Dashboard",   id="dashboard"):
                 if self.cfg:
                     yield DashboardTab(self.cfg, self.db)
                 else:
-                    yield Static("[red]Could not load config. Check config/config.yaml[/]")
+                    yield Static(
+                        "[red]Could not load config.[/]\n"
+                        "Check [bold]config/config.yaml[/] and run from the project root."
+                    )
             with TabPane("📈 Performance", id="performance"):
                 yield PerformanceTab(self.db)
             with TabPane("💼 Positions",   id="positions"):
@@ -864,7 +1168,7 @@ class TradingTUI(App):
                     yield Static("[red]Config not loaded.[/]")
             with TabPane("🎯 Signals",     id="signals"):
                 yield SignalsTab()
-            with TabPane("⚙️  Control",     id="control"):
+            with TabPane("⚙️  Control",    id="control"):
                 if self.cfg:
                     yield ControlTab(self.cfg)
                 else:
@@ -881,6 +1185,14 @@ class TradingTUI(App):
             widget.refresh_data()
         for widget in self.query(SignalsTab):
             widget._load_signals("all")
+        self.notify("Refreshed all data", timeout=2)
+
+    def action_show_help(self) -> None:
+        self.notify(
+            "Keys: 1-5 tabs · r refresh · q quit · F1 help",
+            title="iStock Help",
+            timeout=5,
+        )
 
 
 # ═══════════════════════════════════════════════════════

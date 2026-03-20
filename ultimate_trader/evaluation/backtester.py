@@ -15,6 +15,17 @@ from ultimate_trader.utils.config_loader import Config
 log = get_logger(__name__)
 
 
+def _atr_estimate(price_data: dict, symbol: str, ts: pd.Timestamp, window: int = 14) -> float:
+    """Estimate ATR as mean of |daily changes| over last `window` days."""
+    s = price_data.get(symbol)
+    if s is None:
+        return 0.0
+    hist = s[s.index <= ts].iloc[-(window + 1):]
+    if len(hist) < window:
+        return 0.0
+    return float(hist.diff().abs().mean())
+
+
 class Backtester:
     def __init__(self, cfg: Config):
         self.cfg = cfg
@@ -44,7 +55,8 @@ class Backtester:
         equity = initial_equity
         equity_curve = []
         all_trades = []
-        # symbol -> {entry_price, shares, entry_date, stop_pct, take_pct, regime}
+        # symbol -> {entry_price, shares, entry_date, stop_price, take_price,
+        #             highest_price, trail_active, orig_stop_pct, regime}
         positions: dict = {}
 
         stop_base = self.cfg.trading.get("base_stop_loss", 0.07)
@@ -68,11 +80,28 @@ class Backtester:
                 current_price = self._get_price(price_data, symbol, ts)
                 if current_price is None:
                     continue
-                pnl_pct = (current_price - pos["entry_price"]) / pos["entry_price"]
-                if pnl_pct <= -pos["stop_pct"] or pnl_pct >= pos["take_pct"]:
-                    pnl_dollar = pnl_pct * pos["entry_price"] * pos["shares"]
-                    equity += pos["entry_price"] * pos["shares"] + pnl_dollar
-                    reason = "stop_loss" if pnl_pct <= -pos["stop_pct"] else "take_profit"
+
+                # Update trailing-stop ratchet
+                pos["highest_price"] = max(pos["highest_price"], current_price)
+                entry = pos["entry_price"]
+                pnl_pct = (current_price - entry) / entry
+                orig_stop_pct = pos["orig_stop_pct"]
+
+                # Activate trailing stop once in profit by 1.5× stop distance
+                if not pos["trail_active"] and pnl_pct > 1.5 * orig_stop_pct:
+                    pos["trail_active"] = True
+                if pos["trail_active"]:
+                    # Ratchet stop up to lock in 30% of the unrealised gain
+                    candidate_stop = entry + 0.3 * (pos["highest_price"] - entry)
+                    pos["stop_price"] = max(pos["stop_price"], candidate_stop)
+
+                hit_stop = current_price <= pos["stop_price"]
+                hit_take = current_price >= pos["take_price"]
+
+                if hit_stop or hit_take:
+                    pnl_dollar = pnl_pct * entry * pos["shares"]
+                    equity += entry * pos["shares"] + pnl_dollar
+                    reason = "stop_loss" if hit_stop else "take_profit"
                     all_trades.append({
                         "symbol": symbol,
                         "entry_date": pos["entry_date"],
@@ -110,13 +139,13 @@ class Backtester:
                 pnl_dollar = pnl_pct * pos["entry_price"] * pos["shares"]
                 equity += pos["entry_price"] * pos["shares"] + pnl_dollar
                 all_trades.append({
-                    "symbol": symbol,
+                    "symbol":     symbol,
                     "entry_date": pos["entry_date"],
-                    "exit_date": date,
-                    "pnl_pct": round(pnl_pct, 5),
+                    "exit_date":  date,
+                    "pnl_pct":    round(pnl_pct, 5),
                     "pnl_dollar": round(pnl_dollar, 2),
                     "exit_reason": "model_sell",
-                    "regime": pos["regime"],
+                    "regime":     pos["regime"],
                 })
 
             # ----------------------------------------------------------------
@@ -148,8 +177,10 @@ class Backtester:
                 if price is None or price <= 0:
                     continue
 
+                # ATR-based stop sizing: adapts to each stock's volatility
+                atr = _atr_estimate(price_data, symbol, ts)
                 stop_price, take_price = self.risk.compute_stop_take(
-                    price, regime, stop_base, take_base
+                    price, regime, stop_base, take_base, atr_value=atr
                 )
                 stop_pct = (price - stop_price) / price
                 take_pct = (take_price - price) / price
@@ -169,12 +200,15 @@ class Backtester:
 
                 equity -= dollar_amount
                 positions[symbol] = {
-                    "entry_price": price,
-                    "shares": shares,
-                    "entry_date": date,
-                    "stop_pct": stop_pct,
-                    "take_pct": take_pct,
-                    "regime": regime,
+                    "entry_price":   price,
+                    "shares":        shares,
+                    "entry_date":    date,
+                    "stop_price":    stop_price,    # absolute level (ratchets up)
+                    "take_price":    take_price,
+                    "highest_price": price,
+                    "trail_active":  False,
+                    "orig_stop_pct": stop_pct,      # original distance for trail trigger
+                    "regime":        regime,
                 }
 
             # ----------------------------------------------------------------
@@ -194,13 +228,13 @@ class Backtester:
                 pnl_pct = (last_price - pos["entry_price"]) / pos["entry_price"]
                 pnl_dollar = pnl_pct * pos["entry_price"] * pos["shares"]
                 all_trades.append({
-                    "symbol": symbol,
+                    "symbol":     symbol,
                     "entry_date": pos["entry_date"],
-                    "exit_date": dates[-1],
-                    "pnl_pct": round(pnl_pct, 5),
+                    "exit_date":  dates[-1],
+                    "pnl_pct":    round(pnl_pct, 5),
                     "pnl_dollar": round(pnl_dollar, 2),
                     "exit_reason": "end_of_backtest",
-                    "regime": pos["regime"],
+                    "regime":     pos["regime"],
                 })
 
         eq_df = pd.DataFrame(equity_curve).set_index("date")

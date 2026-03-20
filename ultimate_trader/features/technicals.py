@@ -44,7 +44,7 @@ def add_technicals(df: pd.DataFrame) -> pd.DataFrame:
     std20 = c.rolling(20).std()
     df["bb_upper"] = sma20 + 2 * std20
     df["bb_lower"] = sma20 - 2 * std20
-    df["bb_width"] = (df["bb_upper"] - df["bb_lower"]) / sma20
+    df["bb_width"] = (df["bb_upper"] - df["bb_lower"]) / (sma20 + 1e-9)
     df["bb_pct_b"] = (c - df["bb_lower"]) / (df["bb_upper"] - df["bb_lower"] + 1e-9)
 
     # ATR (Average True Range)
@@ -54,19 +54,12 @@ def add_technicals(df: pd.DataFrame) -> pd.DataFrame:
         (l - c.shift(1)).abs()
     ], axis=1).max(axis=1)
     df["atr_14"] = tr.rolling(14).mean()
-    df["atr_pct"] = df["atr_14"] / c
+    df["atr_pct"] = df["atr_14"] / (c + 1e-9)
 
-    # OBV (On-Balance Volume)
-    obv = [0.0]
-    for i in range(1, len(c)):
-        if c.iloc[i] > c.iloc[i - 1]:
-            obv.append(obv[-1] + v.iloc[i])
-        elif c.iloc[i] < c.iloc[i - 1]:
-            obv.append(obv[-1] - v.iloc[i])
-        else:
-            obv.append(obv[-1])
-    df["obv"] = obv
-    df["obv_change_5d"] = pd.Series(obv, index=c.index).pct_change(5)
+    # OBV (On-Balance Volume) — vectorized with np.where
+    direction = np.where(c > c.shift(1), 1.0, np.where(c < c.shift(1), -1.0, 0.0))
+    df["obv"] = (v * direction).cumsum()
+    df["obv_change_5d"] = df["obv"].pct_change(5)
 
     # Volume anomaly (today vs 20d avg)
     df["volume_anomaly"] = v / (v.rolling(20).mean() + 1e-9)
@@ -96,9 +89,43 @@ def add_technicals(df: pd.DataFrame) -> pd.DataFrame:
         c.rolling(20).max() - c.rolling(20).min() + 1e-9
     )
 
-    # Log price (sometimes helps models with non-stationarity)
+    # Log price/volume
     df["log_close"] = np.log(c + 1e-9)
     df["log_volume"] = np.log(v + 1e-9)
+
+    # ── New indicators ─────────────────────────────────────────────────────────
+
+    # VWAP deviation: uses Alpaca per-bar vwap if available, else rolling approx
+    if "vwap" in df.columns:
+        vwap = df["vwap"]
+    else:
+        vwap = (c * v).rolling(20).sum() / (v.rolling(20).sum() + 1e-9)
+    df["vwap_dev"] = (c - vwap) / (vwap + 1e-9)
+
+    # MFI (Money Flow Index, 14-period)
+    df["mfi_14"] = _mfi(c, h, l, v, 14)
+
+    # CMF (Chaikin Money Flow, 20-period)
+    mf_vol = ((c - l) - (h - c)) / (h - l + 1e-9) * v
+    df["cmf_20"] = mf_vol.rolling(20).sum() / (v.rolling(20).sum() + 1e-9)
+
+    # Elder Ray: bull power = high - ema13, bear power = low - ema13
+    ema13 = c.ewm(span=13, adjust=False).mean()
+    df["elder_bull"] = (h - ema13) / (c + 1e-9)   # normalised
+    df["elder_bear"] = (l - ema13) / (c + 1e-9)
+
+    # Ichimoku (standard 9/26/52 periods) — all ratios relative to close
+    tenkan = (h.rolling(9).max() + l.rolling(9).min()) / 2
+    kijun = (h.rolling(26).max() + l.rolling(26).min()) / 2
+    # Senkou: projected 26 periods ahead — use .shift(26) to look at cloud 26 days ago (no lookahead)
+    senkou_a = ((tenkan + kijun) / 2).shift(26)
+    senkou_b = ((h.rolling(52).max() + l.rolling(52).min()) / 2).shift(26)
+    # Chikou: current close vs close 26 days ago (look-back safe)
+    df["ichi_tenkan"] = tenkan / (c + 1e-9)
+    df["ichi_kijun"] = kijun / (c + 1e-9)
+    df["ichi_senkou_a"] = senkou_a / (c + 1e-9)
+    df["ichi_senkou_b"] = senkou_b / (c + 1e-9)
+    df["ichi_chikou"] = c / (c.shift(26) + 1e-9)
 
     return df.fillna(0)
 
@@ -111,3 +138,17 @@ def _rsi(series: pd.Series, window: int = 14) -> pd.Series:
     avg_loss = loss.ewm(com=window - 1, adjust=False).mean()
     rs = avg_gain / (avg_loss + 1e-9)
     return 100 - (100 / (1 + rs))
+
+
+def _mfi(close: pd.Series, high: pd.Series, low: pd.Series,
+         volume: pd.Series, window: int = 14) -> pd.Series:
+    """Money Flow Index: volume-weighted RSI on typical price."""
+    tp = (high + low + close) / 3
+    mf = tp * volume
+    tp_diff = tp.diff()
+    pos_mf = mf.where(tp_diff > 0, 0.0)
+    neg_mf = mf.where(tp_diff <= 0, 0.0)
+    pos_sum = pos_mf.rolling(window).sum()
+    neg_sum = neg_mf.rolling(window).sum()
+    mfr = pos_sum / (neg_sum + 1e-9)
+    return 100 - (100 / (1 + mfr))

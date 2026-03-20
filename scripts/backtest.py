@@ -54,7 +54,7 @@ def parse_args():
 @torch.no_grad()
 def run_inference(model, fb, bars, sentiment, macro_df,
                   symbols, symbol_to_idx, symbol_to_sector,
-                  dates, device, mc_samples=30):
+                  dates, device, mc_samples=30, fundamentals=None):
     """
     Run model inference on each date in `dates`.
     Returns a DataFrame with columns:
@@ -64,10 +64,8 @@ def run_inference(model, fb, bars, sentiment, macro_df,
 
     for date in dates:
         ts = pd.Timestamp(date)
-        # Slice bars up to this date
         date_bars = {sym: df[df.index <= ts] for sym, df in bars.items() if sym in symbols}
 
-        # Only symbols with enough history
         valid_syms = [
             s for s, df in date_bars.items()
             if len(df) >= fb.price_window
@@ -82,6 +80,7 @@ def run_inference(model, fb, bars, sentiment, macro_df,
             symbols=valid_syms,
             symbol_to_idx=symbol_to_idx,
             symbol_to_sector=symbol_to_sector,
+            fundamentals=fundamentals,
             fit=False,
         )
 
@@ -89,11 +88,14 @@ def run_inference(model, fb, bars, sentiment, macro_df,
             tech = torch.tensor(feat["tech"], dtype=torch.float32).unsqueeze(0).to(device)
             sent = torch.tensor(feat["sent"], dtype=torch.float32).unsqueeze(0).to(device)
             macro = torch.tensor(feat["macro"], dtype=torch.float32).unsqueeze(0).to(device)
+            fund = torch.tensor(feat.get("fund", [0.0] * 6), dtype=torch.float32).unsqueeze(0).to(device)
             sym_idx = torch.tensor([feat["sym_idx"]], dtype=torch.long).to(device)
             sec_idx = torch.tensor([feat["sec_idx"]], dtype=torch.long).to(device)
+            regime_idx = torch.tensor([0], dtype=torch.long).to(device)
 
             mean_probs, uncertainty = model.predict_with_uncertainty(
-                tech, sent, macro, sym_idx, sec_idx, n_samples=mc_samples
+                tech, sent, macro, fund, sym_idx, sec_idx, regime_idx,
+                n_samples=mc_samples,
             )
             probs = mean_probs.squeeze(0).cpu().numpy()
             pred_class = int(probs.argmax())
@@ -159,10 +161,16 @@ def main():
     sent_dim = ckpt["sent_dim"]
     macro_dim = ckpt["macro_dim"]
 
-    model = build_model(cfg, n_symbols, n_sectors, tech_dim, sent_dim, macro_dim).to(device)
+    fund_dim = ckpt.get("fund_dim", 6)
+    model = build_model(cfg, n_symbols, n_sectors, tech_dim, sent_dim, macro_dim, fund_dim).to(device)
     model.load_state_dict(ckpt["model_state"])
+    # Restore calibrated temperature if saved
+    if "temperature" in ckpt:
+        with torch.no_grad():
+            model.temperature.fill_(ckpt["temperature"])
     model.eval()
-    log.info(f"Model loaded (fold {ckpt.get('fold', '?')}, val_acc={ckpt.get('val_acc', '?'):.4f})")
+    log.info(f"Model loaded (fold {ckpt.get('fold', '?')}, val_acc={ckpt.get('val_acc', 0):.4f}, "
+             f"T={model.temperature.item():.3f})")
 
     # ---- Load scalers ----
     fb = FeatureBuilder(cfg)
@@ -196,7 +204,8 @@ def main():
     predictions_df = run_inference(
         model, fb, bars, sentiment, macro_df,
         symbols, symbol_to_idx, symbol_to_sector,
-        bt_dates, device, mc_samples=args.mc_samples
+        bt_dates, device, mc_samples=args.mc_samples,
+        fundamentals=None,  # not used in backtest by default
     )
     log.info(f"Generated {len(predictions_df)} predictions across {len(bt_dates)} dates")
 

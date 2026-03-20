@@ -1,5 +1,6 @@
 """Evaluation metrics for training and backtesting."""
 import numpy as np
+import pandas as pd
 from typing import List, Dict
 
 
@@ -26,6 +27,41 @@ def sortino_ratio(returns: List[float], risk_free: float = 0.0) -> float:
     if len(downside) == 0 or downside.std() < 1e-9:
         return float("inf") if r.mean() > 0 else 0.0
     return float((r.mean() - risk_free / 252) / downside.std() * np.sqrt(252))
+
+
+def compute_val_sharpe(model, val_loader, device, val_samples) -> float:
+    """
+    Proxy Sharpe from val-set predictions. No future prices needed —
+    uses label-class as return proxy (label 4→+2.5%, 0→-2.5%, 2→0%).
+    Groups by date, averages pnl across symbols, computes annualised Sharpe.
+    """
+    import torch
+    LABEL_RET = {4: 0.025, 3: 0.005, 2: 0.0, 1: -0.005, 0: -0.025}
+    model.eval()
+    rows = []
+    idx = 0
+    with torch.no_grad():
+        for batch in val_loader:
+            tech, sent, macro, fund, sym_idx, sec_idx, regime_idx, labels = batch
+            logits = model(
+                tech.to(device), sent.to(device), macro.to(device),
+                fund.to(device), sym_idx.to(device), sec_idx.to(device), regime_idx.to(device)
+            )
+            probs = torch.softmax(logits, dim=1).cpu().numpy()
+            preds = probs.argmax(axis=1)
+            conf  = probs.max(axis=1)
+            for j in range(len(preds)):
+                pc = int(preds[j])
+                signal = +float(conf[j]) if pc >= 3 else (-float(conf[j]) if pc <= 1 else 0.0)
+                ret    = LABEL_RET[int(labels[j].item())]
+                date   = val_samples[idx]["date"] if idx < len(val_samples) else None
+                rows.append({"date": date, "pnl": signal * ret})
+                idx += 1
+    if not rows:
+        return 0.0
+    df = pd.DataFrame(rows)
+    daily = df.groupby("date")["pnl"].mean()
+    return sharpe_ratio(daily.values)
 
 
 def max_drawdown(equity_curve: List[float]) -> float:

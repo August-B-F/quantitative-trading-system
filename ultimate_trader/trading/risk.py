@@ -1,7 +1,9 @@
 """Risk management: position sizing, exposure limits, regime-based adjustments."""
 import numpy as np
 from typing import Dict, Tuple
-from ultimate_trader.features.regimes import REGIME_BULL, REGIME_BEAR, REGIME_SIDEWAYS
+from ultimate_trader.features.regimes import (
+    REGIME_BULL, REGIME_BEAR, REGIME_SIDEWAYS, REGIME_CRISIS
+)
 from ultimate_trader.utils.logging import get_logger
 from ultimate_trader.utils.config_loader import Config
 
@@ -9,15 +11,17 @@ logger = get_logger(__name__)
 
 # Regime multipliers: how aggressively to deploy capital per regime
 REGIME_EXPOSURE_MULTIPLIER = {
-    REGIME_BULL:     1.0,   # full exposure allowed
-    REGIME_SIDEWAYS: 0.6,   # reduce exposure in choppy markets
-    REGIME_BEAR:     0.25,  # minimal exposure in bear regime
+    REGIME_BULL:     1.0,    # full exposure allowed
+    REGIME_SIDEWAYS: 0.6,    # reduce exposure in choppy markets
+    REGIME_BEAR:     0.25,   # minimal exposure in bear regime
+    REGIME_CRISIS:   0.0,    # no new positions during crisis
 }
 
 REGIME_CONFIDENCE_BOOST = {
     REGIME_BULL:     0.0,    # keep normal confidence threshold
     REGIME_SIDEWAYS: 0.05,   # require slightly higher confidence
     REGIME_BEAR:     0.15,   # require much higher confidence
+    REGIME_CRISIS:   0.25,   # very high confidence required (rarely triggered anyway)
 }
 
 
@@ -65,6 +69,12 @@ class RiskManager:
 
         Returns (dollar_amount, num_shares).
         """
+        regime_mult = REGIME_EXPOSURE_MULTIPLIER.get(regime, 0.5)
+
+        # Crisis: no new positions
+        if regime_mult == 0.0:
+            return 0.0, 0.0
+
         p = float(np.clip(confidence, 0.01, 0.99))
         q = 1.0 - p
         b = take_profit_pct / max(stop_loss_pct, 1e-4)
@@ -77,7 +87,6 @@ class RiskManager:
         fractional_f = min(fractional_f, self.max_single)
 
         # Scale by regime
-        regime_mult = REGIME_EXPOSURE_MULTIPLIER.get(regime, 0.5)
         fractional_f *= regime_mult
 
         dollar_amount = equity * fractional_f
@@ -87,13 +96,37 @@ class RiskManager:
 
     def compute_stop_take(
         self, price: float, regime: str,
-        base_stop: float = 0.07, base_take: float = 0.12
+        base_stop: float = 0.07, base_take: float = 0.12,
+        atr_value: float = None,
     ) -> Tuple[float, float]:
         """
         Compute stop loss and take profit prices.
-        In bear regimes, tighten stops; in bull regimes, widen takes.
+
+        When atr_value is provided, use ATR-scaled stops (N_atr × ATR / price)
+        so volatile stocks (TSLA, NVDA) get wider stops and stable stocks
+        (JNJ, KO) get tighter ones. Regime scales N_atr.
+
+        Falls back to fixed percentage stops when atr_value is None.
         """
-        if regime == REGIME_BEAR:
+        # ATR-based sizing: stops proportional to realised volatility
+        N_ATR = {
+            REGIME_BULL:     2.5,
+            REGIME_SIDEWAYS: 2.0,
+            REGIME_BEAR:     2.0,
+            REGIME_CRISIS:   1.5,
+        }
+        if atr_value and atr_value > 0 and price > 0:
+            n = N_ATR.get(regime, 2.0)
+            stop_pct = float(np.clip(n * atr_value / price, 0.03, 0.12))
+            take_pct = float(np.clip(stop_pct * (base_take / max(base_stop, 1e-4)),
+                                     0.05, 0.25))
+            return round(price * (1 - stop_pct), 2), round(price * (1 + take_pct), 2)
+
+        # Fixed percentage fallback (regime-adjusted)
+        if regime == REGIME_CRISIS:
+            stop_pct = base_stop * 0.5   # very tight stop if somehow in a position
+            take_pct = base_take * 0.5
+        elif regime == REGIME_BEAR:
             stop_pct = base_stop * 0.7   # tighter stop
             take_pct = base_take * 0.8
         elif regime == REGIME_BULL:
@@ -109,6 +142,8 @@ class RiskManager:
         self, current_exposure: float, equity: float, regime: str
     ) -> bool:
         """Returns True if there is room to open more positions."""
+        if REGIME_EXPOSURE_MULTIPLIER.get(regime, 0.5) == 0.0:
+            return False  # crisis: never open new positions
         max_dep = self.max_deployable_equity(equity, regime)
         current_invested = current_exposure * equity
         return current_invested < max_dep

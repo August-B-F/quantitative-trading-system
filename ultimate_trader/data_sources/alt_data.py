@@ -6,13 +6,13 @@ Currently implemented:
   - Sector relative strength vs SPY
   - Dollar index proxy (UUP ETF)
   - Earnings calendar via yfinance
-  - Inter-symbol correlation helpers
+  - GDELT market sentiment (optional, merged into macro_df)
 
 All are optional and gracefully disabled if data unavailable.
 """
 import pandas as pd
 import numpy as np
-from typing import Dict
+from typing import Dict, Optional
 from ultimate_trader.utils.logging import get_logger
 from ultimate_trader.utils.config_loader import Config
 
@@ -29,21 +29,24 @@ class AltDataBuilder:
     def __init__(self, cfg: Config):
         self.cfg = cfg
 
-    def build_macro_features(self, bars: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    def build_macro_features(
+        self,
+        bars: Dict[str, pd.DataFrame],
+        gdelt_df: Optional[pd.DataFrame] = None,
+    ) -> pd.DataFrame:
         """
         Build a date-indexed macro feature DataFrame from available ETF bars.
-        Columns:
-            vix_level         - VIXY close (VIX proxy)
-            vix_change_1d     - 1d change in vix
-            vix_regime_pct    - rolling 60d percentile rank of VIX
-            yield_proxy       - TLT close (long bond price, inverse of rates)
-            yield_change_5d   - 5d change in TLT
-            spy_return_1d     - SPY 1d return
-            spy_return_5d     - SPY 5d return
-            spy_vol_20d       - SPY 20d rolling vol
-            spy_trend         - SPY 50d vs 200d SMA ratio (>1 = bull trend)
-            oil_return_5d     - USO 5d return
-            gold_return_5d    - GLD 5d return
+
+        Columns (11 base + 3 GDELT = 14 when GDELT available):
+            vix_level, vix_change_1d, vix_regime_pct
+            yield_proxy, yield_change_5d
+            spy_return_1d, spy_return_5d, spy_vol_20d, spy_trend
+            oil_return_5d, gold_return_5d
+            gdelt_avg_tone, gdelt_article_count, gdelt_goldstein_scale (if gdelt_df provided)
+
+        Args:
+            bars:     {symbol: DataFrame} from MarketDataFetcher
+            gdelt_df: Optional pre-fetched GDELT daily sentiment DataFrame
         """
         frames = []
 
@@ -54,7 +57,7 @@ class AltDataBuilder:
                 "spy_return_1d": spy_ret,
                 "spy_return_5d": spy["close"].pct_change(5),
                 "spy_vol_20d": spy_ret.rolling(20).std(),
-                "spy_trend": spy["close"].rolling(50).mean() / spy["close"].rolling(200).mean(),
+                "spy_trend": spy["close"].rolling(50).mean() / (spy["close"].rolling(200).mean() + 1e-9),
             }, index=spy.index)
             frames.append(df_spy)
 
@@ -89,12 +92,26 @@ class AltDataBuilder:
             ))
 
         if not frames:
-            logger.warning("No macro data available - alt features will be empty")
+            logger.warning("No macro data available — alt features will be empty")
             return pd.DataFrame()
 
         macro = pd.concat(frames, axis=1).sort_index()
-        # FIX: use .ffill() not deprecated fillna(method='ffill')
         macro = macro.ffill().fillna(0)
+
+        # ── Merge GDELT sentiment if provided ─────────────────────────────────
+        if gdelt_df is not None and not gdelt_df.empty:
+            gdelt_cols = [c for c in ["gdelt_avg_tone", "gdelt_article_count", "gdelt_goldstein_scale"]
+                          if c in gdelt_df.columns]
+            if gdelt_cols:
+                gdelt_aligned = (
+                    gdelt_df[gdelt_cols]
+                    .reindex(macro.index)
+                    .ffill()
+                    .fillna(0)
+                )
+                macro = pd.concat([macro, gdelt_aligned], axis=1)
+                logger.info(f"Merged GDELT columns: {gdelt_cols}")
+
         return macro
 
     def build_sector_strength(self, bars: Dict[str, pd.DataFrame]) -> pd.DataFrame:
@@ -111,7 +128,7 @@ class AltDataBuilder:
             etf_bars = bars.get(etf)
             if etf_bars is None:
                 continue
-            rel = etf_bars["close"] / spy["close"]
+            rel = etf_bars["close"] / (spy["close"] + 1e-9)
             df = pd.DataFrame({
                 f"{etf}_rel_strength_20d": rel.pct_change(20),
                 f"{etf}_rel_momentum_5d": rel.pct_change(5),
@@ -132,7 +149,7 @@ class AltDataBuilder:
         try:
             import yfinance as yf
         except ImportError:
-            logger.warning("yfinance not installed - earnings calendar unavailable")
+            logger.warning("yfinance not installed — earnings calendar unavailable")
             return {}
 
         earnings = {}
