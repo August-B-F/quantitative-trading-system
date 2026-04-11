@@ -1,0 +1,50 @@
+{
+  "strategy": "composite_mom_mr",
+  "config": {},
+  "metrics": {
+    "total_return": 76.05,
+    "benchmark_total_return": 189.62,
+    "cagr": 7.33,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.525,
+    "sortino_ratio": 0.675,
+    "max_drawdown": -23.69,
+    "calmar_ratio": 0.31,
+    "annual_returns": {
+      "2018": -12.43,
+      "2019": 13.57,
+      "2020": 14.02,
+      "2021": 16.55,
+      "2022": -8.28,
+      "2023": 10.04,
+      "2024": 19.02,
+      "2025": 13.43
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -7.18,
+      "2019": -17.51,
+      "2020": -3.21,
+      "2021": -13.95,
+      "2022": 10.37,
+      "2023": -16.67,
+      "2024": -6.57,
+      "2025": -5.46
+    },
+    "return_std_across_years": 11.05,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 12.5,
+    "cumulative_vs_benchmark": 0.4,
+    "years_tested": 8
+  }
+}

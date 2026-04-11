@@ -1,0 +1,53 @@
+{
+  "strategy": "E_pure_trend_SOXX_sma150",
+  "config": {
+    "ticker": "SOXX",
+    "sma_period": 150
+  },
+  "metrics": {
+    "total_return": 103.81,
+    "benchmark_total_return": 189.62,
+    "cagr": 9.32,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.455,
+    "sortino_ratio": 0.609,
+    "max_drawdown": -45.98,
+    "calmar_ratio": 0.203,
+    "annual_returns": {
+      "2018": -18.15,
+      "2019": 19.51,
+      "2020": 29.35,
+      "2021": 41.55,
+      "2022": -43.95,
+      "2023": 40.93,
+      "2024": 10.65,
+      "2025": 28.64
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -12.9,
+      "2019": -11.57,
+      "2020": 12.11,
+      "2021": 11.04,
+      "2022": -25.31,
+      "2023": 14.22,
+      "2024": -14.94,
+      "2025": 9.75
+    },
+    "return_std_across_years": 28.21,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 50.0,
+    "cumulative_vs_benchmark": 0.55,
+    "years_tested": 8
+  }
+}

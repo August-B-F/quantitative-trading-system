@@ -1,0 +1,53 @@
+{
+  "strategy": "E_soxx_qqq_sma200_mom63",
+  "config": {
+    "sma_period": 200,
+    "mom_period": 63
+  },
+  "metrics": {
+    "total_return": 157.43,
+    "benchmark_total_return": 189.62,
+    "cagr": 12.56,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.58,
+    "sortino_ratio": 0.778,
+    "max_drawdown": -40.68,
+    "calmar_ratio": 0.309,
+    "annual_returns": {
+      "2018": -0.84,
+      "2019": 23.93,
+      "2020": 23.53,
+      "2021": 29.13,
+      "2022": -35.47,
+      "2023": 30.72,
+      "2024": 31.81,
+      "2025": 17.24
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 4.41,
+      "2019": -7.16,
+      "2020": 6.29,
+      "2021": -1.37,
+      "2022": -16.82,
+      "2023": 4.01,
+      "2024": 6.22,
+      "2025": -1.65
+    },
+    "return_std_across_years": 21.46,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 50.0,
+    "cumulative_vs_benchmark": 0.83,
+    "years_tested": 8
+  }
+}

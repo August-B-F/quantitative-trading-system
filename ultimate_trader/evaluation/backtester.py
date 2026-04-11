@@ -156,8 +156,9 @@ class Backtester:
                 day_preds["pred_class"].isin([3, 4]) &
                 (day_preds["confidence"] >= min_conf)
             )
+            unc_threshold = getattr(self.cfg.trading, "max_uncertainty", 0.75)
             if uncertainty_col:
-                buy_mask &= day_preds[uncertainty_col] < 0.75
+                buy_mask &= day_preds[uncertainty_col] < unc_threshold
 
             buy_signals = day_preds[buy_mask].sort_values("confidence", ascending=False)
 

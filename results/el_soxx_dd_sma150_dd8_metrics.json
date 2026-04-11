@@ -1,0 +1,53 @@
+{
+  "strategy": "EL_soxx_dd_sma150_dd8",
+  "config": {
+    "sma_period": 150,
+    "dd_threshold": -0.08
+  },
+  "metrics": {
+    "total_return": 163.08,
+    "benchmark_total_return": 189.62,
+    "cagr": 12.87,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.625,
+    "sortino_ratio": 0.827,
+    "max_drawdown": -43.32,
+    "calmar_ratio": 0.297,
+    "annual_returns": {
+      "2018": -1.37,
+      "2019": 28.06,
+      "2020": 11.31,
+      "2021": 40.42,
+      "2022": -41.2,
+      "2023": 40.83,
+      "2024": 31.73,
+      "2025": 23.11
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 3.87,
+      "2019": -3.03,
+      "2020": -5.92,
+      "2021": 9.91,
+      "2022": -22.55,
+      "2023": 14.12,
+      "2024": 6.14,
+      "2025": 4.22
+    },
+    "return_std_across_years": 25.61,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 62.5,
+    "cumulative_vs_benchmark": 0.86,
+    "years_tested": 8
+  }
+}

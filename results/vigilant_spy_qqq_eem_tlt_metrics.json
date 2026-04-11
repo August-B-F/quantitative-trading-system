@@ -1,0 +1,57 @@
+{
+  "strategy": "vigilant_SPY_QQQ_EEM_TLT",
+  "config": {
+    "offensive": [
+      "SPY",
+      "QQQ",
+      "EEM",
+      "TLT"
+    ]
+  },
+  "metrics": {
+    "total_return": 103.41,
+    "benchmark_total_return": 189.62,
+    "cagr": 9.29,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.74,
+    "sortino_ratio": 0.941,
+    "max_drawdown": -25.67,
+    "calmar_ratio": 0.362,
+    "annual_returns": {
+      "2018": 0.07,
+      "2019": 7.21,
+      "2020": 51.63,
+      "2021": 10.96,
+      "2022": -16.78,
+      "2023": 9.97,
+      "2024": 9.68,
+      "2025": 13.04
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 5.32,
+      "2019": -23.88,
+      "2020": 34.4,
+      "2021": -19.55,
+      "2022": 1.87,
+      "2023": -16.74,
+      "2024": -15.91,
+      "2025": -5.85
+    },
+    "return_std_across_years": 17.9,
+    "negative_years": 1,
+    "positive_year_ratio": 87.5,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 0.55,
+    "years_tested": 8
+  }
+}

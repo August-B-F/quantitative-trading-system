@@ -1,0 +1,50 @@
+{
+  "strategy": "E_dual_growth_bond",
+  "config": {},
+  "metrics": {
+    "total_return": 57.64,
+    "benchmark_total_return": 189.62,
+    "cagr": 5.86,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.412,
+    "sortino_ratio": 0.566,
+    "max_drawdown": -36.11,
+    "calmar_ratio": 0.162,
+    "annual_returns": {
+      "2018": -11.12,
+      "2019": 18.41,
+      "2020": 25.05,
+      "2021": 19.09,
+      "2022": -33.86,
+      "2023": 12.18,
+      "2024": 25.73,
+      "2025": 9.22
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -5.87,
+      "2019": -12.68,
+      "2020": 7.82,
+      "2021": -11.42,
+      "2022": -15.22,
+      "2023": -14.53,
+      "2024": 0.14,
+      "2025": -9.67
+    },
+    "return_std_across_years": 19.28,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 25.0,
+    "cumulative_vs_benchmark": 0.3,
+    "years_tested": 8
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "strategy": "dual_momentum_lb126_skip0",
+  "config": {
+    "lookback": 126,
+    "skip": 0
+  },
+  "metrics": {
+    "total_return": 34.97,
+    "benchmark_total_return": 189.62,
+    "cagr": 3.82,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.315,
+    "sortino_ratio": 0.358,
+    "max_drawdown": -34.05,
+    "calmar_ratio": 0.112,
+    "annual_returns": {
+      "2018": -13.79,
+      "2019": 11.52,
+      "2020": -5.85,
+      "2021": 25.18,
+      "2022": -23.87,
+      "2023": 17.83,
+      "2024": 22.86,
+      "2025": 9.3
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -8.54,
+      "2019": -19.57,
+      "2020": -23.09,
+      "2021": -5.32,
+      "2022": -5.23,
+      "2023": -8.88,
+      "2024": -2.73,
+      "2025": -9.59
+    },
+    "return_std_across_years": 16.79,
+    "negative_years": 3,
+    "positive_year_ratio": 62.5,
+    "beat_benchmark_rate": 0.0,
+    "cumulative_vs_benchmark": 0.18,
+    "years_tested": 8
+  }
+}

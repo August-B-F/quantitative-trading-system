@@ -1,0 +1,56 @@
+{
+  "strategy": "EL_maxgrowth_sma200_dd8_n1",
+  "config": {
+    "growth": [
+      "SOXX"
+    ],
+    "sma_period": 200,
+    "dd_limit": -0.08
+  },
+  "metrics": {
+    "total_return": 201.54,
+    "benchmark_total_return": 189.62,
+    "cagr": 14.81,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.687,
+    "sortino_ratio": 0.889,
+    "max_drawdown": -38.93,
+    "calmar_ratio": 0.38,
+    "annual_returns": {
+      "2018": -20.17,
+      "2019": 5.39,
+      "2020": 22.61,
+      "2021": 32.52,
+      "2022": -12.57,
+      "2023": 39.1,
+      "2024": 24.25,
+      "2025": 46.86
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -14.93,
+      "2019": -25.7,
+      "2020": 5.37,
+      "2021": 2.02,
+      "2022": 6.08,
+      "2023": 12.39,
+      "2024": -1.34,
+      "2025": 27.97
+    },
+    "return_std_across_years": 22.63,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 62.5,
+    "cumulative_vs_benchmark": 1.06,
+    "years_tested": 8
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "strategy": "lev_growth_QQQ_XLK_VGT",
+  "config": {
+    "aggressive": [
+      "QQQ",
+      "XLK",
+      "VGT",
+      "IGV",
+      "SOXX"
+    ]
+  },
+  "metrics": {
+    "total_return": 195.15,
+    "benchmark_total_return": 189.62,
+    "cagr": 14.5,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.686,
+    "sortino_ratio": 0.897,
+    "max_drawdown": -23.63,
+    "calmar_ratio": 0.614,
+    "annual_returns": {
+      "2018": 2.37,
+      "2019": 29.03,
+      "2020": 14.46,
+      "2021": 22.91,
+      "2022": -20.44,
+      "2023": 32.71,
+      "2024": 40.43,
+      "2025": 8.28
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 7.61,
+      "2019": -2.05,
+      "2020": -2.78,
+      "2021": -7.6,
+      "2022": -1.8,
+      "2023": 6.0,
+      "2024": 14.84,
+      "2025": -10.61
+    },
+    "return_std_across_years": 18.27,
+    "negative_years": 1,
+    "positive_year_ratio": 87.5,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 1.03,
+    "years_tested": 8
+  }
+}

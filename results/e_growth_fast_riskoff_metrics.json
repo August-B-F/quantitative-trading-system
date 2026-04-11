@@ -1,0 +1,50 @@
+{
+  "strategy": "E_growth_fast_riskoff",
+  "config": {},
+  "metrics": {
+    "total_return": 75.88,
+    "benchmark_total_return": 189.62,
+    "cagr": 7.32,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.402,
+    "sortino_ratio": 0.546,
+    "max_drawdown": -49.07,
+    "calmar_ratio": 0.149,
+    "annual_returns": {
+      "2018": -5.36,
+      "2019": 19.51,
+      "2020": 4.56,
+      "2021": 30.78,
+      "2022": -47.16,
+      "2023": 41.16,
+      "2024": 41.06,
+      "2025": 10.27
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -0.11,
+      "2019": -11.58,
+      "2020": -12.67,
+      "2021": 0.28,
+      "2022": -28.51,
+      "2023": 14.45,
+      "2024": 15.47,
+      "2025": -8.62
+    },
+    "return_std_across_years": 27.3,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 0.4,
+    "years_tested": 8
+  }
+}

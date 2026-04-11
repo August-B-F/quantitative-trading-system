@@ -1,0 +1,53 @@
+{
+  "strategy": "EL_soxx_gold_sma100_mom42",
+  "config": {
+    "sma_period": 100,
+    "mom_period": 42
+  },
+  "metrics": {
+    "total_return": 170.7,
+    "benchmark_total_return": 189.62,
+    "cagr": 13.27,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.656,
+    "sortino_ratio": 0.856,
+    "max_drawdown": -39.33,
+    "calmar_ratio": 0.337,
+    "annual_returns": {
+      "2018": -3.4,
+      "2019": 31.14,
+      "2020": 13.93,
+      "2021": 30.92,
+      "2022": -37.06,
+      "2023": 45.31,
+      "2024": 31.73,
+      "2025": 20.3
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 1.85,
+      "2019": 0.05,
+      "2020": -3.31,
+      "2021": 0.42,
+      "2022": -18.41,
+      "2023": 18.6,
+      "2024": 6.14,
+      "2025": 1.41
+    },
+    "return_std_across_years": 24.42,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 75.0,
+    "cumulative_vs_benchmark": 0.9,
+    "years_tested": 8
+  }
+}

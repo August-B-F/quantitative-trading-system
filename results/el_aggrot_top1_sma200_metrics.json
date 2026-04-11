@@ -1,0 +1,53 @@
+{
+  "strategy": "EL_aggrot_top1_sma200",
+  "config": {
+    "top_n": 1,
+    "sma_period": 200
+  },
+  "metrics": {
+    "total_return": 129.94,
+    "benchmark_total_return": 189.62,
+    "cagr": 10.98,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.554,
+    "sortino_ratio": 0.742,
+    "max_drawdown": -35.28,
+    "calmar_ratio": 0.311,
+    "annual_returns": {
+      "2018": 3.09,
+      "2019": 13.95,
+      "2020": 15.04,
+      "2021": 21.17,
+      "2022": -32.46,
+      "2023": 21.45,
+      "2024": 38.56,
+      "2025": 24.84
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 8.34,
+      "2019": -17.13,
+      "2020": -2.19,
+      "2021": -9.34,
+      "2022": -13.81,
+      "2023": -5.26,
+      "2024": 12.97,
+      "2025": 5.95
+    },
+    "return_std_across_years": 19.69,
+    "negative_years": 1,
+    "positive_year_ratio": 87.5,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 0.69,
+    "years_tested": 8
+  }
+}

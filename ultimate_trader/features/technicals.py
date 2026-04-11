@@ -127,7 +127,9 @@ def add_technicals(df: pd.DataFrame) -> pd.DataFrame:
     df["ichi_senkou_b"] = senkou_b / (c + 1e-9)
     df["ichi_chikou"] = c / (c.shift(26) + 1e-9)
 
-    return df.fillna(0)
+    # Replace inf/-inf first, then NaN
+    df = df.replace([np.inf, -np.inf], np.nan).fillna(0)
+    return df
 
 
 def _rsi(series: pd.Series, window: int = 14) -> pd.Series:

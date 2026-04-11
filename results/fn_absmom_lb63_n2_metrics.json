@@ -1,0 +1,56 @@
+{
+  "strategy": "FN_absmom_lb63_n2",
+  "config": {
+    "growth": [
+      "SOXX",
+      "QQQ"
+    ],
+    "lookback": 63
+  },
+  "metrics": {
+    "total_return": 254.19,
+    "benchmark_total_return": 189.62,
+    "cagr": 17.15,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.756,
+    "sortino_ratio": 1.017,
+    "max_drawdown": -30.45,
+    "calmar_ratio": 0.563,
+    "annual_returns": {
+      "2018": -9.56,
+      "2019": 20.22,
+      "2020": 31.04,
+      "2021": 22.37,
+      "2022": 17.36,
+      "2023": 21.5,
+      "2024": 12.62,
+      "2025": 32.46
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -4.31,
+      "2019": -10.86,
+      "2020": 13.81,
+      "2021": -8.14,
+      "2022": 36.01,
+      "2023": -5.21,
+      "2024": -12.97,
+      "2025": 13.57
+    },
+    "return_std_across_years": 12.26,
+    "negative_years": 1,
+    "positive_year_ratio": 87.5,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 1.34,
+    "years_tested": 8
+  }
+}

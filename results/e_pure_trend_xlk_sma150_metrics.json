@@ -1,0 +1,53 @@
+{
+  "strategy": "E_pure_trend_XLK_sma150",
+  "config": {
+    "ticker": "XLK",
+    "sma_period": 150
+  },
+  "metrics": {
+    "total_return": 160.97,
+    "benchmark_total_return": 189.62,
+    "cagr": 12.75,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.643,
+    "sortino_ratio": 0.83,
+    "max_drawdown": -43.02,
+    "calmar_ratio": 0.296,
+    "annual_returns": {
+      "2018": 7.89,
+      "2019": 26.27,
+      "2020": 22.73,
+      "2021": 34.0,
+      "2022": -41.11,
+      "2023": 43.67,
+      "2024": 22.18,
+      "2025": 13.49
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 13.14,
+      "2019": -4.81,
+      "2020": 5.49,
+      "2021": 3.49,
+      "2022": -22.47,
+      "2023": 16.96,
+      "2024": -3.41,
+      "2025": -5.4
+    },
+    "return_std_across_years": 24.01,
+    "negative_years": 1,
+    "positive_year_ratio": 87.5,
+    "beat_benchmark_rate": 50.0,
+    "cumulative_vs_benchmark": 0.85,
+    "years_tested": 8
+  }
+}

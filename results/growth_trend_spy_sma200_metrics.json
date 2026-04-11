@@ -1,0 +1,53 @@
+{
+  "strategy": "growth_trend_SPY_sma200",
+  "config": {
+    "growth_ticker": "SPY",
+    "sma_period": 200
+  },
+  "metrics": {
+    "total_return": 44.29,
+    "benchmark_total_return": 189.62,
+    "cagr": 4.69,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.362,
+    "sortino_ratio": 0.467,
+    "max_drawdown": -39.49,
+    "calmar_ratio": 0.119,
+    "annual_returns": {
+      "2018": -11.6,
+      "2019": 7.0,
+      "2020": 17.41,
+      "2021": 27.67,
+      "2022": -36.6,
+      "2023": 23.55,
+      "2024": 22.86,
+      "2025": 5.39
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -6.35,
+      "2019": -24.09,
+      "2020": 0.17,
+      "2021": -2.84,
+      "2022": -17.95,
+      "2023": -3.16,
+      "2024": -2.73,
+      "2025": -13.5
+    },
+    "return_std_across_years": 20.34,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 12.5,
+    "cumulative_vs_benchmark": 0.23,
+    "years_tested": 8
+  }
+}

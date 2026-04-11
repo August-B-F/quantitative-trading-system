@@ -1,0 +1,54 @@
+{
+  "strategy": "sector_mom_top2_lb126_tfTrue",
+  "config": {
+    "top_k": 2,
+    "lookback": 126,
+    "trend_filter": true
+  },
+  "metrics": {
+    "total_return": 66.36,
+    "benchmark_total_return": 189.62,
+    "cagr": 6.58,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.41,
+    "sortino_ratio": 0.513,
+    "max_drawdown": -30.09,
+    "calmar_ratio": 0.219,
+    "annual_returns": {
+      "2018": -7.21,
+      "2019": 12.68,
+      "2020": 13.85,
+      "2021": 20.83,
+      "2022": -7.38,
+      "2023": 7.66,
+      "2024": 10.11,
+      "2025": 8.26
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -1.96,
+      "2019": -18.41,
+      "2020": -3.39,
+      "2021": -9.68,
+      "2022": 11.27,
+      "2023": -19.05,
+      "2024": -15.48,
+      "2025": -10.63
+    },
+    "return_std_across_years": 9.28,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 12.5,
+    "cumulative_vs_benchmark": 0.35,
+    "years_tested": 8
+  }
+}

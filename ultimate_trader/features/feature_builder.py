@@ -12,6 +12,12 @@ from ultimate_trader.utils.config_loader import Config
 
 logger = get_logger(__name__)
 
+
+def _sanitize_array(arr: np.ndarray) -> np.ndarray:
+    """Replace inf/-inf with 0 and NaN with 0 in float arrays."""
+    arr = np.where(np.isfinite(arr), arr, 0.0)
+    return np.nan_to_num(arr, nan=0.0, posinf=0.0, neginf=0.0)
+
 # Technical feature columns fed to model (30 original + 10 new = 40 total)
 TECH_FEATURES = [
     "return_1d", "return_3d", "return_5d", "return_10d", "return_20d",
@@ -265,8 +271,8 @@ class FeatureBuilder:
             sent_cols = [c for c in SENTIMENT_FEATURES if c in sent_df.columns]
             sent_arr = sent_df[sent_cols].values if sent_cols else np.zeros((len(df), len(SENTIMENT_FEATURES)))
 
-            tech_arr = df[[c for c in TECH_FEATURES if c in df.columns]].values.astype(np.float32)
-            macro_arr = macro_aligned[[c for c in MACRO_FEATURES if c in macro_aligned.columns]].values.astype(np.float32)
+            tech_arr = _sanitize_array(df[[c for c in TECH_FEATURES if c in df.columns]].values.astype(np.float32))
+            macro_arr = _sanitize_array(macro_aligned[[c for c in MACRO_FEATURES if c in macro_aligned.columns]].values.astype(np.float32))
 
             # Fundamentals (daily, aligned to bar dates)
             fund_arr = _align_fundamentals(fundamentals, symbol, df.index)
@@ -379,11 +385,11 @@ class FeatureBuilder:
             sent_df = sentiment.get(symbol, pd.DataFrame()).reindex(df.index).fillna(0)
             sent_cols = [c for c in SENTIMENT_FEATURES if c in sent_df.columns]
 
-            tech_arr = df[[c for c in TECH_FEATURES if c in df.columns]].values.astype(np.float32)
-            sent_arr = (sent_df[sent_cols].values if sent_cols
+            tech_arr = _sanitize_array(df[[c for c in TECH_FEATURES if c in df.columns]].values.astype(np.float32))
+            sent_arr = _sanitize_array(sent_df[sent_cols].values if sent_cols
                         else np.zeros((len(df), len(SENTIMENT_FEATURES)), dtype=np.float32))
-            macro_arr = macro_aligned[[c for c in MACRO_FEATURES
-                                        if c in macro_aligned.columns]].values.astype(np.float32)
+            macro_arr = _sanitize_array(macro_aligned[[c for c in MACRO_FEATURES
+                                        if c in macro_aligned.columns]].values.astype(np.float32))
             fund_arr = _align_fundamentals(fundamentals, symbol, df.index)
 
             date_mask = pd.Series(df.index).isin(date_range).values
@@ -487,7 +493,7 @@ def _align_fundamentals(
         cols = [c for c in FUNDAMENTAL_FEATURES if c in fund_df.columns]
         if not cols:
             return empty
-        aligned = fund_df[cols].reindex(index).ffill().fillna(0).values.astype(np.float32)
+        aligned = _sanitize_array(fund_df[cols].reindex(index).ffill().fillna(0).values.astype(np.float32))
         # Pad if some features are missing
         if aligned.shape[1] < n_feat:
             pad = np.zeros((n, n_feat - aligned.shape[1]), dtype=np.float32)

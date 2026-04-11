@@ -1,0 +1,53 @@
+{
+  "strategy": "EL_breakout_XLK_lb63",
+  "config": {
+    "ticker": "XLK",
+    "lookback": 63
+  },
+  "metrics": {
+    "total_return": 191.61,
+    "benchmark_total_return": 189.62,
+    "cagr": 14.33,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.833,
+    "sortino_ratio": 1.05,
+    "max_drawdown": -25.03,
+    "calmar_ratio": 0.572,
+    "annual_returns": {
+      "2018": -1.87,
+      "2019": 21.75,
+      "2020": 16.81,
+      "2021": 21.16,
+      "2022": -19.55,
+      "2023": 29.9,
+      "2024": 20.35,
+      "2025": 40.22
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": 3.38,
+      "2019": -9.34,
+      "2020": -0.42,
+      "2021": -9.35,
+      "2022": -0.9,
+      "2023": 3.19,
+      "2024": -5.24,
+      "2025": 21.33
+    },
+    "return_std_across_years": 17.47,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 1.01,
+    "years_tested": 8
+  }
+}

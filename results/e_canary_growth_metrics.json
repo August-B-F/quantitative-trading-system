@@ -1,0 +1,50 @@
+{
+  "strategy": "E_canary_growth",
+  "config": {},
+  "metrics": {
+    "total_return": 117.4,
+    "benchmark_total_return": 189.62,
+    "cagr": 10.2,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.58,
+    "sortino_ratio": 0.75,
+    "max_drawdown": -30.68,
+    "calmar_ratio": 0.333,
+    "annual_returns": {
+      "2018": -9.72,
+      "2019": 32.32,
+      "2020": 27.8,
+      "2021": 9.8,
+      "2022": -25.66,
+      "2023": 15.12,
+      "2024": 18.52,
+      "2025": 31.91
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -4.47,
+      "2019": 1.23,
+      "2020": 10.56,
+      "2021": -20.71,
+      "2022": -7.02,
+      "2023": -11.59,
+      "2024": -7.06,
+      "2025": 13.02
+    },
+    "return_std_across_years": 19.38,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 0.62,
+    "years_tested": 8
+  }
+}

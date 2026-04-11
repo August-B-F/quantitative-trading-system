@@ -1,111 +1,107 @@
 alpaca:
-  key_id: "YOUR_ALPACA_KEY"
-  secret_key: "YOUR_ALPACA_SECRET"
-  base_url: "https://paper-api.alpaca.markets"
-  data_base_url: "https://data.alpaca.markets"
-
+  key_id: YOUR_ALPACA_KEY
+  secret_key: YOUR_ALPACA_SECRET
+  base_url: https://paper-api.alpaca.markets
+  data_base_url: https://data.alpaca.markets
 universe:
   symbols:
-    - AAPL
-    - MSFT
-    - AMZN
-    - GOOGL
-    - META
-    - NVDA
-    - TSLA
-    - JPM
-    - V
-    - UNH
-    - XOM
-    - LLY
-    - JNJ
-    - WMT
-    - MA
-    - AVGO
-    - PG
-    - HD
-    - CVX
-    - MRK
-    - COST
-    - ABBV
-    - BAC
-    - KO
-    - NFLX
-    - PEP
-    - ADBE
-    - TMO
-    - ORCL
-    - CRM
-    - MCD
-    - CSCO
-    - ABT
-    - ACN
-    - AMD
-    - NKE
-    - TXN
-    - DHR
-    - LIN
-    - AMGN
-    - PM
-    - INTU
-    - UPS
-    - INTC
-    - RTX
-    - NOW
-    - QCOM
-    - NEE
-    - SPGI
-    - GS
-  benchmark: "SPY"
+  - AAPL
+  - MSFT
+  - AMZN
+  - GOOGL
+  - META
+  - NVDA
+  - TSLA
+  - JPM
+  - V
+  - UNH
+  - XOM
+  - LLY
+  - JNJ
+  - WMT
+  - MA
+  - AVGO
+  - PG
+  - HD
+  - CVX
+  - MRK
+  - COST
+  - ABBV
+  - BAC
+  - KO
+  - NFLX
+  - PEP
+  - ADBE
+  - TMO
+  - ORCL
+  - CRM
+  - MCD
+  - CSCO
+  - ABT
+  - ACN
+  - AMD
+  - NKE
+  - TXN
+  - DHR
+  - LIN
+  - AMGN
+  - PM
+  - INTU
+  - UPS
+  - INTC
+  - RTX
+  - NOW
+  - QCOM
+  - NEE
+  - SPGI
+  - GS
+  benchmark: SPY
   sector_etfs:
-    - XLK
-    - XLF
-    - XLE
-    - XLY
-    - XLV
-    - XLI
-    - XLP
-    - XLU
-    - XLB
-    - XLRE
+  - XLK
+  - XLF
+  - XLE
+  - XLY
+  - XLV
+  - XLI
+  - XLP
+  - XLU
+  - XLB
+  - XLRE
   macro_tickers:
-    - TLT   # 20yr treasury
-    - GLD   # gold
-    - UUP   # USD ETF (dollar index proxy; replaces DX-Y.NYB which is Yahoo-only)
-    - USO   # oil
-  vix_ticker: "VIXY"  # VIX ETF proxy
-
+  - TLT
+  - GLD
+  - UUP
+  - USO
+  vix_ticker: VIXY
 data:
-  start_date: "2018-01-01"
+  start_date: '2018-01-01'
   end_date: null
-  bar_timeframe: "1Day"
-  timezone: "America/New_York"
+  bar_timeframe: 1Day
+  timezone: America/New_York
   min_history_days: 300
-
 news:
   enabled: true
   max_articles_per_day: 20
   lookback_days: 90
   sources:
-    - alpaca
-
+  - alpaca
 paths:
-  raw_dir: "data/raw"
-  processed_dir: "data/processed"
-  models_dir: "data/models"
-  scalers_dir: "data/scalers"
-  logs_dir: "logs"
-  db_path: "data/performance.db"
-
+  raw_dir: data/raw
+  processed_dir: data/processed
+  models_dir: data/models
+  scalers_dir: data/scalers
+  logs_dir: logs
+  db_path: data/performance.db
 trading:
   live: false
-  run_time: "15:45"         # HH:MM Eastern - time to run the daily bot
+  run_time: '15:45'
   max_gross_exposure: 0.95
   max_single_position: 0.15
   min_cash_buffer: 0.05
   kelly_fraction: 0.3
-  min_confidence: 0.60
-  base_stop_loss: 0.07      # 7% stop loss baseline
-  base_take_profit: 0.12    # 12% take profit baseline
+  min_confidence: 0.6
+  base_stop_loss: 0.07
+  base_take_profit: 0.12
   bracket_orders: true
   allow_short: false
+  max_uncertainty: 0.75

@@ -1,0 +1,53 @@
+{
+  "strategy": "FN_broadrot_top2_sma150",
+  "config": {
+    "top_n": 2,
+    "sma_period": 150
+  },
+  "metrics": {
+    "total_return": 156.98,
+    "benchmark_total_return": 189.62,
+    "cagr": 12.54,
+    "benchmark_cagr": 14.23,
+    "sharpe_ratio": 0.643,
+    "sortino_ratio": 0.813,
+    "max_drawdown": -26.68,
+    "calmar_ratio": 0.47,
+    "annual_returns": {
+      "2018": -6.95,
+      "2019": 24.02,
+      "2020": 25.24,
+      "2021": 27.85,
+      "2022": -17.23,
+      "2023": 17.19,
+      "2024": 22.22,
+      "2025": 22.61
+    },
+    "annual_benchmark_returns": {
+      "2018": -5.25,
+      "2019": 31.09,
+      "2020": 17.24,
+      "2021": 30.51,
+      "2022": -18.65,
+      "2023": 26.71,
+      "2024": 25.59,
+      "2025": 18.89
+    },
+    "annual_excess_returns": {
+      "2018": -1.7,
+      "2019": -7.06,
+      "2020": 8.0,
+      "2021": -2.66,
+      "2022": 1.42,
+      "2023": -9.52,
+      "2024": -3.37,
+      "2025": 3.73
+    },
+    "return_std_across_years": 15.75,
+    "negative_years": 2,
+    "positive_year_ratio": 75.0,
+    "beat_benchmark_rate": 37.5,
+    "cumulative_vs_benchmark": 0.83,
+    "years_tested": 8
+  }
+}
