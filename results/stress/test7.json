@@ -1,0 +1,89 @@
+{
+  "top5_drawdowns": [
+    {
+      "start": "2018-01-25",
+      "trough": "2018-02-23",
+      "end": "2019-03-25",
+      "dd_pct": -12.94,
+      "duration_months": 15,
+      "sma_gate_active_in_window": true,
+      "m26_deferrals": 3,
+      "transition_days_pct": 0.0,
+      "top1_picks": {
+        "IGV": 4,
+        "GLD": 4,
+        "XLE": 3,
+        "QQQ": 2,
+        "VGT": 2
+      },
+      "fomc_meetings_in_range": 10
+    },
+    {
+      "start": "2019-04-25",
+      "trough": "2019-04-25",
+      "end": "2019-06-28",
+      "dd_pct": -12.66,
+      "duration_months": 3,
+      "sma_gate_active_in_window": false,
+      "m26_deferrals": 0,
+      "transition_days_pct": 0.0,
+      "top1_picks": {
+        "SOXX": 1,
+        "XLK": 1,
+        "GLD": 1
+      },
+      "fomc_meetings_in_range": 2
+    },
+    {
+      "start": "2019-12-30",
+      "trough": "2020-02-25",
+      "end": "2020-05-26",
+      "dd_pct": -12.6,
+      "duration_months": 6,
+      "sma_gate_active_in_window": true,
+      "m26_deferrals": 0,
+      "transition_days_pct": 0.0,
+      "top1_picks": {
+        "GLD": 3,
+        "SOXX": 2,
+        "IGV": 1
+      },
+      "fomc_meetings_in_range": 4
+    },
+    {
+      "start": "2021-12-29",
+      "trough": "2021-12-29",
+      "end": "2022-02-23",
+      "dd_pct": -10.22,
+      "duration_months": 3,
+      "sma_gate_active_in_window": false,
+      "m26_deferrals": 0,
+      "transition_days_pct": 0.0,
+      "top1_picks": {
+        "XLE": 2,
+        "SOXX": 1
+      },
+      "fomc_meetings_in_range": 1
+    },
+    {
+      "start": "2015-05-26",
+      "trough": "2015-12-30",
+      "end": "2016-06-28",
+      "dd_pct": -10.11,
+      "duration_months": 14,
+      "sma_gate_active_in_window": true,
+      "m26_deferrals": 0,
+      "transition_days_pct": 12.3,
+      "top1_picks": {
+        "GLD": 5,
+        "SHY": 2,
+        "QQQ": 2,
+        "SOXX": 2,
+        "XLE": 2,
+        "IGV": 1
+      },
+      "fomc_meetings_in_range": 9
+    }
+  ],
+  "longest_rolling_12m_underperf_spy_months": 13
+}

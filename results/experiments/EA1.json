@@ -1,0 +1,2054 @@
+{
+  "experiment": "EA1_regime_classifier",
+  "n_monthly": 189,
+  "regime_accuracy": 0.6825396825396826,
+  "wf_cagr": 0.0842176740970928,
+  "wf_sharpe": 0.4883362890611932,
+  "wf_max_dd": -0.40565843035684546,
+  "annual_returns": {
+    "2010": 0.007103835878237819,
+    "2011": -0.3303606267235617,
+    "2012": 0.13229966239488777,
+    "2013": 0.3175696423710035,
+    "2014": 0.19749807821655474,
+    "2015": -0.04200497417242921,
+    "2016": 0.002594710409044909,
+    "2017": 0.17173999021974673,
+    "2018": -0.22343148913374777,
+    "2019": 0.12588117105794838,
+    "2020": 0.028214425659885745,
+    "2021": 0.35070713481990534,
+    "2022": 0.6607549173908858,
+    "2023": -0.07829024168509835,
+    "2024": 0.048274443037457315,
+    "2025": 0.32546470932301474,
+    "2026": 0.01356867182366317
+  },
+  "n_folds_used": 63,
+  "fold_records": [
+    {
+      "fold_id": 0,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 1,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 2,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 3,
+      "n": 13,
+      "acc": 0.6153846153846154
+    },
+    {
+      "fold_id": 4,
+      "n": 13,
+      "acc": 0.9230769230769231
+    },
+    {
+      "fold_id": 5,
+      "n": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 6,
+      "n": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 7,
+      "n": 13,
+      "acc": 0.7692307692307693
+    },
+    {
+      "fold_id": 8,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 9,
+      "n": 13,
+      "acc": 0.9230769230769231
+    },
+    {
+      "fold_id": 10,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 11,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 12,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 13,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 14,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 15,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 16,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 17,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 18,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 19,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 20,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 21,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 22,
+      "n": 13,
+      "acc": 0.8461538461538461
+    },
+    {
+      "fold_id": 23,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 24,
+      "n": 13,
+      "acc": 0.8461538461538461
+    },
+    {
+      "fold_id": 25,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 26,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 27,
+      "n": 13,
+      "acc": 0.6923076923076923
+    },
+    {
+      "fold_id": 28,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 29,
+      "n": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 30,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 31,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 32,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 33,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 34,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 35,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 36,
+      "n": 13,
+      "acc": 0.6153846153846154
+    },
+    {
+      "fold_id": 37,
+      "n": 13,
+      "acc": 0.7692307692307693
+    },
+    {
+      "fold_id": 38,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 39,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 40,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 41,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 42,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 43,
+      "n": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 44,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 45,
+      "n": 13,
+      "acc": 0.7692307692307693
+    },
+    {
+      "fold_id": 46,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 47,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 48,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 49,
+      "n": 13,
+      "acc": 1.0
+    },
+    {
+      "fold_id": 50,
+      "n": 13,
+      "acc": 0.5384615384615384
+    },
+    {
+      "fold_id": 51,
+      "n": 13,
+      "acc": 0.6923076923076923
+    },
+    {
+      "fold_id": 52,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 53,
+      "n": 13,
+      "acc": 0.3076923076923077
+    },
+    {
+      "fold_id": 54,
+      "n": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 55,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 56,
+      "n": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 57,
+      "n": 13,
+      "acc": 0.6923076923076923
+    },
+    {
+      "fold_id": 58,
+      "n": 13,
+      "acc": 0.7692307692307693
+    },
+    {
+      "fold_id": 59,
+      "n": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 60,
+      "n": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 61,
+      "n": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 62,
+      "n": 10,
+      "acc": 0.2
+    }
+  ],
+  "pick_distribution": {
+    "SOXX": 85,
+    "XLE": 34,
+    "GLD": 7,
+    "SHY": 63
+  },
+  "monthly_predictions": [
+    {
+      "date": "2010-07-27",
+      "fold_id": 0,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.9255458838812936,
+      "fwd_ret": 0.0028662533915135846
+    },
+    {
+      "date": "2010-08-31",
+      "fold_id": 0,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.8009674071442728,
+      "fwd_ret": 0.0019590615111813037
+    },
+    {
+      "date": "2010-09-29",
+      "fold_id": 0,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.7934833308284608,
+      "fwd_ret": 0.002194644209477792
+    },
+    {
+      "date": "2010-10-25",
+      "fold_id": 1,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.85021558641631,
+      "fwd_ret": -0.0022893421002293524
+    },
+    {
+      "date": "2010-11-30",
+      "fold_id": 1,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.586575154340265,
+      "fwd_ret": -0.0001413041227882328
+    },
+    {
+      "date": "2010-12-29",
+      "fold_id": 1,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.5735008190737776,
+      "fwd_ret": 0.0025035939601079082
+    },
+    {
+      "date": "2011-01-25",
+      "fold_id": 2,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.5612564353518914,
+      "fwd_ret": -0.0005005691216386499
+    },
+    {
+      "date": "2011-02-23",
+      "fold_id": 2,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.6152707904754107,
+      "fwd_ret": 0.0001303008443855891
+    },
+    {
+      "date": "2011-03-30",
+      "fold_id": 2,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.88016894487747,
+      "fwd_ret": 0.005174811754738107
+    },
+    {
+      "date": "2011-04-26",
+      "fold_id": 3,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9104455688381343,
+      "fwd_ret": -0.04796347770854592
+    },
+    {
+      "date": "2011-05-24",
+      "fold_id": 3,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.926934146417496,
+      "fwd_ret": -0.07216888780314779
+    },
+    {
+      "date": "2011-06-29",
+      "fold_id": 3,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.8223056242199863,
+      "fwd_ret": -0.05567598251930028
+    },
+    {
+      "date": "2011-07-26",
+      "fold_id": 4,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.6310522618783875,
+      "fwd_ret": -0.1673973783028201
+    },
+    {
+      "date": "2011-08-30",
+      "fold_id": 4,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.44873710968988834,
+      "fwd_ret": -0.14423453376580064
+    },
+    {
+      "date": "2011-09-28",
+      "fold_id": 4,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.45478875202966734,
+      "fwd_ret": 0.21167929636910032
+    },
+    {
+      "date": "2011-10-31",
+      "fold_id": 5,
+      "pred_regime": "regime_lg_hi_stagflation",
+      "actual_regime": "regime_hg_hi",
+      "pick": "GLD",
+      "confidence": 0.4660386784670986,
+      "fwd_ret": 0.013442465852329777
+    },
+    {
+      "date": "2011-11-29",
+      "fold_id": 5,
+      "pred_regime": "regime_lg_hi_stagflation",
+      "actual_regime": "regime_hg_hi",
+      "pick": "GLD",
+      "confidence": 0.5264740173638607,
+      "fwd_ret": -0.10662433944055594
+    },
+    {
+      "date": "2011-12-28",
+      "fold_id": 5,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.35245347347483164,
+      "fwd_ret": 0.022123183161411486
+    },
+    {
+      "date": "2012-01-25",
+      "fold_id": 6,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.4444491801523269,
+      "fwd_ret": 0.031322113623278636
+    },
+    {
+      "date": "2012-02-23",
+      "fold_id": 6,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.8094720069021885,
+      "fwd_ret": 0.04250271357193358
+    },
+    {
+      "date": "2012-03-29",
+      "fold_id": 6,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.8513967951930647,
+      "fwd_ret": -0.05332149688674526
+    },
+    {
+      "date": "2012-04-25",
+      "fold_id": 7,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.5773668857320313,
+      "fwd_ret": -0.10560877434108518
+    },
+    {
+      "date": "2012-05-31",
+      "fold_id": 7,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9903081274032844,
+      "fwd_ret": 0.08923525271758548
+    },
+    {
+      "date": "2012-06-28",
+      "fold_id": 7,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.994316533798459,
+      "fwd_ret": -0.0024847093826156907
+    },
+    {
+      "date": "2012-07-25",
+      "fold_id": 8,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9837932876896851,
+      "fwd_ret": 0.06545180633090619
+    },
+    {
+      "date": "2012-08-29",
+      "fold_id": 8,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9966501253011768,
+      "fwd_ret": -0.026263588556013295
+    },
+    {
+      "date": "2012-09-27",
+      "fold_id": 8,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.8169773022063619,
+      "fwd_ret": -0.03835753663147656
+    },
+    {
+      "date": "2012-10-24",
+      "fold_id": 9,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9745117938763471,
+      "fwd_ret": 0.024375338294506443
+    },
+    {
+      "date": "2012-11-26",
+      "fold_id": 9,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.6050618031936444,
+      "fwd_ret": 0.0268901342529706
+    },
+    {
+      "date": "2012-12-24",
+      "fold_id": 9,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.8564958614545317,
+      "fwd_ret": 0.09080371891630845
+    },
+    {
+      "date": "2013-01-25",
+      "fold_id": 10,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9953095814760589,
+      "fwd_ret": 0.027630037620832715
+    },
+    {
+      "date": "2013-02-25",
+      "fold_id": 10,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9953477524432712,
+      "fwd_ret": 0.03382475275461583
+    },
+    {
+      "date": "2013-03-25",
+      "fold_id": 10,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9061846276236898,
+      "fwd_ret": 0.016186715562537923
+    },
+    {
+      "date": "2013-04-24",
+      "fold_id": 11,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.8703294430189931,
+      "fwd_ret": 0.05197858804643807
+    },
+    {
+      "date": "2013-05-30",
+      "fold_id": 11,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9675179265597459,
+      "fwd_ret": -0.001689602886859931
+    },
+    {
+      "date": "2013-06-27",
+      "fold_id": 11,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9262160878009138,
+      "fwd_ret": 0.017789457766672623
+    },
+    {
+      "date": "2013-07-25",
+      "fold_id": 12,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9972400525323629,
+      "fwd_ret": -0.019287649989227273
+    },
+    {
+      "date": "2013-08-29",
+      "fold_id": 12,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.951773668157175,
+      "fwd_ret": 0.08306035830905811
+    },
+    {
+      "date": "2013-09-27",
+      "fold_id": 12,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9783443088454079,
+      "fwd_ret": 0.03225826118166486
+    },
+    {
+      "date": "2013-10-31",
+      "fold_id": 13,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9504367383180091,
+      "fwd_ret": 0.014146034583677247
+    },
+    {
+      "date": "2013-11-29",
+      "fold_id": 13,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9908816467206822,
+      "fwd_ret": 0.038119364007062284
+    },
+    {
+      "date": "2013-12-30",
+      "fold_id": 13,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.996387272617045,
+      "fwd_ret": -0.010865278932934763
+    },
+    {
+      "date": "2014-01-27",
+      "fold_id": 14,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.999280212075783,
+      "fwd_ret": 0.07246636309911092
+    },
+    {
+      "date": "2014-02-25",
+      "fold_id": 14,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9993968674821238,
+      "fwd_ret": 0.016748795451108967
+    },
+    {
+      "date": "2014-03-25",
+      "fold_id": 14,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.999690245639011,
+      "fwd_ret": -0.0095563838101701
+    },
+    {
+      "date": "2014-04-25",
+      "fold_id": 15,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9997453104920735,
+      "fwd_ret": 0.053434755427690384
+    },
+    {
+      "date": "2014-05-23",
+      "fold_id": 15,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9991020685429529,
+      "fwd_ret": 0.05745459773583117
+    },
+    {
+      "date": "2014-06-30",
+      "fold_id": 15,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9994354409428212,
+      "fwd_ret": -0.056405637848572776
+    },
+    {
+      "date": "2014-07-25",
+      "fold_id": 16,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9992809271666471,
+      "fwd_ret": 0.037639097552901735
+    },
+    {
+      "date": "2014-08-29",
+      "fold_id": 16,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9993366417820094,
+      "fwd_ret": -0.0294283135882093
+    },
+    {
+      "date": "2014-09-29",
+      "fold_id": 16,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9993421482960676,
+      "fwd_ret": -0.022452605335692377
+    },
+    {
+      "date": "2014-10-31",
+      "fold_id": 17,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9980566934070652,
+      "fwd_ret": 0.08022795756375944
+    },
+    {
+      "date": "2014-11-21",
+      "fold_id": 17,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9866595899573003,
+      "fwd_ret": 0.03992275928525979
+    },
+    {
+      "date": "2014-12-30",
+      "fold_id": 17,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9823693339009002,
+      "fwd_ret": -0.04618368300665032
+    },
+    {
+      "date": "2015-01-27",
+      "fold_id": 18,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9742048403974221,
+      "fwd_ret": 0.07526669892678273
+    },
+    {
+      "date": "2015-02-25",
+      "fold_id": 18,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9947051625286885,
+      "fwd_ret": -0.030977615501496913
+    },
+    {
+      "date": "2015-03-25",
+      "fold_id": 18,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9963647247020044,
+      "fwd_ret": 0.030121075330526548
+    },
+    {
+      "date": "2015-04-27",
+      "fold_id": 19,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9993589621269944,
+      "fwd_ret": 0.06957728448862865
+    },
+    {
+      "date": "2015-05-26",
+      "fold_id": 19,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9992604454090664,
+      "fwd_ret": -0.034972441426840195
+    },
+    {
+      "date": "2015-06-30",
+      "fold_id": 19,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9991442175829904,
+      "fwd_ret": -0.05167371668837906
+    },
+    {
+      "date": "2015-07-27",
+      "fold_id": 20,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9989439207923023,
+      "fwd_ret": -0.09431385862220176
+    },
+    {
+      "date": "2015-08-31",
+      "fold_id": 20,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9969217633221348,
+      "fwd_ret": 0.010644773396624174
+    },
+    {
+      "date": "2015-09-29",
+      "fold_id": 20,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.99316444972127,
+      "fwd_ret": 0.09047429242240246
+    },
+    {
+      "date": "2015-10-26",
+      "fold_id": 21,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9953477389668615,
+      "fwd_ret": 0.0032238490330256386
+    },
+    {
+      "date": "2015-11-23",
+      "fold_id": 21,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9948836620934881,
+      "fwd_ret": 0.014357771001119568
+    },
+    {
+      "date": "2015-12-30",
+      "fold_id": 21,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.9954463508775785,
+      "fwd_ret": -0.10229301307074012
+    },
+    {
+      "date": "2016-01-26",
+      "fold_id": 22,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.7691558261335214,
+      "fwd_ret": 0.0017103325301131012
+    },
+    {
+      "date": "2016-02-24",
+      "fold_id": 22,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9232227018603821,
+      "fwd_ret": -0.0018011441664081973
+    },
+    {
+      "date": "2016-03-31",
+      "fold_id": 22,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9855826613052823,
+      "fwd_ret": 0.0005768970100232806
+    },
+    {
+      "date": "2016-04-25",
+      "fold_id": 23,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9980473692349057,
+      "fwd_ret": -1.3870160228801609e-05
+    },
+    {
+      "date": "2016-05-31",
+      "fold_id": 23,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9944659845835108,
+      "fwd_ret": 0.006726442703161473
+    },
+    {
+      "date": "2016-06-28",
+      "fold_id": 23,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9764031563715387,
+      "fwd_ret": -3.256828265962852e-07
+    },
+    {
+      "date": "2016-07-26",
+      "fold_id": 24,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9807709575836309,
+      "fwd_ret": -0.0008113594232033172
+    },
+    {
+      "date": "2016-08-30",
+      "fold_id": 24,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.6812211220397013,
+      "fwd_ret": 0.0012953358008986893
+    },
+    {
+      "date": "2016-09-28",
+      "fold_id": 24,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.6105775820627418,
+      "fwd_ret": -0.0020099083814048013
+    },
+    {
+      "date": "2016-10-31",
+      "fold_id": 25,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.926424515723037,
+      "fwd_ret": -0.005182296950051235
+    },
+    {
+      "date": "2016-11-29",
+      "fold_id": 25,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9508860377970156,
+      "fwd_ret": 0.0007234980206216601
+    },
+    {
+      "date": "2016-12-28",
+      "fold_id": 25,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.8574963428272471,
+      "fwd_ret": 0.001421457355788025
+    },
+    {
+      "date": "2017-01-25",
+      "fold_id": 26,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.8030648579153497,
+      "fwd_ret": 0.0015508486182094217
+    },
+    {
+      "date": "2017-02-23",
+      "fold_id": 26,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.8448637678001616,
+      "fwd_ret": -0.0006610183994341101
+    },
+    {
+      "date": "2017-03-30",
+      "fold_id": 26,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.7835307530364719,
+      "fwd_ret": 0.0015383854512875939
+    },
+    {
+      "date": "2017-04-25",
+      "fold_id": 27,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.8794123459730318,
+      "fwd_ret": 0.0012068364181661018
+    },
+    {
+      "date": "2017-05-31",
+      "fold_id": 27,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.7714984433365396,
+      "fwd_ret": -0.000591941488751857
+    },
+    {
+      "date": "2017-06-28",
+      "fold_id": 27,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9770628458952781,
+      "fwd_ret": 0.04263328826969137
+    },
+    {
+      "date": "2017-07-25",
+      "fold_id": 28,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9462065202442045,
+      "fwd_ret": -0.02456950472674313
+    },
+    {
+      "date": "2017-08-29",
+      "fold_id": 28,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9325672267498738,
+      "fwd_ret": 0.06221821543328199
+    },
+    {
+      "date": "2017-09-27",
+      "fold_id": 28,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.8896604257382154,
+      "fwd_ret": 0.0870172896849486
+    },
+    {
+      "date": "2017-10-31",
+      "fold_id": 29,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.6246524829300993,
+      "fwd_ret": -0.0017924526662136397
+    },
+    {
+      "date": "2017-11-29",
+      "fold_id": 29,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.5306681753450423,
+      "fwd_ret": -0.0005595055973418583
+    },
+    {
+      "date": "2017-12-28",
+      "fold_id": 29,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.7777571459759588,
+      "fwd_ret": -0.0028620046052068027
+    },
+    {
+      "date": "2018-01-25",
+      "fold_id": 30,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9944097609935199,
+      "fwd_ret": -0.002246524096486624
+    },
+    {
+      "date": "2018-02-23",
+      "fold_id": 30,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9242278652994841,
+      "fwd_ret": -0.03566914416729139
+    },
+    {
+      "date": "2018-03-23",
+      "fold_id": 30,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.8908605394035609,
+      "fwd_ret": -0.09978072628379031
+    },
+    {
+      "date": "2018-04-24",
+      "fold_id": 31,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9943609452674318,
+      "fwd_ret": 0.1120284359255741
+    },
+    {
+      "date": "2018-05-30",
+      "fold_id": 31,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9102480870418914,
+      "fwd_ret": -0.04576004708211845
+    },
+    {
+      "date": "2018-06-27",
+      "fold_id": 31,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9437084666062522,
+      "fwd_ret": 0.0360375229629466
+    },
+    {
+      "date": "2018-07-25",
+      "fold_id": 32,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9165880206870247,
+      "fwd_ret": -0.0006955705334651396
+    },
+    {
+      "date": "2018-08-29",
+      "fold_id": 32,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9894107040740153,
+      "fwd_ret": -0.014688653064543922
+    },
+    {
+      "date": "2018-09-27",
+      "fold_id": 32,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9919579578377118,
+      "fwd_ret": -0.16509039593540487
+    },
+    {
+      "date": "2018-10-31",
+      "fold_id": 33,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9870503795093227,
+      "fwd_ret": 0.012074189393889156
+    },
+    {
+      "date": "2018-11-29",
+      "fold_id": 33,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9648372502532434,
+      "fwd_ret": -0.1142620213289165
+    },
+    {
+      "date": "2018-12-31",
+      "fold_id": 33,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9951753124771707,
+      "fwd_ret": 0.10663604937980353
+    },
+    {
+      "date": "2019-01-25",
+      "fold_id": 34,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9559176706436912,
+      "fwd_ret": 0.07789397297214862
+    },
+    {
+      "date": "2019-02-25",
+      "fold_id": 34,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9984778663560344,
+      "fwd_ret": 0.009303175996612456
+    },
+    {
+      "date": "2019-03-25",
+      "fold_id": 34,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9834235542373677,
+      "fwd_ret": 0.11679174393416591
+    },
+    {
+      "date": "2019-04-25",
+      "fold_id": 35,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9908772729550958,
+      "fwd_ret": -0.1575067586201121
+    },
+    {
+      "date": "2019-05-31",
+      "fold_id": 35,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9956625865278932,
+      "fwd_ret": 0.13990793591984163
+    },
+    {
+      "date": "2019-06-28",
+      "fold_id": 35,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9565734971366371,
+      "fwd_ret": 0.030332727739893484
+    },
+    {
+      "date": "2019-07-25",
+      "fold_id": 36,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.9772301215343945,
+      "fwd_ret": -0.0839525444439414
+    },
+    {
+      "date": "2019-08-29",
+      "fold_id": 36,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.5906224868681738,
+      "fwd_ret": 0.027539724014189915
+    },
+    {
+      "date": "2019-09-27",
+      "fold_id": 36,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.5776580220535549,
+      "fwd_ret": 0.000768093826481131
+    },
+    {
+      "date": "2019-10-31",
+      "fold_id": 37,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SOXX",
+      "confidence": 0.785830837656213,
+      "fwd_ret": -0.013856302020266775
+    },
+    {
+      "date": "2019-11-29",
+      "fold_id": 37,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9868958382274962,
+      "fwd_ret": 0.00233143186104412
+    },
+    {
+      "date": "2019-12-30",
+      "fold_id": 37,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9934888717347895,
+      "fwd_ret": 0.005790161251382209
+    },
+    {
+      "date": "2020-01-27",
+      "fold_id": 38,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.946416074092166,
+      "fwd_ret": 0.007486069001757523
+    },
+    {
+      "date": "2020-02-25",
+      "fold_id": 38,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.93047214385147,
+      "fwd_ret": 0.017306399680682594
+    },
+    {
+      "date": "2020-03-31",
+      "fold_id": 38,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.8121788582427005,
+      "fwd_ret": 0.0005987063137009585
+    },
+    {
+      "date": "2020-04-27",
+      "fold_id": 39,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.8963134480631053,
+      "fwd_ret": 0.0008300711020898799
+    },
+    {
+      "date": "2020-05-26",
+      "fold_id": 39,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9288754648242534,
+      "fwd_ret": 0.00023024366580193245
+    },
+    {
+      "date": "2020-06-30",
+      "fold_id": 39,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9992389692982189,
+      "fwd_ret": 0.0012717381338984701
+    },
+    {
+      "date": "2020-07-27",
+      "fold_id": 40,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9940644970392066,
+      "fwd_ret": -0.00011602229603790981
+    },
+    {
+      "date": "2020-08-31",
+      "fold_id": 40,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.999233556455586,
+      "fwd_ret": -1.0077918433104571e-07
+    },
+    {
+      "date": "2020-09-29",
+      "fold_id": 40,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9891613004526421,
+      "fwd_ret": -0.00034670116012391894
+    },
+    {
+      "date": "2020-10-26",
+      "fold_id": 41,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9955217557540167,
+      "fwd_ret": 0.00010444354876604223
+    },
+    {
+      "date": "2020-11-23",
+      "fold_id": 41,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9909907329588142,
+      "fwd_ret": 0.0006367500342772114
+    },
+    {
+      "date": "2020-12-30",
+      "fold_id": 41,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9987616492321014,
+      "fwd_ret": -3.0221852576062247e-07
+    },
+    {
+      "date": "2021-01-26",
+      "fold_id": 42,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9980539871779205,
+      "fwd_ret": -0.0003481557416684655
+    },
+    {
+      "date": "2021-02-24",
+      "fold_id": 42,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9952983606888103,
+      "fwd_ret": 0.0012995322430608969
+    },
+    {
+      "date": "2021-03-31",
+      "fold_id": 42,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.9935992027386097,
+      "fwd_ret": 0.00048711853305016817
+    },
+    {
+      "date": "2021-04-26",
+      "fold_id": 43,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.997178014603686,
+      "fwd_ret": 0.0011826564425887476
+    },
+    {
+      "date": "2021-05-24",
+      "fold_id": 43,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.9386890383898354,
+      "fwd_ret": 0.037056405881411125
+    },
+    {
+      "date": "2021-06-29",
+      "fold_id": 43,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.7689205234386558,
+      "fwd_ret": 0.005922133984940237
+    },
+    {
+      "date": "2021-07-27",
+      "fold_id": 44,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.8517024622588285,
+      "fwd_ret": 0.040662504981993974
+    },
+    {
+      "date": "2021-08-31",
+      "fold_id": 44,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.6565264368080594,
+      "fwd_ret": -0.03949275340091085
+    },
+    {
+      "date": "2021-09-29",
+      "fold_id": 44,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.5965620206022816,
+      "fwd_ret": 0.06450304069496005
+    },
+    {
+      "date": "2021-10-25",
+      "fold_id": 45,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.5862413930310142,
+      "fwd_ret": -0.02079812439969142
+    },
+    {
+      "date": "2021-11-30",
+      "fold_id": 45,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.46479488379039857,
+      "fwd_ret": 0.040893068562091184
+    },
+    {
+      "date": "2021-12-29",
+      "fold_id": 45,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.6970965787892459,
+      "fwd_ret": 0.19075121883435675
+    },
+    {
+      "date": "2022-01-25",
+      "fold_id": 46,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9157067399543741,
+      "fwd_ret": 0.056441994901068826
+    },
+    {
+      "date": "2022-02-23",
+      "fold_id": 46,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9429682832056352,
+      "fwd_ret": 0.18467126400472877
+    },
+    {
+      "date": "2022-03-30",
+      "fold_id": 46,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.8519864959234038,
+      "fwd_ret": -0.0011773616281399724
+    },
+    {
+      "date": "2022-04-26",
+      "fold_id": 47,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9581680517377276,
+      "fwd_ret": 0.1613679829345136
+    },
+    {
+      "date": "2022-05-24",
+      "fold_id": 47,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9409838363074409,
+      "fwd_ret": -0.13342952049546086
+    },
+    {
+      "date": "2022-06-30",
+      "fold_id": 47,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9263379970581312,
+      "fwd_ret": 0.05566289082800724
+    },
+    {
+      "date": "2022-07-26",
+      "fold_id": 48,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9452961066579543,
+      "fwd_ret": 0.12148784780035937
+    },
+    {
+      "date": "2022-08-30",
+      "fold_id": 48,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9533867382772846,
+      "fwd_ret": -0.09558734005734759
+    },
+    {
+      "date": "2022-09-28",
+      "fold_id": 48,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9414988610387244,
+      "fwd_ret": 0.2293391003202352
+    },
+    {
+      "date": "2022-10-31",
+      "fold_id": 49,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9949429013801088,
+      "fwd_ret": -0.0002201935851277037
+    },
+    {
+      "date": "2022-11-29",
+      "fold_id": 49,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9894287360338785,
+      "fwd_ret": -0.030489524272335866
+    },
+    {
+      "date": "2022-12-28",
+      "fold_id": 49,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9511537388331036,
+      "fwd_ret": 0.03462959705069801
+    },
+    {
+      "date": "2023-01-25",
+      "fold_id": 50,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "XLE",
+      "confidence": 0.9901157164938693,
+      "fwd_ret": -0.08806784959546243
+    },
+    {
+      "date": "2023-02-23",
+      "fold_id": 50,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.6018643651978524,
+      "fwd_ret": -0.05055244009183135
+    },
+    {
+      "date": "2023-03-30",
+      "fold_id": 50,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9767504420354818,
+      "fwd_ret": -0.02800912008449785
+    },
+    {
+      "date": "2023-04-25",
+      "fold_id": 51,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.9111137056209502,
+      "fwd_ret": -0.053273990290254036
+    },
+    {
+      "date": "2023-05-31",
+      "fold_id": 51,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.8880773103823572,
+      "fwd_ret": 0.058507074329496644
+    },
+    {
+      "date": "2023-06-29",
+      "fold_id": 51,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "XLE",
+      "confidence": 0.49092347923591323,
+      "fwd_ret": 0.07268684858873864
+    },
+    {
+      "date": "2023-07-25",
+      "fold_id": 52,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "SHY",
+      "confidence": 0.9782123413602141,
+      "fwd_ret": 0.0010135216484283838
+    },
+    {
+      "date": "2023-08-29",
+      "fold_id": 52,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SHY",
+      "confidence": 0.9959882723012825,
+      "fwd_ret": 0.00019523400442289507
+    },
+    {
+      "date": "2023-09-27",
+      "fold_id": 52,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SHY",
+      "confidence": 0.7715562573689154,
+      "fwd_ret": 0.004197386025904581
+    },
+    {
+      "date": "2023-10-31",
+      "fold_id": 53,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.7697752219759596,
+      "fwd_ret": 0.0003529627983638317
+    },
+    {
+      "date": "2023-11-29",
+      "fold_id": 53,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SHY",
+      "confidence": 0.7782749739117246,
+      "fwd_ret": 0.009802057195316793
+    },
+    {
+      "date": "2023-12-28",
+      "fold_id": 53,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SHY",
+      "confidence": 0.6959149461211203,
+      "fwd_ret": 0.003169063792014759
+    },
+    {
+      "date": "2024-01-25",
+      "fold_id": 54,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.5570246614595075,
+      "fwd_ret": 0.019465963054112745
+    },
+    {
+      "date": "2024-02-23",
+      "fold_id": 54,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "XLE",
+      "confidence": 0.8314150671608848,
+      "fwd_ret": 0.08147288341752934
+    },
+    {
+      "date": "2024-03-22",
+      "fold_id": 54,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "SHY",
+      "confidence": 0.8626587588442426,
+      "fwd_ret": -0.0024577449916618477
+    },
+    {
+      "date": "2024-04-24",
+      "fold_id": 55,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "XLE",
+      "confidence": 0.9773498762863297,
+      "fwd_ret": -0.05443429091830354
+    },
+    {
+      "date": "2024-05-30",
+      "fold_id": 55,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "XLE",
+      "confidence": 0.8801945941532943,
+      "fwd_ret": -0.014358069118431516
+    },
+    {
+      "date": "2024-06-28",
+      "fold_id": 55,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "XLE",
+      "confidence": 0.7846413695985432,
+      "fwd_ret": 0.022039493618924322
+    },
+    {
+      "date": "2024-07-25",
+      "fold_id": 56,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "XLE",
+      "confidence": 0.9592747612266118,
+      "fwd_ret": -0.010738797066036976
+    },
+    {
+      "date": "2024-08-29",
+      "fold_id": 56,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "SHY",
+      "confidence": 0.48287976549322503,
+      "fwd_ret": 0.008376496513148313
+    },
+    {
+      "date": "2024-09-27",
+      "fold_id": 56,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_hi_stagflation",
+      "pick": "SHY",
+      "confidence": 0.6231633305568595,
+      "fwd_ret": -0.005634968337531299
+    },
+    {
+      "date": "2024-10-31",
+      "fold_id": 57,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.6962738053153632,
+      "fwd_ret": 0.00335166881600224
+    },
+    {
+      "date": "2024-11-29",
+      "fold_id": 57,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.8659867017114535,
+      "fwd_ret": 0.0023208890969543816
+    },
+    {
+      "date": "2024-12-30",
+      "fold_id": 57,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.702855949581335,
+      "fwd_ret": 0.003083934672312161
+    },
+    {
+      "date": "2025-01-28",
+      "fold_id": 58,
+      "pred_regime": "regime_lg_hi_stagflation",
+      "actual_regime": "regime_lg_li",
+      "pick": "GLD",
+      "confidence": 0.4794366548062093,
+      "fwd_ret": 0.03568053569755336
+    },
+    {
+      "date": "2025-02-26",
+      "fold_id": 58,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.6488221819898239,
+      "fwd_ret": 0.0055043744060649935
+    },
+    {
+      "date": "2025-03-26",
+      "fold_id": 58,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_lg_li",
+      "pick": "SHY",
+      "confidence": 0.6497295470099271,
+      "fwd_ret": 0.008746387962133007
+    },
+    {
+      "date": "2025-04-25",
+      "fold_id": 59,
+      "pred_regime": "regime_lg_hi_stagflation",
+      "actual_regime": "regime_lg_li",
+      "pick": "GLD",
+      "confidence": 0.5483293347214139,
+      "fwd_ret": -0.017018829523976375
+    },
+    {
+      "date": "2025-05-23",
+      "fold_id": 59,
+      "pred_regime": "regime_lg_hi_stagflation",
+      "actual_regime": "regime_lg_li",
+      "pick": "GLD",
+      "confidence": 0.6787197469237073,
+      "fwd_ret": 0.007487680720186685
+    },
+    {
+      "date": "2025-06-24",
+      "fold_id": 59,
+      "pred_regime": "regime_lg_hi_stagflation",
+      "actual_regime": "regime_lg_li",
+      "pick": "GLD",
+      "confidence": 0.8387932262249364,
+      "fwd_ret": 0.0009116917939193669
+    },
+    {
+      "date": "2025-07-25",
+      "fold_id": 60,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_li",
+      "pick": "XLE",
+      "confidence": 0.2776338971995025,
+      "fwd_ret": 0.0015892911357207051
+    },
+    {
+      "date": "2025-08-29",
+      "fold_id": 60,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.3919575232981787,
+      "fwd_ret": 0.14039091949734317
+    },
+    {
+      "date": "2025-09-29",
+      "fold_id": 60,
+      "pred_regime": "regime_lg_hi_stagflation",
+      "actual_regime": "regime_hg_li",
+      "pick": "GLD",
+      "confidence": 0.37439710992650954,
+      "fwd_ret": 0.02118321870604678
+    },
+    {
+      "date": "2025-10-31",
+      "fold_id": 61,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SHY",
+      "confidence": 0.45985972291620786,
+      "fwd_ret": 0.0047036199901884235
+    },
+    {
+      "date": "2025-11-21",
+      "fold_id": 61,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_li",
+      "pick": "SOXX",
+      "confidence": 0.36166569701962736,
+      "fwd_ret": 0.08450147199371716
+    },
+    {
+      "date": "2025-12-30",
+      "fold_id": 61,
+      "pred_regime": "regime_lg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SHY",
+      "confidence": 0.47315590264246093,
+      "fwd_ret": 0.001568107581751299
+    },
+    {
+      "date": "2026-01-27",
+      "fold_id": 62,
+      "pred_regime": "regime_hg_hi",
+      "actual_regime": "regime_hg_hi",
+      "pick": "XLE",
+      "confidence": 0.32878752227880675,
+      "fwd_ret": 0.11728267723113661
+    },
+    {
+      "date": "2026-02-25",
+      "fold_id": 62,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.9284042074416065,
+      "fwd_ret": -0.09282700566386548
+    },
+    {
+      "date": "2026-03-11",
+      "fold_id": 62,
+      "pred_regime": "regime_hg_li",
+      "actual_regime": "regime_hg_hi",
+      "pick": "SOXX",
+      "confidence": 0.8504381090830708,
+      "fwd_ret": null
+    }
+  ]
+}

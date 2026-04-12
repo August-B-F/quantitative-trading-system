@@ -1,0 +1,44 @@
+{
+  "E00a_overlapping_rolling": {
+    "TARGET_T1_winner_idx": {
+      "real_monthly_acc": 0.18518518518518517,
+      "shuf_monthly_acc": 0.21693121693121692,
+      "gap": -0.031746031746031744,
+      "n_monthly": 189
+    },
+    "TARGET_T4_drawdown_gt_5pct": {
+      "real_monthly_acc": 0.873015873015873,
+      "shuf_monthly_acc": 0.8783068783068783,
+      "gap": -0.005291005291005235,
+      "n_monthly": 189
+    }
+  },
+  "E00b_expanding_decay": {
+    "TARGET_T1_winner_idx": {
+      "real_monthly_acc": 0.2275132275132275,
+      "shuf_monthly_acc": 0.1746031746031746,
+      "gap": 0.05291005291005291,
+      "n_monthly": 189
+    },
+    "TARGET_T4_drawdown_gt_5pct": {
+      "real_monthly_acc": 0.873015873015873,
+      "shuf_monthly_acc": 0.8783068783068783,
+      "gap": -0.005291005291005235,
+      "n_monthly": 189
+    }
+  },
+  "E00c_monthly_only": {
+    "TARGET_T1_winner_idx": {
+      "real_monthly_acc": 0.22162162162162163,
+      "shuf_monthly_acc": 0.23243243243243245,
+      "gap": -0.010810810810810811,
+      "n_monthly": 185
+    },
+    "TARGET_T4_drawdown_gt_5pct": {
+      "real_monthly_acc": 0.8594594594594595,
+      "shuf_monthly_acc": 0.8756756756756757,
+      "gap": -0.016216216216216273,
+      "n_monthly": 185
+    }
+  }
+}

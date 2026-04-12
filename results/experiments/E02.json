@@ -1,0 +1,2304 @@
+{
+  "experiment": "E02_histgb_core_t2",
+  "n_monthly": 189,
+  "argmax_accuracy": 0.08465608465608465,
+  "top2_accuracy": 0.164021164021164,
+  "mean_spearman": -0.07184175500494454,
+  "wf_cagr": 0.08072525600508373,
+  "wf_sharpe": 0.5036600939703504,
+  "wf_max_dd": -0.24496600413349046,
+  "annual_returns": {
+    "2010": 0.26679954560088404,
+    "2011": -0.22455593046999478,
+    "2012": 0.19323518876584145,
+    "2013": 0.09354025952359857,
+    "2014": 0.033695192443844,
+    "2015": 0.08296436404817031,
+    "2016": 0.03455949156422711,
+    "2017": 0.15579978960366736,
+    "2018": -0.011265437985853555,
+    "2019": 0.20014305788242504,
+    "2020": 0.3464523292846431,
+    "2021": -0.09691912576551387,
+    "2022": 0.19766653944434398,
+    "2023": 0.08116982114167293,
+    "2024": 0.01706455338733104,
+    "2025": 0.2784226681836488,
+    "2026": -0.18516651727573663
+  },
+  "fold_acc_mean": 0.11518111518111518,
+  "fold_acc_std": 0.1014256120134321,
+  "n_folds_used": 63,
+  "fold_records": [
+    {
+      "fold_id": 0,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": 0.187222948718546
+    },
+    {
+      "fold_id": 1,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": -0.04618748031894945
+    },
+    {
+      "fold_id": 2,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.061212536807839654
+    },
+    {
+      "fold_id": 3,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.09453684646545638
+    },
+    {
+      "fold_id": 4,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.08563103538731157
+    },
+    {
+      "fold_id": 5,
+      "n_samples": 13,
+      "argmax_acc": 0.3076923076923077,
+      "spearman": -0.04636329482457075
+    },
+    {
+      "fold_id": 6,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.027560528351752926
+    },
+    {
+      "fold_id": 7,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": -0.13063149605898844
+    },
+    {
+      "fold_id": 8,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": -0.1545945625455068
+    },
+    {
+      "fold_id": 9,
+      "n_samples": 13,
+      "argmax_acc": 0.3076923076923077,
+      "spearman": -0.08428303880868947
+    },
+    {
+      "fold_id": 10,
+      "n_samples": 13,
+      "argmax_acc": 0.3076923076923077,
+      "spearman": 0.16169861721145937
+    },
+    {
+      "fold_id": 11,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.08129251556898387
+    },
+    {
+      "fold_id": 12,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": -0.27868255296428407
+    },
+    {
+      "fold_id": 13,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.24854207046142207
+    },
+    {
+      "fold_id": 14,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": -0.28669205690346883
+    },
+    {
+      "fold_id": 15,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.0832636039131185
+    },
+    {
+      "fold_id": 16,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.021568225608870138
+    },
+    {
+      "fold_id": 17,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.09601793060756733
+    },
+    {
+      "fold_id": 18,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.09067534186770071
+    },
+    {
+      "fold_id": 19,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": 0.06586346158426465
+    },
+    {
+      "fold_id": 20,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": 0.01020279031136236
+    },
+    {
+      "fold_id": 21,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.10355015062418058
+    },
+    {
+      "fold_id": 22,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.32681412085500033
+    },
+    {
+      "fold_id": 23,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.10622701450596773
+    },
+    {
+      "fold_id": 24,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": 0.12223030790794163
+    },
+    {
+      "fold_id": 25,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.21087173286129363
+    },
+    {
+      "fold_id": 26,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": -0.10782599867033939
+    },
+    {
+      "fold_id": 27,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": 0.35738811305307777
+    },
+    {
+      "fold_id": 28,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": 0.1842475128403069
+    },
+    {
+      "fold_id": 29,
+      "n_samples": 13,
+      "argmax_acc": 0.3076923076923077,
+      "spearman": 0.2798857188762532
+    },
+    {
+      "fold_id": 30,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.3634156190895482
+    },
+    {
+      "fold_id": 31,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": 0.2907679145372376
+    },
+    {
+      "fold_id": 32,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.25634877047594035
+    },
+    {
+      "fold_id": 33,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": 0.16092591680148394
+    },
+    {
+      "fold_id": 34,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.03364146858045131
+    },
+    {
+      "fold_id": 35,
+      "n_samples": 13,
+      "argmax_acc": 0.3076923076923077,
+      "spearman": -0.027541704336087387
+    },
+    {
+      "fold_id": 36,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.06765972387105133
+    },
+    {
+      "fold_id": 37,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.009591470072405957
+    },
+    {
+      "fold_id": 38,
+      "n_samples": 13,
+      "argmax_acc": 0.3076923076923077,
+      "spearman": 0.2866138451336665
+    },
+    {
+      "fold_id": 39,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.19461546875560184
+    },
+    {
+      "fold_id": 40,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.26763793964254556
+    },
+    {
+      "fold_id": 41,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.008750343151279623
+    },
+    {
+      "fold_id": 42,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": 0.1469935764161989
+    },
+    {
+      "fold_id": 43,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": 0.1618113590774028
+    },
+    {
+      "fold_id": 44,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": 0.08113418092767066
+    },
+    {
+      "fold_id": 45,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": 0.04511004511571421
+    },
+    {
+      "fold_id": 46,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.2433782657359157
+    },
+    {
+      "fold_id": 47,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": 0.05193343284604342
+    },
+    {
+      "fold_id": 48,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.02418390159536444
+    },
+    {
+      "fold_id": 49,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.15226524718680604
+    },
+    {
+      "fold_id": 50,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.2141783043535942
+    },
+    {
+      "fold_id": 51,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.03915279018911547
+    },
+    {
+      "fold_id": 52,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": -0.36181705742867154
+    },
+    {
+      "fold_id": 53,
+      "n_samples": 13,
+      "argmax_acc": 0.15384615384615385,
+      "spearman": -0.07765394023755806
+    },
+    {
+      "fold_id": 54,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.24728850584362164
+    },
+    {
+      "fold_id": 55,
+      "n_samples": 13,
+      "argmax_acc": 0.0,
+      "spearman": -0.28947014618901956
+    },
+    {
+      "fold_id": 56,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": 0.18665228348015786
+    },
+    {
+      "fold_id": 57,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.11973039330945998
+    },
+    {
+      "fold_id": 58,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.26875707798332743
+    },
+    {
+      "fold_id": 59,
+      "n_samples": 13,
+      "argmax_acc": 0.23076923076923078,
+      "spearman": 0.29376630029390305
+    },
+    {
+      "fold_id": 60,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": 0.14638292982857057
+    },
+    {
+      "fold_id": 61,
+      "n_samples": 13,
+      "argmax_acc": 0.07692307692307693,
+      "spearman": -0.062018059743289077
+    },
+    {
+      "fold_id": 62,
+      "n_samples": 9,
+      "argmax_acc": 0.3333333333333333,
+      "spearman": -0.08941913291130593
+    }
+  ],
+  "monthly_predictions": [
+    {
+      "date": "2010-07-31",
+      "fold_id": 0,
+      "pred_ticker": "GLD",
+      "actual_idx": 6,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.7229684624403735,
+      "fwd_ret": 0.06310423960456424
+    },
+    {
+      "date": "2010-08-31",
+      "fold_id": 0,
+      "pred_ticker": "VGT",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.5367450401216933,
+      "fwd_ret": 0.09535070856057648
+    },
+    {
+      "date": "2010-09-30",
+      "fold_id": 0,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.31716752370827334,
+      "fwd_ret": 0.05861934929263346
+    },
+    {
+      "date": "2010-10-31",
+      "fold_id": 1,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.627376434428478,
+      "fwd_ret": 0.025213842220769278
+    },
+    {
+      "date": "2010-11-30",
+      "fold_id": 1,
+      "pred_ticker": "SHY",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": -0.08939165274178947,
+      "fwd_ret": -0.0001413041227882328
+    },
+    {
+      "date": "2010-12-31",
+      "fold_id": 1,
+      "pred_ticker": "SHY",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.28743030285918214,
+      "fwd_ret": 0.0025035939601079082
+    },
+    {
+      "date": "2011-01-31",
+      "fold_id": 2,
+      "pred_ticker": "SHY",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.38095238095238104,
+      "fwd_ret": -0.0005005691216386499
+    },
+    {
+      "date": "2011-02-28",
+      "fold_id": 2,
+      "pred_ticker": "SHY",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.09523809523809526,
+      "fwd_ret": 0.0001303008443855891
+    },
+    {
+      "date": "2011-03-31",
+      "fold_id": 2,
+      "pred_ticker": "SHY",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.467074242146171,
+      "fwd_ret": 0.005174811754738107
+    },
+    {
+      "date": "2011-04-30",
+      "fold_id": 3,
+      "pred_ticker": "XLE",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.28571428571428575,
+      "fwd_ret": -0.03984329904650685
+    },
+    {
+      "date": "2011-05-31",
+      "fold_id": 3,
+      "pred_ticker": "SOXX",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.6666666666666669,
+      "fwd_ret": -0.07216888780314779
+    },
+    {
+      "date": "2011-06-30",
+      "fold_id": 3,
+      "pred_ticker": "SHY",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5269555552418339,
+      "fwd_ret": 0.002514984474891513
+    },
+    {
+      "date": "2011-07-31",
+      "fold_id": 4,
+      "pred_ticker": "XLK",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.09759000729485333,
+      "fwd_ret": -0.10437475861829892
+    },
+    {
+      "date": "2011-08-31",
+      "fold_id": 4,
+      "pred_ticker": "XLK",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.13173888881045848,
+      "fwd_ret": -0.030696715352888093
+    },
+    {
+      "date": "2011-09-30",
+      "fold_id": 4,
+      "pred_ticker": "GLD",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": -0.28571428571428575,
+      "fwd_ret": 0.07558654660505493
+    },
+    {
+      "date": "2011-10-31",
+      "fold_id": 5,
+      "pred_ticker": "GLD",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.012049067317796997,
+      "fwd_ret": 0.013442465852329777
+    },
+    {
+      "date": "2011-11-30",
+      "fold_id": 5,
+      "pred_ticker": "GLD",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.1197626261913259,
+      "fwd_ret": -0.10662433944055594
+    },
+    {
+      "date": "2011-12-31",
+      "fold_id": 5,
+      "pred_ticker": "XLE",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.28234145428063595,
+      "fwd_ret": 0.022123183161411486
+    },
+    {
+      "date": "2012-01-31",
+      "fold_id": 6,
+      "pred_ticker": "SOXX",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.11904761904761905,
+      "fwd_ret": 0.031322113623278636
+    },
+    {
+      "date": "2012-02-29",
+      "fold_id": 6,
+      "pred_ticker": "VGT",
+      "actual_idx": 1,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.3233590907165799,
+      "fwd_ret": 0.057534961763203496
+    },
+    {
+      "date": "2012-03-31",
+      "fold_id": 6,
+      "pred_ticker": "GLD",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.05988131309566295,
+      "fwd_ret": -0.004934541185931396
+    },
+    {
+      "date": "2012-04-30",
+      "fold_id": 7,
+      "pred_ticker": "IGV",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.277128548309331,
+      "fwd_ret": -0.07186740189937213
+    },
+    {
+      "date": "2012-05-31",
+      "fold_id": 7,
+      "pred_ticker": "SHY",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8095238095238096,
+      "fwd_ret": -0.0007573762588219957
+    },
+    {
+      "date": "2012-06-30",
+      "fold_id": 7,
+      "pred_ticker": "SHY",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.07142857142857144,
+      "fwd_ret": 0.0022055250979677865
+    },
+    {
+      "date": "2012-07-31",
+      "fold_id": 8,
+      "pred_ticker": "SOXX",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.05988131309566295,
+      "fwd_ret": 0.06545180633090619
+    },
+    {
+      "date": "2012-08-31",
+      "fold_id": 8,
+      "pred_ticker": "GLD",
+      "actual_idx": 6,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.11904761904761905,
+      "fwd_ret": 0.07332412596808746
+    },
+    {
+      "date": "2012-09-30",
+      "fold_id": 8,
+      "pred_ticker": "XLE",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.14371515142959107,
+      "fwd_ret": -0.02029145636460239
+    },
+    {
+      "date": "2012-10-31",
+      "fold_id": 9,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.18413573105258865,
+      "fwd_ret": 0.013264750485462384
+    },
+    {
+      "date": "2012-11-30",
+      "fold_id": 9,
+      "pred_ticker": "GLD",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": -0.19641144645609454,
+      "fwd_ret": -0.04475136477566888
+    },
+    {
+      "date": "2012-12-31",
+      "fold_id": 9,
+      "pred_ticker": "SOXX",
+      "actual_idx": 0,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.4000661320993194,
+      "fwd_ret": 0.09080371891630845
+    },
+    {
+      "date": "2013-01-31",
+      "fold_id": 10,
+      "pred_ticker": "SOXX",
+      "actual_idx": 0,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.18413573105258865,
+      "fwd_ret": 0.027630037620832715
+    },
+    {
+      "date": "2013-02-28",
+      "fold_id": 10,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.7733700704208724,
+      "fwd_ret": 0.03382475275461583
+    },
+    {
+      "date": "2013-03-31",
+      "fold_id": 10,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3855701541695039,
+      "fwd_ret": -0.012880388065214965
+    },
+    {
+      "date": "2013-04-30",
+      "fold_id": 11,
+      "pred_ticker": "XLK",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.3212080372198105,
+      "fwd_ret": 0.05457549386506999
+    },
+    {
+      "date": "2013-05-31",
+      "fold_id": 11,
+      "pred_ticker": "SHY",
+      "actual_idx": 7,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": -0.07610194341477615,
+      "fwd_ret": -0.00054475559848155
+    },
+    {
+      "date": "2013-06-30",
+      "fold_id": 11,
+      "pred_ticker": "SHY",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.6946232319096901,
+      "fwd_ret": 0.0016247411313337068
+    },
+    {
+      "date": "2013-07-31",
+      "fold_id": 12,
+      "pred_ticker": "GLD",
+      "actual_idx": 6,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.36782605983808475,
+      "fwd_ret": 0.05179374306701434
+    },
+    {
+      "date": "2013-08-31",
+      "fold_id": 12,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.7910398521054723,
+      "fwd_ret": -0.07450601057120598
+    },
+    {
+      "date": "2013-09-30",
+      "fold_id": 12,
+      "pred_ticker": "GLD",
+      "actual_idx": 2,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5422080293008649,
+      "fwd_ret": 0.012404522449158462
+    },
+    {
+      "date": "2013-10-31",
+      "fold_id": 13,
+      "pred_ticker": "SHY",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5182674893104819,
+      "fwd_ret": 0.0009356203114947448
+    },
+    {
+      "date": "2013-11-30",
+      "fold_id": 13,
+      "pred_ticker": "SHY",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.30122668294492494,
+      "fwd_ret": -0.0006980923946077189
+    },
+    {
+      "date": "2013-12-31",
+      "fold_id": 13,
+      "pred_ticker": "SHY",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.45509797952703834,
+      "fwd_ret": 0.0020146856886036346
+    },
+    {
+      "date": "2014-01-31",
+      "fold_id": 14,
+      "pred_ticker": "SHY",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.7092081432669752,
+      "fwd_ret": 0.0014557300124409256
+    },
+    {
+      "date": "2014-02-28",
+      "fold_id": 14,
+      "pred_ticker": "SHY",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.507346289431841,
+      "fwd_ret": -0.0017980854974370963
+    },
+    {
+      "date": "2014-03-31",
+      "fold_id": 14,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8728715609439694,
+      "fwd_ret": -0.0095563838101701
+    },
+    {
+      "date": "2014-04-30",
+      "fold_id": 15,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.28234145428063595,
+      "fwd_ret": 0.05246938447295957
+    },
+    {
+      "date": "2014-05-31",
+      "fold_id": 15,
+      "pred_ticker": "XLK",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.28917761562712796,
+      "fwd_ret": 0.017681604751979663
+    },
+    {
+      "date": "2014-06-30",
+      "fold_id": 15,
+      "pred_ticker": "SOXX",
+      "actual_idx": 2,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.32732683535398854,
+      "fwd_ret": -0.056405637848572776
+    },
+    {
+      "date": "2014-07-31",
+      "fold_id": 16,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5401314777542601,
+      "fwd_ret": 0.02821098810482381
+    },
+    {
+      "date": "2014-08-31",
+      "fold_id": 16,
+      "pred_ticker": "IGV",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3437200312981655,
+      "fwd_ret": -0.0432625406487428
+    },
+    {
+      "date": "2014-09-30",
+      "fold_id": 16,
+      "pred_ticker": "QQQ",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.34731161595484505,
+      "fwd_ret": 0.010324513489385456
+    },
+    {
+      "date": "2014-10-31",
+      "fold_id": 17,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.2142857142857143,
+      "fwd_ret": 0.03009088320117148
+    },
+    {
+      "date": "2014-11-30",
+      "fold_id": 17,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.5855400437691199,
+      "fwd_ret": 0.03465058032385748
+    },
+    {
+      "date": "2014-12-31",
+      "fold_id": 17,
+      "pred_ticker": "IGV",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.6341828617898013,
+      "fwd_ret": -0.024784280057300268
+    },
+    {
+      "date": "2015-01-31",
+      "fold_id": 18,
+      "pred_ticker": "VGT",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.07185757571479554,
+      "fwd_ret": 0.07872434724350263
+    },
+    {
+      "date": "2015-02-28",
+      "fold_id": 18,
+      "pred_ticker": "VGT",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3855701541695039,
+      "fwd_ret": -0.035887062328885055
+    },
+    {
+      "date": "2015-03-31",
+      "fold_id": 18,
+      "pred_ticker": "IGV",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.07319250547113999,
+      "fwd_ret": 0.051044982492541635
+    },
+    {
+      "date": "2015-04-30",
+      "fold_id": 19,
+      "pred_ticker": "SHY",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.023952525238265177,
+      "fwd_ret": 0.00017730510088309615
+    },
+    {
+      "date": "2015-05-31",
+      "fold_id": 19,
+      "pred_ticker": "GLD",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.08383383833392813,
+      "fwd_ret": -0.012731556379075526
+    },
+    {
+      "date": "2015-06-30",
+      "fold_id": 19,
+      "pred_ticker": "IGV",
+      "actual_idx": 1,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.5783552312542559,
+      "fwd_ret": 0.027165206900730654
+    },
+    {
+      "date": "2015-07-31",
+      "fold_id": 20,
+      "pred_ticker": "QQQ",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.025367314471592056,
+      "fwd_ret": -0.07288788478821662
+    },
+    {
+      "date": "2015-08-31",
+      "fold_id": 20,
+      "pred_ticker": "IGV",
+      "actual_idx": 4,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.265079480991534,
+      "fwd_ret": 0.036886834678583114
+    },
+    {
+      "date": "2015-09-30",
+      "fold_id": 20,
+      "pred_ticker": "XLK",
+      "actual_idx": 1,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.35756661096715786,
+      "fwd_ret": 0.11240501554469073
+    },
+    {
+      "date": "2015-10-31",
+      "fold_id": 21,
+      "pred_ticker": "XLK",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.0,
+      "fwd_ret": 0.009214645612668937
+    },
+    {
+      "date": "2015-11-30",
+      "fold_id": 21,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.27545404024004955,
+      "fwd_ret": -0.008875416124450197
+    },
+    {
+      "date": "2015-12-31",
+      "fold_id": 21,
+      "pred_ticker": "QQQ",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.36782605983808475,
+      "fwd_ret": -0.08680490239311867
+    },
+    {
+      "date": "2016-01-31",
+      "fold_id": 22,
+      "pred_ticker": "QQQ",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.2439750182371333,
+      "fwd_ret": 0.028335754759997833
+    },
+    {
+      "date": "2016-02-29",
+      "fold_id": 22,
+      "pred_ticker": "GLD",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5988131309566295,
+      "fwd_ret": -0.011194027436576492
+    },
+    {
+      "date": "2016-03-31",
+      "fold_id": 22,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.7319250547113999,
+      "fwd_ret": -0.04563709297873575
+    },
+    {
+      "date": "2016-04-30",
+      "fold_id": 23,
+      "pred_ticker": "SOXX",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.17964393928698885,
+      "fwd_ret": 0.02510144570222228
+    },
+    {
+      "date": "2016-05-31",
+      "fold_id": 23,
+      "pred_ticker": "SOXX",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.2515015150017844,
+      "fwd_ret": -0.01606002293030173
+    },
+    {
+      "date": "2016-06-30",
+      "fold_id": 23,
+      "pred_ticker": "XLE",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8715757936489197,
+      "fwd_ret": -0.004726703223801865
+    },
+    {
+      "date": "2016-07-31",
+      "fold_id": 24,
+      "pred_ticker": "VGT",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.26837252006084666,
+      "fwd_ret": 0.02515238436845646
+    },
+    {
+      "date": "2016-08-31",
+      "fold_id": 24,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.1197626261913259,
+      "fwd_ret": 0.0089741028121062
+    },
+    {
+      "date": "2016-09-30",
+      "fold_id": 24,
+      "pred_ticker": "IGV",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.0,
+      "fwd_ret": -0.0064687404767044265
+    },
+    {
+      "date": "2016-10-31",
+      "fold_id": 25,
+      "pred_ticker": "QQQ",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5524071931577659,
+      "fwd_ret": -0.005512048695750726
+    },
+    {
+      "date": "2016-11-30",
+      "fold_id": 25,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8010018789148143,
+      "fwd_ret": 0.01132244200718624
+    },
+    {
+      "date": "2016-12-31",
+      "fold_id": 25,
+      "pred_ticker": "XLK",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.13173888881045848,
+      "fwd_ret": 0.027493172427819124
+    },
+    {
+      "date": "2017-01-31",
+      "fold_id": 26,
+      "pred_ticker": "SHY",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.467074242146171,
+      "fwd_ret": 0.0015508486182094217
+    },
+    {
+      "date": "2017-02-28",
+      "fold_id": 26,
+      "pred_ticker": "XLE",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.12198750911856665,
+      "fwd_ret": -0.03297161516848701
+    },
+    {
+      "date": "2017-03-31",
+      "fold_id": 26,
+      "pred_ticker": "XLE",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8728715609439694,
+      "fwd_ret": -0.03705296853339102
+    },
+    {
+      "date": "2017-04-30",
+      "fold_id": 27,
+      "pred_ticker": "SOXX",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.6024533658898499,
+      "fwd_ret": 0.07184174979137792
+    },
+    {
+      "date": "2017-05-31",
+      "fold_id": 27,
+      "pred_ticker": "SOXX",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.6260614855788014,
+      "fwd_ret": -0.05126423366825905
+    },
+    {
+      "date": "2017-06-30",
+      "fold_id": 27,
+      "pred_ticker": "IGV",
+      "actual_idx": 2,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.6260614855788014,
+      "fwd_ret": 0.03971629619753703
+    },
+    {
+      "date": "2017-07-31",
+      "fold_id": 28,
+      "pred_ticker": "IGV",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.07610194341477615,
+      "fwd_ret": -0.013503285559494316
+    },
+    {
+      "date": "2017-08-31",
+      "fold_id": 28,
+      "pred_ticker": "IGV",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.29940656547831473,
+      "fwd_ret": 0.001797049899046721
+    },
+    {
+      "date": "2017-09-30",
+      "fold_id": 28,
+      "pred_ticker": "SOXX",
+      "actual_idx": 0,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.7952384429746019,
+      "fwd_ret": 0.0870172896849486
+    },
+    {
+      "date": "2017-10-31",
+      "fold_id": 29,
+      "pred_ticker": "SOXX",
+      "actual_idx": 1,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.19047619047619052,
+      "fwd_ret": -0.008135568306104402
+    },
+    {
+      "date": "2017-11-30",
+      "fold_id": 29,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.04761904761904763,
+      "fwd_ret": 0.01262944302490876
+    },
+    {
+      "date": "2017-12-31",
+      "fold_id": 29,
+      "pred_ticker": "SOXX",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.20293851577273644,
+      "fwd_ret": 0.08633177434436168
+    },
+    {
+      "date": "2018-01-31",
+      "fold_id": 30,
+      "pred_ticker": "SOXX",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.17078251276599332,
+      "fwd_ret": -0.002246524096486624
+    },
+    {
+      "date": "2018-02-28",
+      "fold_id": 30,
+      "pred_ticker": "XLK",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.7807200583588266,
+      "fwd_ret": -0.06600270922764362
+    },
+    {
+      "date": "2018-03-31",
+      "fold_id": 30,
+      "pred_ticker": "QQQ",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5476190476190477,
+      "fwd_ret": -0.03497591761483787
+    },
+    {
+      "date": "2018-04-30",
+      "fold_id": 31,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.4879500364742666,
+      "fwd_ret": 0.0687050052872682
+    },
+    {
+      "date": "2018-05-31",
+      "fold_id": 31,
+      "pred_ticker": "IGV",
+      "actual_idx": 1,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.1576018096148834,
+      "fwd_ret": -0.0012671742298370203
+    },
+    {
+      "date": "2018-06-30",
+      "fold_id": 31,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.40864755539103753,
+      "fwd_ret": 0.02289838901357011
+    },
+    {
+      "date": "2018-07-31",
+      "fold_id": 32,
+      "pred_ticker": "SHY",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.6088155473182092,
+      "fwd_ret": 0.003467981411724219
+    },
+    {
+      "date": "2018-08-31",
+      "fold_id": 32,
+      "pred_ticker": "IGV",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.3233590907165799,
+      "fwd_ret": 0.016962775107330685
+    },
+    {
+      "date": "2018-09-30",
+      "fold_id": 32,
+      "pred_ticker": "QQQ",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5389318178609664,
+      "fwd_ret": -0.12142744507357561
+    },
+    {
+      "date": "2018-10-31",
+      "fold_id": 33,
+      "pred_ticker": "SHY",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.07319250547113999,
+      "fwd_ret": 0.0024323821833862613
+    },
+    {
+      "date": "2018-11-30",
+      "fold_id": 33,
+      "pred_ticker": "SHY",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.2439750182371333,
+      "fwd_ret": 0.009767390616372218
+    },
+    {
+      "date": "2018-12-31",
+      "fold_id": 33,
+      "pred_ticker": "XLE",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.7065994945288228,
+      "fwd_ret": 0.10961009321143278
+    },
+    {
+      "date": "2019-01-31",
+      "fold_id": 34,
+      "pred_ticker": "XLE",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.2515015150017844,
+      "fwd_ret": 0.057945341555944996
+    },
+    {
+      "date": "2019-02-28",
+      "fold_id": 34,
+      "pred_ticker": "XLE",
+      "actual_idx": 2,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.30952380952380953,
+      "fwd_ret": 0.0126012109038931
+    },
+    {
+      "date": "2019-03-31",
+      "fold_id": 34,
+      "pred_ticker": "SHY",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8095238095238096,
+      "fwd_ret": 0.0005244390845509095
+    },
+    {
+      "date": "2019-04-30",
+      "fold_id": 35,
+      "pred_ticker": "GLD",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.5181098946652709,
+      "fwd_ret": -0.004449212353194509
+    },
+    {
+      "date": "2019-05-31",
+      "fold_id": 35,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.34731161595484505,
+      "fwd_ret": 0.06634164344389815
+    },
+    {
+      "date": "2019-06-30",
+      "fold_id": 35,
+      "pred_ticker": "XLE",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.934148484292342,
+      "fwd_ret": -0.0167789857591647
+    },
+    {
+      "date": "2019-07-31",
+      "fold_id": 36,
+      "pred_ticker": "SHY",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.14371515142959107,
+      "fwd_ret": 0.007344014824618661
+    },
+    {
+      "date": "2019-08-31",
+      "fold_id": 36,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.32532481758051895,
+      "fwd_ret": -0.029056073798895077
+    },
+    {
+      "date": "2019-09-30",
+      "fold_id": 36,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4523809523809524,
+      "fwd_ret": 0.006041128183269517
+    },
+    {
+      "date": "2019-10-31",
+      "fold_id": 37,
+      "pred_ticker": "QQQ",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.407192929050508,
+      "fwd_ret": 0.01277231948408053
+    },
+    {
+      "date": "2019-11-30",
+      "fold_id": 37,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.6626987024788349,
+      "fwd_ret": 0.0447057403458726
+    },
+    {
+      "date": "2019-12-31",
+      "fold_id": 37,
+      "pred_ticker": "QQQ",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.545544725589981,
+      "fwd_ret": 0.030384226017021287
+    },
+    {
+      "date": "2020-01-31",
+      "fold_id": 38,
+      "pred_ticker": "IGV",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.12198750911856665,
+      "fwd_ret": -0.06718315591950497
+    },
+    {
+      "date": "2020-02-29",
+      "fold_id": 38,
+      "pred_ticker": "GLD",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.22893227903814295,
+      "fwd_ret": -0.004741155561158172
+    },
+    {
+      "date": "2020-03-31",
+      "fold_id": 38,
+      "pred_ticker": "XLE",
+      "actual_idx": 5,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.7470421737034137,
+      "fwd_ret": 0.29797241098392346
+    },
+    {
+      "date": "2020-04-30",
+      "fold_id": 39,
+      "pred_ticker": "XLE",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3044077736591046,
+      "fwd_ret": 0.07628477069108652
+    },
+    {
+      "date": "2020-05-31",
+      "fold_id": 39,
+      "pred_ticker": "SHY",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.7229684624403735,
+      "fwd_ret": 0.00023024366580193245
+    },
+    {
+      "date": "2020-06-30",
+      "fold_id": 39,
+      "pred_ticker": "XLE",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3044077736591046,
+      "fwd_ret": -0.024370808356478202
+    },
+    {
+      "date": "2020-07-31",
+      "fold_id": 40,
+      "pred_ticker": "XLE",
+      "actual_idx": 2,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.7065994945288228,
+      "fwd_ret": -0.03196975232515731
+    },
+    {
+      "date": "2020-08-31",
+      "fold_id": 40,
+      "pred_ticker": "GLD",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.3333333333333334,
+      "fwd_ret": -0.03431508240364389
+    },
+    {
+      "date": "2020-09-30",
+      "fold_id": 40,
+      "pred_ticker": "XLE",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.6347419188140272,
+      "fwd_ret": -0.046410860303429
+    },
+    {
+      "date": "2020-10-31",
+      "fold_id": 41,
+      "pred_ticker": "QQQ",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.32977508813069667,
+      "fwd_ret": 0.048185194526344954
+    },
+    {
+      "date": "2020-11-30",
+      "fold_id": 41,
+      "pred_ticker": "IGV",
+      "actual_idx": 4,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.8783100656536799,
+      "fwd_ret": 0.10100198293824536
+    },
+    {
+      "date": "2020-12-31",
+      "fold_id": 41,
+      "pred_ticker": "VGT",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.14458880781356398,
+      "fwd_ret": 0.034116189031502486
+    },
+    {
+      "date": "2021-01-31",
+      "fold_id": 42,
+      "pred_ticker": "QQQ",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.1077863635721933,
+      "fwd_ret": -0.016560669405749295
+    },
+    {
+      "date": "2021-02-28",
+      "fold_id": 42,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.19047619047619052,
+      "fwd_ret": -0.0446294542378628
+    },
+    {
+      "date": "2021-03-31",
+      "fold_id": 42,
+      "pred_ticker": "SOXX",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3571428571428572,
+      "fwd_ret": -0.04991121576656177
+    },
+    {
+      "date": "2021-04-30",
+      "fold_id": 43,
+      "pred_ticker": "XLK",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5269555552418339,
+      "fwd_ret": -0.031031830552597284
+    },
+    {
+      "date": "2021-05-31",
+      "fold_id": 43,
+      "pred_ticker": "XLK",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.4431217169079058,
+      "fwd_ret": 0.05060622209579302
+    },
+    {
+      "date": "2021-06-30",
+      "fold_id": 43,
+      "pred_ticker": "QQQ",
+      "actual_idx": 2,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.626551500525444,
+      "fwd_ret": 0.02860963822748208
+    },
+    {
+      "date": "2021-07-31",
+      "fold_id": 44,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.6099375455928333,
+      "fwd_ret": 0.018013757387063345
+    },
+    {
+      "date": "2021-08-31",
+      "fold_id": 44,
+      "pred_ticker": "IGV",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.9027075674773933,
+      "fwd_ret": -0.04615901884197271
+    },
+    {
+      "date": "2021-09-30",
+      "fold_id": 44,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": -0.2577900234736241,
+      "fwd_ret": 0.06450304069496005
+    },
+    {
+      "date": "2021-10-31",
+      "fold_id": 45,
+      "pred_ticker": "XLE",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 1,
+      "spearman": 0.04819626927118799,
+      "fwd_ret": -0.02079812439969142
+    },
+    {
+      "date": "2021-11-30",
+      "fold_id": 45,
+      "pred_ticker": "XLE",
+      "actual_idx": 2,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.7065994945288228,
+      "fwd_ret": 0.040893068562091184
+    },
+    {
+      "date": "2021-12-31",
+      "fold_id": 45,
+      "pred_ticker": "VGT",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4047619047619048,
+      "fwd_ret": -0.08296042162018569
+    },
+    {
+      "date": "2022-01-31",
+      "fold_id": 46,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.2142857142857143,
+      "fwd_ret": 0.0209517332221989
+    },
+    {
+      "date": "2022-02-28",
+      "fold_id": 46,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3233590907165799,
+      "fwd_ret": 0.03622256720610828
+    },
+    {
+      "date": "2022-03-31",
+      "fold_id": 46,
+      "pred_ticker": "GLD",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.08383383833392813,
+      "fwd_ret": -0.03885961389898773
+    },
+    {
+      "date": "2022-04-30",
+      "fold_id": 47,
+      "pred_ticker": "XLK",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.17078251276599332,
+      "fwd_ret": -0.035661778243299636
+    },
+    {
+      "date": "2022-05-31",
+      "fold_id": 47,
+      "pred_ticker": "XLK",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.03592878785739777,
+      "fwd_ret": -0.005430175366858081
+    },
+    {
+      "date": "2022-06-30",
+      "fold_id": 47,
+      "pred_ticker": "XLK",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.6666666666666669,
+      "fwd_ret": 0.12149750083494393
+    },
+    {
+      "date": "2022-07-31",
+      "fold_id": 48,
+      "pred_ticker": "XLK",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.14371515142959107,
+      "fwd_ret": 0.044385673403160686
+    },
+    {
+      "date": "2022-08-31",
+      "fold_id": 48,
+      "pred_ticker": "SOXX",
+      "actual_idx": 7,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4819626927118799,
+      "fwd_ret": -0.1331650866356332
+    },
+    {
+      "date": "2022-09-30",
+      "fold_id": 48,
+      "pred_ticker": "IGV",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.08383383833392813,
+      "fwd_ret": 0.061074238329831054
+    },
+    {
+      "date": "2022-10-31",
+      "fold_id": 49,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.5714285714285715,
+      "fwd_ret": 0.09370512833897848
+    },
+    {
+      "date": "2022-11-30",
+      "fold_id": 49,
+      "pred_ticker": "SOXX",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.5714285714285715,
+      "fwd_ret": -0.10070781026504705
+    },
+    {
+      "date": "2022-12-31",
+      "fold_id": 49,
+      "pred_ticker": "SOXX",
+      "actual_idx": 0,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.30952380952380953,
+      "fwd_ret": 0.15900076514954042
+    },
+    {
+      "date": "2023-01-31",
+      "fold_id": 50,
+      "pred_ticker": "SOXX",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.08383383833392813,
+      "fwd_ret": -0.0031242852045344494
+    },
+    {
+      "date": "2023-02-28",
+      "fold_id": 50,
+      "pred_ticker": "XLE",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4191691916696407,
+      "fwd_ret": -0.05055244009183135
+    },
+    {
+      "date": "2023-03-31",
+      "fold_id": 50,
+      "pred_ticker": "SOXX",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.6428571428571429,
+      "fwd_ret": -0.0714462675922729
+    },
+    {
+      "date": "2023-04-30",
+      "fold_id": 51,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.6867968371144288,
+      "fwd_ret": 0.08929998222331981
+    },
+    {
+      "date": "2023-05-31",
+      "fold_id": 51,
+      "pred_ticker": "XLE",
+      "actual_idx": 5,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": -0.07185757571479554,
+      "fwd_ret": 0.058507074329496644
+    },
+    {
+      "date": "2023-06-30",
+      "fold_id": 51,
+      "pred_ticker": "GLD",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.407192929050508,
+      "fwd_ret": 0.012284750036013481
+    },
+    {
+      "date": "2023-07-31",
+      "fold_id": 52,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8751723492699258,
+      "fwd_ret": -0.05553973551525926
+    },
+    {
+      "date": "2023-08-31",
+      "fold_id": 52,
+      "pred_ticker": "XLE",
+      "actual_idx": 5,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.21562217300853243,
+      "fwd_ret": 0.024724537398501
+    },
+    {
+      "date": "2023-09-30",
+      "fold_id": 52,
+      "pred_ticker": "SOXX",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.7637626158259734,
+      "fwd_ret": -0.058503436624915195
+    },
+    {
+      "date": "2023-10-31",
+      "fold_id": 53,
+      "pred_ticker": "GLD",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8263621207201486,
+      "fwd_ret": 0.04631900307578807
+    },
+    {
+      "date": "2023-11-30",
+      "fold_id": 53,
+      "pred_ticker": "SOXX",
+      "actual_idx": 0,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.09523809523809526,
+      "fwd_ret": 0.08331501209925851
+    },
+    {
+      "date": "2023-12-31",
+      "fold_id": 53,
+      "pred_ticker": "VGT",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.6666666666666669,
+      "fwd_ret": 0.020475259168197146
+    },
+    {
+      "date": "2024-01-31",
+      "fold_id": 54,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.1197626261913259,
+      "fwd_ret": 0.010441461687485498
+    },
+    {
+      "date": "2024-02-29",
+      "fold_id": 54,
+      "pred_ticker": "IGV",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4191691916696407,
+      "fwd_ret": 0.004140500932882096
+    },
+    {
+      "date": "2024-03-31",
+      "fold_id": 54,
+      "pred_ticker": "VGT",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4523809523809524,
+      "fwd_ret": -0.05874753155972634
+    },
+    {
+      "date": "2024-04-30",
+      "fold_id": 55,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.43915503282683993,
+      "fwd_ret": 0.0
+    },
+    {
+      "date": "2024-05-31",
+      "fold_id": 55,
+      "pred_ticker": "XLE",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.1077863635721933,
+      "fwd_ret": -0.014358069118431516
+    },
+    {
+      "date": "2024-06-30",
+      "fold_id": 55,
+      "pred_ticker": "QQQ",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4000661320993194,
+      "fwd_ret": -0.022514074292629194
+    },
+    {
+      "date": "2024-07-31",
+      "fold_id": 56,
+      "pred_ticker": "GLD",
+      "actual_idx": 6,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.5030030300035688,
+      "fwd_ret": 0.05497887574478488
+    },
+    {
+      "date": "2024-08-31",
+      "fold_id": 56,
+      "pred_ticker": "SHY",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.7229440390678199,
+      "fwd_ret": 0.008376496513148313
+    },
+    {
+      "date": "2024-09-30",
+      "fold_id": 56,
+      "pred_ticker": "XLE",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.8455943246644705,
+      "fwd_ret": 0.0004556219732103628
+    },
+    {
+      "date": "2024-10-31",
+      "fold_id": 57,
+      "pred_ticker": "VGT",
+      "actual_idx": 4,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.3233590907165799,
+      "fwd_ret": 0.07700358676209018
+    },
+    {
+      "date": "2024-11-30",
+      "fold_id": 57,
+      "pred_ticker": "XLK",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.11048143863155317,
+      "fwd_ret": -0.01525716138355615
+    },
+    {
+      "date": "2024-12-31",
+      "fold_id": 57,
+      "pred_ticker": "XLK",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.024098134635593994,
+      "fwd_ret": -0.020729265032594757
+    },
+    {
+      "date": "2025-01-31",
+      "fold_id": 58,
+      "pred_ticker": "XLK",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.28743030285918214,
+      "fwd_ret": -0.02679735583430798
+    },
+    {
+      "date": "2025-02-28",
+      "fold_id": 58,
+      "pred_ticker": "XLE",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.19518001458970666,
+      "fwd_ret": 0.0395143652855523
+    },
+    {
+      "date": "2025-03-31",
+      "fold_id": 58,
+      "pred_ticker": "SOXX",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.07142857142857144,
+      "fwd_ret": -0.051809225325366026
+    },
+    {
+      "date": "2025-04-30",
+      "fold_id": 59,
+      "pred_ticker": "SOXX",
+      "actual_idx": 0,
+      "argmax_correct": 1,
+      "top2_correct": 1,
+      "spearman": 0.7380952380952381,
+      "fwd_ret": 0.1287944226589095
+    },
+    {
+      "date": "2025-05-31",
+      "fold_id": 59,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.5030030300035688,
+      "fwd_ret": 0.04914131630513552
+    },
+    {
+      "date": "2025-06-30",
+      "fold_id": 59,
+      "pred_ticker": "SHY",
+      "actual_idx": 3,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4761904761904762,
+      "fwd_ret": 0.0010136393446489311
+    },
+    {
+      "date": "2025-07-31",
+      "fold_id": 60,
+      "pred_ticker": "QQQ",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.06137857701752955,
+      "fwd_ret": 0.007867612252357992
+    },
+    {
+      "date": "2025-08-31",
+      "fold_id": 60,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.2395252523826518,
+      "fwd_ret": 0.09349182340914508
+    },
+    {
+      "date": "2025-09-30",
+      "fold_id": 60,
+      "pred_ticker": "IGV",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.17078251276599332,
+      "fwd_ret": 0.001825920185827945
+    },
+    {
+      "date": "2025-10-31",
+      "fold_id": 61,
+      "pred_ticker": "IGV",
+      "actual_idx": 6,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.1077863635721933,
+      "fwd_ret": -0.07796021504738204
+    },
+    {
+      "date": "2025-11-30",
+      "fold_id": 61,
+      "pred_ticker": "GLD",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.011976262619132589,
+      "fwd_ret": 0.08345602169910493
+    },
+    {
+      "date": "2025-12-31",
+      "fold_id": 61,
+      "pred_ticker": "QQQ",
+      "actual_idx": 0,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.26347777762091695,
+      "fwd_ret": 0.01925741480952392
+    },
+    {
+      "date": "2026-01-31",
+      "fold_id": 62,
+      "pred_ticker": "GLD",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": 0.3903600291794133,
+      "fwd_ret": -0.021857808176879545
+    },
+    {
+      "date": "2026-02-28",
+      "fold_id": 62,
+      "pred_ticker": "SOXX",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.4191691916696407,
+      "fwd_ret": -0.09282700566386548
+    },
+    {
+      "date": "2026-03-31",
+      "fold_id": 62,
+      "pred_ticker": "IGV",
+      "actual_idx": 5,
+      "argmax_correct": 0,
+      "top2_correct": 0,
+      "spearman": -0.22754898976351917,
+      "fwd_ret": -0.08171654231531833
+    }
+  ]
+}

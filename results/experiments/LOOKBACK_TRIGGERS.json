@@ -1,0 +1,156 @@
+{
+  "control": {
+    "name": "Regime (ML)",
+    "description": "66.5% acc classifier",
+    "n_fires": 53,
+    "cagr": 0.23607236517296193,
+    "sharpe": 1.4981158884366998,
+    "max_dd": -0.12940782702766251,
+    "n": 188
+  },
+  "triggers": {
+    "Regime (ML)": {
+      "description": "66.5% acc classifier",
+      "n_fires": 53,
+      "cagr": 0.23607236517296193,
+      "sharpe": 1.4981158884366998,
+      "max_dd": -0.12940782702766251,
+      "n": 188
+    },
+    "T01 VIX>25": {
+      "description": "VIX level > 25",
+      "n_fires": 25,
+      "cagr": 0.21572713908829422,
+      "sharpe": 1.3854326472963847,
+      "max_dd": -0.1453344096303476,
+      "n": 188
+    },
+    "T02 VIX>20": {
+      "description": "VIX level > 20",
+      "n_fires": 50,
+      "cagr": 0.17849134950788237,
+      "sharpe": 1.1469072329130168,
+      "max_dd": -0.17816927467376553,
+      "n": 188
+    },
+    "T03 VIX>30": {
+      "description": "VIX level > 30",
+      "n_fires": 11,
+      "cagr": 0.2147954654543316,
+      "sharpe": 1.3808532513398297,
+      "max_dd": -0.13811292468471348,
+      "n": 188
+    },
+    "T04 rvol>63d med": {
+      "description": "SPY 21d rvol > 63d rolling median",
+      "n_fires": 86,
+      "cagr": 0.17541677842883852,
+      "sharpe": 1.1466310049099475,
+      "max_dd": -0.18165931689668824,
+      "n": 188
+    },
+    "T05 VIX chg>5": {
+      "description": "VIX up >5pts over 21d",
+      "n_fires": 23,
+      "cagr": 0.2112630721286619,
+      "sharpe": 1.383889517231784,
+      "max_dd": -0.1453344096303475,
+      "n": 188
+    },
+    "T06 HY-IG z>1": {
+      "description": "HY-IG credit z-score > 1.0",
+      "n_fires": 34,
+      "cagr": 0.20352339583438628,
+      "sharpe": 1.3155338364691005,
+      "max_dd": -0.20083079681634775,
+      "n": 188
+    },
+    "T07 VIX>25 | HY-IG z>1": {
+      "description": "Either VIX>25 or HY-IG z>1",
+      "n_fires": 44,
+      "cagr": 0.20182684524256733,
+      "sharpe": 1.3085771737663932,
+      "max_dd": -0.20083079681634786,
+      "n": 188
+    },
+    "T08 disp<5%": {
+      "description": "Cross-sec 63d return stdev < 5%",
+      "n_fires": 75,
+      "cagr": 0.1505332889438291,
+      "sharpe": 0.983651444652179,
+      "max_dd": -0.2620601219067886,
+      "n": 188
+    },
+    "T09 top gap<2pp": {
+      "description": "Top1-Top2 gap on 63d mom < 2pp",
+      "n_fires": 68,
+      "cagr": 0.19936290359709052,
+      "sharpe": 1.2964561728144266,
+      "max_dd": -0.23617240631437342,
+      "n": 188
+    },
+    "T10 random 28%": {
+      "description": "Random daily fire at 28% (500 runs)",
+      "n_fires": 52,
+      "cagr": 0.19140294011097359,
+      "sharpe": 1.2414401339436427,
+      "max_dd": -0.1784620112800085,
+      "rand_description": "Random daily fire at 28% (500 runs)",
+      "rand_median_cagr": 0.19140294011097359,
+      "rand_median_sharpe": 1.2414401339436427,
+      "rand_median_dd": -0.1784620112800085,
+      "rand_p05_sharpe": 1.0637597987862362,
+      "rand_p95_sharpe": 1.4172433134662668,
+      "rand_p05_cagr": 0.1602311429657009,
+      "rand_p95_cagr": 0.22055232022189994,
+      "rand_mean_fires": 52.944,
+      "rand_regime_sharpe_percentile": 99.8,
+      "rand_regime_cagr_percentile": 99.6
+    }
+  },
+  "random": {
+    "description": "Random daily fire at 28% (500 runs)",
+    "median_cagr": 0.19140294011097359,
+    "median_sharpe": 1.2414401339436427,
+    "median_dd": -0.1784620112800085,
+    "p05_sharpe": 1.0637597987862362,
+    "p95_sharpe": 1.4172433134662668,
+    "p05_cagr": 0.1602311429657009,
+    "p95_cagr": 0.22055232022189994,
+    "mean_fires": 52.944,
+    "regime_sharpe_percentile": 99.8,
+    "regime_cagr_percentile": 99.6
+  },
+  "b2_top3": {
+    "Regime (ML)": {
+      "n": 53,
+      "dist": {
+        "NEUTRAL": 26,
+        "HARMFUL": 14,
+        "HELPFUL": 13
+      },
+      "helpful_pct": 24.528301886792452,
+      "harmful_pct": 26.41509433962264
+    },
+    "T01 VIX>25": {
+      "n": 25,
+      "dist": {
+        "NEUTRAL": 13,
+        "HELPFUL": 7,
+        "HARMFUL": 5
+      },
+      "helpful_pct": 28.0,
+      "harmful_pct": 20.0
+    },
+    "T05 VIX chg>5": {
+      "n": 23,
+      "dist": {
+        "NEUTRAL": 10,
+        "HELPFUL": 8,
+        "HARMFUL": 5
+      },
+      "helpful_pct": 34.78260869565217,
+      "harmful_pct": 21.73913043478261
+    }
+  }
+}

@@ -1,0 +1,1 @@
+{"experiment": "EB3_mlp_big_ext_t2", "error": "MLP diverged to NaN predictions despite gradient clipping; 3-layer MLP on 120 features did not stabilize in walk-forward training."}

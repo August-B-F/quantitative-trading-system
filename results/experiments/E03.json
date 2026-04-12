@@ -1,0 +1,1918 @@
+{
+  "experiment": "E03_rf_core_t1",
+  "n_monthly": 189,
+  "argmax_accuracy": 0.14814814814814814,
+  "top2_accuracy": 0.31216931216931215,
+  "macro_f1": 0.10141188556208901,
+  "ece_10bin": 0.08009316977208211,
+  "per_class": {
+    "SOXX": {
+      "n_predicted": 54,
+      "precision": 0.2777777777777778
+    },
+    "QQQ": {
+      "n_predicted": 8,
+      "precision": 0.0
+    },
+    "XLK": {
+      "n_predicted": 24,
+      "precision": 0.0
+    },
+    "VGT": {
+      "n_predicted": 10,
+      "precision": 0.0
+    },
+    "IGV": {
+      "n_predicted": 38,
+      "precision": 0.05263157894736842
+    },
+    "XLE": {
+      "n_predicted": 34,
+      "precision": 0.20588235294117646
+    },
+    "GLD": {
+      "n_predicted": 9,
+      "precision": 0.1111111111111111
+    },
+    "SHY": {
+      "n_predicted": 12,
+      "precision": 0.25
+    }
+  },
+  "pred_distribution": {
+    "SOXX": 54,
+    "QQQ": 8,
+    "XLK": 24,
+    "VGT": 10,
+    "IGV": 38,
+    "XLE": 34,
+    "GLD": 9,
+    "SHY": 12
+  },
+  "train_class_freq_norm": [
+    0.24263111997010092,
+    0.05825339479257506,
+    0.030023670113367384,
+    0.018985922511523607,
+    0.1156596486856858,
+    0.22362028154976954,
+    0.20894481126199077,
+    0.10188115111498693
+  ],
+  "wf_cagr": 0.09937614115835158,
+  "wf_sharpe": 0.5490259384336401,
+  "wf_max_dd": -0.49287556230943175,
+  "annual_returns": {
+    "2010": 0.17655344110898685,
+    "2011": 0.180047655140525,
+    "2012": 0.15664446494966633,
+    "2013": 0.037691510507663395,
+    "2014": 0.17189071991141835,
+    "2015": 0.0028220676505588127,
+    "2016": 0.21464875699992958,
+    "2017": 0.37563447271316797,
+    "2018": -0.07300809633717142,
+    "2019": 0.4932147245788516,
+    "2020": 0.5104691221729938,
+    "2021": 0.09571823376346478,
+    "2022": 0.16973302118732647,
+    "2023": -0.10727237764431885,
+    "2024": -0.04850282485999047,
+    "2025": -0.23400522532206203,
+    "2026": -0.22059667154331275
+  },
+  "fold_acc_mean": 0.15995115995115994,
+  "fold_acc_std": 0.14653032117704715,
+  "n_folds_used": 63,
+  "fold_records": [
+    {
+      "fold_id": 0,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 1,
+      "n_samples": 13,
+      "acc": 0.3076923076923077
+    },
+    {
+      "fold_id": 2,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 3,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 4,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 5,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 6,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 7,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 8,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 9,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 10,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 11,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 12,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 13,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 14,
+      "n_samples": 13,
+      "acc": 0.46153846153846156
+    },
+    {
+      "fold_id": 15,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 16,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 17,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 18,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 19,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 20,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 21,
+      "n_samples": 13,
+      "acc": 0.3076923076923077
+    },
+    {
+      "fold_id": 22,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 23,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 24,
+      "n_samples": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 25,
+      "n_samples": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 26,
+      "n_samples": 13,
+      "acc": 0.3076923076923077
+    },
+    {
+      "fold_id": 27,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 28,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 29,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 30,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 31,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 32,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 33,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 34,
+      "n_samples": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 35,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 36,
+      "n_samples": 13,
+      "acc": 0.3076923076923077
+    },
+    {
+      "fold_id": 37,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 38,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 39,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 40,
+      "n_samples": 13,
+      "acc": 0.46153846153846156
+    },
+    {
+      "fold_id": 41,
+      "n_samples": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 42,
+      "n_samples": 13,
+      "acc": 0.5384615384615384
+    },
+    {
+      "fold_id": 43,
+      "n_samples": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 44,
+      "n_samples": 13,
+      "acc": 0.3076923076923077
+    },
+    {
+      "fold_id": 45,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 46,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 47,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 48,
+      "n_samples": 13,
+      "acc": 0.3076923076923077
+    },
+    {
+      "fold_id": 49,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 50,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 51,
+      "n_samples": 13,
+      "acc": 0.23076923076923078
+    },
+    {
+      "fold_id": 52,
+      "n_samples": 13,
+      "acc": 0.38461538461538464
+    },
+    {
+      "fold_id": 53,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 54,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 55,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 56,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 57,
+      "n_samples": 13,
+      "acc": 0.15384615384615385
+    },
+    {
+      "fold_id": 58,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 59,
+      "n_samples": 13,
+      "acc": 0.07692307692307693
+    },
+    {
+      "fold_id": 60,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 61,
+      "n_samples": 13,
+      "acc": 0.0
+    },
+    {
+      "fold_id": 62,
+      "n_samples": 9,
+      "acc": 0.0
+    }
+  ],
+  "monthly_predictions": [
+    {
+      "date": "2010-07-31",
+      "fold_id": 0,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.11500517961539802
+    },
+    {
+      "date": "2010-08-31",
+      "fold_id": 0,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.11593842795424902
+    },
+    {
+      "date": "2010-09-30",
+      "fold_id": 0,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.06911828360403627
+    },
+    {
+      "date": "2010-10-31",
+      "fold_id": 1,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.111681487209071
+    },
+    {
+      "date": "2010-11-30",
+      "fold_id": 1,
+      "pred_ticker": "SHY",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.0001413041227882328
+    },
+    {
+      "date": "2010-12-31",
+      "fold_id": 1,
+      "pred_ticker": "SHY",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.0025035939601079082
+    },
+    {
+      "date": "2011-01-31",
+      "fold_id": 2,
+      "pred_ticker": "GLD",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.0474230027983753
+    },
+    {
+      "date": "2011-02-28",
+      "fold_id": 2,
+      "pred_ticker": "SHY",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.0001303008443855891
+    },
+    {
+      "date": "2011-03-31",
+      "fold_id": 2,
+      "pred_ticker": "GLD",
+      "actual_ticker": "GLD",
+      "correct": 1,
+      "fwd_ret": 0.07543259692347637
+    },
+    {
+      "date": "2011-04-30",
+      "fold_id": 3,
+      "pred_ticker": "SHY",
+      "actual_ticker": "SHY",
+      "correct": 1,
+      "fwd_ret": 0.0037604936668218514
+    },
+    {
+      "date": "2011-05-31",
+      "fold_id": 3,
+      "pred_ticker": "SHY",
+      "actual_ticker": "SHY",
+      "correct": 1,
+      "fwd_ret": 0.0037506499916668545
+    },
+    {
+      "date": "2011-06-30",
+      "fold_id": 3,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.013138634410102545
+    },
+    {
+      "date": "2011-07-31",
+      "fold_id": 4,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.13824963999406925
+    },
+    {
+      "date": "2011-08-31",
+      "fold_id": 4,
+      "pred_ticker": "VGT",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.0412161507780312
+    },
+    {
+      "date": "2011-09-30",
+      "fold_id": 4,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.12933764654119484
+    },
+    {
+      "date": "2011-10-31",
+      "fold_id": 5,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.0027597934922043432
+    },
+    {
+      "date": "2011-11-30",
+      "fold_id": 5,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.02045319231601861
+    },
+    {
+      "date": "2011-12-31",
+      "fold_id": 5,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.11960479055105955
+    },
+    {
+      "date": "2012-01-31",
+      "fold_id": 6,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": 0.031322113623278636
+    },
+    {
+      "date": "2012-02-29",
+      "fold_id": 6,
+      "pred_ticker": "XLE",
+      "actual_ticker": "QQQ",
+      "correct": 0,
+      "fwd_ret": -0.04130657196888443
+    },
+    {
+      "date": "2012-03-31",
+      "fold_id": 6,
+      "pred_ticker": "XLE",
+      "actual_ticker": "XLE",
+      "correct": 1,
+      "fwd_ret": 0.007107739591059703
+    },
+    {
+      "date": "2012-04-30",
+      "fold_id": 7,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.08047379109479802
+    },
+    {
+      "date": "2012-05-31",
+      "fold_id": 7,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.07544674975590704
+    },
+    {
+      "date": "2012-06-30",
+      "fold_id": 7,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.0024847093826156907
+    },
+    {
+      "date": "2012-07-31",
+      "fold_id": 8,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": 0.06545180633090619
+    },
+    {
+      "date": "2012-08-31",
+      "fold_id": 8,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.04674427605656817
+    },
+    {
+      "date": "2012-09-30",
+      "fold_id": 8,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.02029145636460239
+    },
+    {
+      "date": "2012-10-31",
+      "fold_id": 9,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.002764802148409462
+    },
+    {
+      "date": "2012-11-30",
+      "fold_id": 9,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": -0.003099254436276677
+    },
+    {
+      "date": "2012-12-31",
+      "fold_id": 9,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.07808991278593691
+    },
+    {
+      "date": "2013-01-31",
+      "fold_id": 10,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.0098640781055499
+    },
+    {
+      "date": "2013-02-28",
+      "fold_id": 10,
+      "pred_ticker": "XLK",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.03035063582812647
+    },
+    {
+      "date": "2013-03-31",
+      "fold_id": 10,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.007923369155783622
+    },
+    {
+      "date": "2013-04-30",
+      "fold_id": 11,
+      "pred_ticker": "GLD",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": -0.055567394652625834
+    },
+    {
+      "date": "2013-05-31",
+      "fold_id": 11,
+      "pred_ticker": "SHY",
+      "actual_ticker": "SHY",
+      "correct": 1,
+      "fwd_ret": -0.00054475559848155
+    },
+    {
+      "date": "2013-06-30",
+      "fold_id": 11,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.06117555475164527
+    },
+    {
+      "date": "2013-07-31",
+      "fold_id": 12,
+      "pred_ticker": "SHY",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.0012087432315937008
+    },
+    {
+      "date": "2013-08-31",
+      "fold_id": 12,
+      "pred_ticker": "SHY",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.0019700269308589036
+    },
+    {
+      "date": "2013-09-30",
+      "fold_id": 12,
+      "pred_ticker": "SHY",
+      "actual_ticker": "XLK",
+      "correct": 0,
+      "fwd_ret": 0.0005691448241011976
+    },
+    {
+      "date": "2013-10-31",
+      "fold_id": 13,
+      "pred_ticker": "SHY",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": 0.0009356203114947448
+    },
+    {
+      "date": "2013-11-30",
+      "fold_id": 13,
+      "pred_ticker": "SHY",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": -0.0006980923946077189
+    },
+    {
+      "date": "2013-12-31",
+      "fold_id": 13,
+      "pred_ticker": "SHY",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.0020146856886036346
+    },
+    {
+      "date": "2014-01-31",
+      "fold_id": 14,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.07246636309911092
+    },
+    {
+      "date": "2014-02-28",
+      "fold_id": 14,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.016748795451108967
+    },
+    {
+      "date": "2014-03-31",
+      "fold_id": 14,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.013505980801315931
+    },
+    {
+      "date": "2014-04-30",
+      "fold_id": 15,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.05246938447295957
+    },
+    {
+      "date": "2014-05-31",
+      "fold_id": 15,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.027919672734092016
+    },
+    {
+      "date": "2014-06-30",
+      "fold_id": 15,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "XLK",
+      "correct": 0,
+      "fwd_ret": 0.0008425270889207415
+    },
+    {
+      "date": "2014-07-31",
+      "fold_id": 16,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.009549782856574929
+    },
+    {
+      "date": "2014-08-31",
+      "fold_id": 16,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.020871628724100644
+    },
+    {
+      "date": "2014-09-30",
+      "fold_id": 16,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": -0.00275649572708625
+    },
+    {
+      "date": "2014-10-31",
+      "fold_id": 17,
+      "pred_ticker": "VGT",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.04179735233032056
+    },
+    {
+      "date": "2014-11-30",
+      "fold_id": 17,
+      "pred_ticker": "VGT",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.006616380907313646
+    },
+    {
+      "date": "2014-12-31",
+      "fold_id": 17,
+      "pred_ticker": "VGT",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.02670368635095277
+    },
+    {
+      "date": "2015-01-31",
+      "fold_id": 18,
+      "pred_ticker": "VGT",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.07872434724350263
+    },
+    {
+      "date": "2015-02-28",
+      "fold_id": 18,
+      "pred_ticker": "VGT",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.035887062328885055
+    },
+    {
+      "date": "2015-03-31",
+      "fold_id": 18,
+      "pred_ticker": "XLK",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.046202169871062626
+    },
+    {
+      "date": "2015-04-30",
+      "fold_id": 19,
+      "pred_ticker": "VGT",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.010526927432654709
+    },
+    {
+      "date": "2015-05-31",
+      "fold_id": 19,
+      "pred_ticker": "VGT",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": -0.01669502251779198
+    },
+    {
+      "date": "2015-06-30",
+      "fold_id": 19,
+      "pred_ticker": "VGT",
+      "actual_ticker": "QQQ",
+      "correct": 0,
+      "fwd_ret": 0.017228322363906035
+    },
+    {
+      "date": "2015-07-31",
+      "fold_id": 20,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.09431385862220176
+    },
+    {
+      "date": "2015-08-31",
+      "fold_id": 20,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.010644773396624174
+    },
+    {
+      "date": "2015-09-30",
+      "fold_id": 20,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "QQQ",
+      "correct": 0,
+      "fwd_ret": 0.09047429242240246
+    },
+    {
+      "date": "2015-10-31",
+      "fold_id": 21,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.0032238490330256386
+    },
+    {
+      "date": "2015-11-30",
+      "fold_id": 21,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.014357771001119568
+    },
+    {
+      "date": "2015-12-31",
+      "fold_id": 21,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.10229301307074012
+    },
+    {
+      "date": "2016-01-31",
+      "fold_id": 22,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.0635598944011524
+    },
+    {
+      "date": "2016-02-29",
+      "fold_id": 22,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.07407674696940791
+    },
+    {
+      "date": "2016-03-31",
+      "fold_id": 22,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.04563709297873575
+    },
+    {
+      "date": "2016-04-30",
+      "fold_id": 23,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.02510144570222228
+    },
+    {
+      "date": "2016-05-31",
+      "fold_id": 23,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.01606002293030173
+    },
+    {
+      "date": "2016-06-30",
+      "fold_id": 23,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.12969782835964838
+    },
+    {
+      "date": "2016-07-31",
+      "fold_id": 24,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.030749881776936716
+    },
+    {
+      "date": "2016-08-31",
+      "fold_id": 24,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.022135119302460815
+    },
+    {
+      "date": "2016-09-30",
+      "fold_id": 24,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": -0.006279669926379072
+    },
+    {
+      "date": "2016-10-31",
+      "fold_id": 25,
+      "pred_ticker": "GLD",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.0911757690486047
+    },
+    {
+      "date": "2016-11-30",
+      "fold_id": 25,
+      "pred_ticker": "GLD",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.019149882681417818
+    },
+    {
+      "date": "2016-12-31",
+      "fold_id": 25,
+      "pred_ticker": "GLD",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.04769246615800804
+    },
+    {
+      "date": "2017-01-31",
+      "fold_id": 26,
+      "pred_ticker": "QQQ",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.03870656012230311
+    },
+    {
+      "date": "2017-02-28",
+      "fold_id": 26,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.007857112897944996
+    },
+    {
+      "date": "2017-03-31",
+      "fold_id": 26,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.030013279670936477
+    },
+    {
+      "date": "2017-04-30",
+      "fold_id": 27,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.04424309767155199
+    },
+    {
+      "date": "2017-05-31",
+      "fold_id": 27,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.05126423366825905
+    },
+    {
+      "date": "2017-06-30",
+      "fold_id": 27,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLK",
+      "correct": 0,
+      "fwd_ret": 0.04263328826969137
+    },
+    {
+      "date": "2017-07-31",
+      "fold_id": 28,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.02456950472674313
+    },
+    {
+      "date": "2017-08-31",
+      "fold_id": 28,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.06221821543328199
+    },
+    {
+      "date": "2017-09-30",
+      "fold_id": 28,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.0870172896849486
+    },
+    {
+      "date": "2017-10-31",
+      "fold_id": 29,
+      "pred_ticker": "IGV",
+      "actual_ticker": "QQQ",
+      "correct": 0,
+      "fwd_ret": -0.003148756508023154
+    },
+    {
+      "date": "2017-11-30",
+      "fold_id": 29,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.01262944302490876
+    },
+    {
+      "date": "2017-12-31",
+      "fold_id": 29,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.08633177434436168
+    },
+    {
+      "date": "2018-01-31",
+      "fold_id": 30,
+      "pred_ticker": "IGV",
+      "actual_ticker": "IGV",
+      "correct": 1,
+      "fwd_ret": 0.006548300672195806
+    },
+    {
+      "date": "2018-02-28",
+      "fold_id": 30,
+      "pred_ticker": "IGV",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.028989855687342914
+    },
+    {
+      "date": "2018-03-31",
+      "fold_id": 30,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.024764206172691594
+    },
+    {
+      "date": "2018-04-30",
+      "fold_id": 31,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.07172172220695328
+    },
+    {
+      "date": "2018-05-31",
+      "fold_id": 31,
+      "pred_ticker": "IGV",
+      "actual_ticker": "QQQ",
+      "correct": 0,
+      "fwd_ret": -0.0012671742298370203
+    },
+    {
+      "date": "2018-06-30",
+      "fold_id": 31,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.016103504375214017
+    },
+    {
+      "date": "2018-07-31",
+      "fold_id": 32,
+      "pred_ticker": "IGV",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": 0.016582005974507652
+    },
+    {
+      "date": "2018-08-31",
+      "fold_id": 32,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.016962775107330685
+    },
+    {
+      "date": "2018-09-30",
+      "fold_id": 32,
+      "pred_ticker": "IGV",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.14138645329268684
+    },
+    {
+      "date": "2018-10-31",
+      "fold_id": 33,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.009559259551812138
+    },
+    {
+      "date": "2018-11-30",
+      "fold_id": 33,
+      "pred_ticker": "IGV",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.09831099536808185
+    },
+    {
+      "date": "2018-12-31",
+      "fold_id": 33,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.10663604937980353
+    },
+    {
+      "date": "2019-01-31",
+      "fold_id": 34,
+      "pred_ticker": "XLE",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.057945341555944996
+    },
+    {
+      "date": "2019-02-28",
+      "fold_id": 34,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLK",
+      "correct": 0,
+      "fwd_ret": 0.009303175996612456
+    },
+    {
+      "date": "2019-03-31",
+      "fold_id": 34,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.11679174393416591
+    },
+    {
+      "date": "2019-04-30",
+      "fold_id": 35,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.04096423394793225
+    },
+    {
+      "date": "2019-05-31",
+      "fold_id": 35,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.13990793591984163
+    },
+    {
+      "date": "2019-06-30",
+      "fold_id": 35,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.0006311314157492198
+    },
+    {
+      "date": "2019-07-31",
+      "fold_id": 36,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.0839525444439414
+    },
+    {
+      "date": "2019-08-31",
+      "fold_id": 36,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.027539724014189915
+    },
+    {
+      "date": "2019-09-30",
+      "fold_id": 36,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.06622182375962749
+    },
+    {
+      "date": "2019-10-31",
+      "fold_id": 37,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.01724343321733901
+    },
+    {
+      "date": "2019-11-30",
+      "fold_id": 37,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.07818950713962769
+    },
+    {
+      "date": "2019-12-31",
+      "fold_id": 37,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.039926033557412755
+    },
+    {
+      "date": "2020-01-31",
+      "fold_id": 38,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.11715237932660949
+    },
+    {
+      "date": "2020-02-29",
+      "fold_id": 38,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.10131210562854742
+    },
+    {
+      "date": "2020-03-31",
+      "fold_id": 38,
+      "pred_ticker": "VGT",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.16430546066099994
+    },
+    {
+      "date": "2020-04-30",
+      "fold_id": 39,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.05576121674907886
+    },
+    {
+      "date": "2020-05-31",
+      "fold_id": 39,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.06253694277639421
+    },
+    {
+      "date": "2020-06-30",
+      "fold_id": 39,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.08597637216635423
+    },
+    {
+      "date": "2020-07-31",
+      "fold_id": 40,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "XLK",
+      "correct": 0,
+      "fwd_ret": 0.09151568718641356
+    },
+    {
+      "date": "2020-08-31",
+      "fold_id": 40,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.0033989674030840966
+    },
+    {
+      "date": "2020-09-30",
+      "fold_id": 40,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.016414319045535253
+    },
+    {
+      "date": "2020-10-31",
+      "fold_id": 41,
+      "pred_ticker": "XLK",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.047745708456222946
+    },
+    {
+      "date": "2020-11-30",
+      "fold_id": 41,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.06251003772353059
+    },
+    {
+      "date": "2020-12-31",
+      "fold_id": 41,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.09045847964411835
+    },
+    {
+      "date": "2021-01-31",
+      "fold_id": 42,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.020578349989743838
+    },
+    {
+      "date": "2021-02-28",
+      "fold_id": 42,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "SOXX",
+      "correct": 1,
+      "fwd_ret": 0.03558239124813589
+    },
+    {
+      "date": "2021-03-31",
+      "fold_id": 42,
+      "pred_ticker": "IGV",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.018537657331441304
+    },
+    {
+      "date": "2021-04-30",
+      "fold_id": 43,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.03433309414364316
+    },
+    {
+      "date": "2021-05-31",
+      "fold_id": 43,
+      "pred_ticker": "IGV",
+      "actual_ticker": "IGV",
+      "correct": 1,
+      "fwd_ret": 0.09315270501179929
+    },
+    {
+      "date": "2021-06-30",
+      "fold_id": 43,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLK",
+      "correct": 0,
+      "fwd_ret": 0.03368878633252814
+    },
+    {
+      "date": "2021-07-31",
+      "fold_id": 44,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.032475925662920124
+    },
+    {
+      "date": "2021-08-31",
+      "fold_id": 44,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.04615901884197271
+    },
+    {
+      "date": "2021-09-30",
+      "fold_id": 44,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.10001491164848275
+    },
+    {
+      "date": "2021-10-31",
+      "fold_id": 45,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.027701651410643957
+    },
+    {
+      "date": "2021-11-30",
+      "fold_id": 45,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLK",
+      "correct": 0,
+      "fwd_ret": 0.0010320962137262413
+    },
+    {
+      "date": "2021-12-31",
+      "fold_id": 45,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.11531071264217463
+    },
+    {
+      "date": "2022-01-31",
+      "fold_id": 46,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.02845263264357789
+    },
+    {
+      "date": "2022-02-28",
+      "fold_id": 46,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.006099996946141717
+    },
+    {
+      "date": "2022-03-31",
+      "fold_id": 46,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.11401972013098083
+    },
+    {
+      "date": "2022-04-30",
+      "fold_id": 47,
+      "pred_ticker": "IGV",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.0601666386879508
+    },
+    {
+      "date": "2022-05-31",
+      "fold_id": 47,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": -0.005430175366858081
+    },
+    {
+      "date": "2022-06-30",
+      "fold_id": 47,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.12149750083494393
+    },
+    {
+      "date": "2022-07-31",
+      "fold_id": 48,
+      "pred_ticker": "XLE",
+      "actual_ticker": "XLE",
+      "correct": 1,
+      "fwd_ret": 0.12148784780035937
+    },
+    {
+      "date": "2022-08-31",
+      "fold_id": 48,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SHY",
+      "correct": 0,
+      "fwd_ret": -0.11967147312228998
+    },
+    {
+      "date": "2022-09-30",
+      "fold_id": 48,
+      "pred_ticker": "XLE",
+      "actual_ticker": "XLE",
+      "correct": 1,
+      "fwd_ret": 0.2293391003202352
+    },
+    {
+      "date": "2022-10-31",
+      "fold_id": 49,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.0002201935851277037
+    },
+    {
+      "date": "2022-11-30",
+      "fold_id": 49,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.030489524272335866
+    },
+    {
+      "date": "2022-12-31",
+      "fold_id": 49,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.03462959705069801
+    },
+    {
+      "date": "2023-01-31",
+      "fold_id": 50,
+      "pred_ticker": "XLE",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": -0.08806784959546243
+    },
+    {
+      "date": "2023-02-28",
+      "fold_id": 50,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.05055244009183135
+    },
+    {
+      "date": "2023-03-31",
+      "fold_id": 50,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.02800912008449785
+    },
+    {
+      "date": "2023-04-30",
+      "fold_id": 51,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.053273990290254036
+    },
+    {
+      "date": "2023-05-31",
+      "fold_id": 51,
+      "pred_ticker": "XLE",
+      "actual_ticker": "XLE",
+      "correct": 1,
+      "fwd_ret": 0.058507074329496644
+    },
+    {
+      "date": "2023-06-30",
+      "fold_id": 51,
+      "pred_ticker": "XLE",
+      "actual_ticker": "XLE",
+      "correct": 1,
+      "fwd_ret": 0.07268684858873864
+    },
+    {
+      "date": "2023-07-31",
+      "fold_id": 52,
+      "pred_ticker": "XLE",
+      "actual_ticker": "XLE",
+      "correct": 1,
+      "fwd_ret": 0.007081462177894293
+    },
+    {
+      "date": "2023-08-31",
+      "fold_id": 52,
+      "pred_ticker": "XLE",
+      "actual_ticker": "XLE",
+      "correct": 1,
+      "fwd_ret": 0.024724537398501
+    },
+    {
+      "date": "2023-09-30",
+      "fold_id": 52,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.08260156243129979
+    },
+    {
+      "date": "2023-10-31",
+      "fold_id": 53,
+      "pred_ticker": "XLE",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.0003529627983638317
+    },
+    {
+      "date": "2023-11-30",
+      "fold_id": 53,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.014547042385113063
+    },
+    {
+      "date": "2023-12-31",
+      "fold_id": 53,
+      "pred_ticker": "XLK",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.02701564063828621
+    },
+    {
+      "date": "2024-01-31",
+      "fold_id": 54,
+      "pred_ticker": "XLK",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.019430003515333194
+    },
+    {
+      "date": "2024-02-29",
+      "fold_id": 54,
+      "pred_ticker": "XLK",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": 0.012228953524387576
+    },
+    {
+      "date": "2024-03-31",
+      "fold_id": 54,
+      "pred_ticker": "XLK",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.050306822573515375
+    },
+    {
+      "date": "2024-04-30",
+      "fold_id": 55,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.05443429091830354
+    },
+    {
+      "date": "2024-05-31",
+      "fold_id": 55,
+      "pred_ticker": "XLE",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": -0.014358069118431516
+    },
+    {
+      "date": "2024-06-30",
+      "fold_id": 55,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.022039493618924322
+    },
+    {
+      "date": "2024-07-31",
+      "fold_id": 56,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.010738797066036976
+    },
+    {
+      "date": "2024-08-31",
+      "fold_id": 56,
+      "pred_ticker": "IGV",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.007834104622903126
+    },
+    {
+      "date": "2024-09-30",
+      "fold_id": 56,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.0004556219732103628
+    },
+    {
+      "date": "2024-10-31",
+      "fold_id": 57,
+      "pred_ticker": "XLE",
+      "actual_ticker": "IGV",
+      "correct": 0,
+      "fwd_ret": 0.07361137018892494
+    },
+    {
+      "date": "2024-11-30",
+      "fold_id": 57,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.07546523658876536
+    },
+    {
+      "date": "2024-12-31",
+      "fold_id": 57,
+      "pred_ticker": "XLE",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": 0.029535319678771765
+    },
+    {
+      "date": "2025-01-31",
+      "fold_id": 58,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.02733460115179498
+    },
+    {
+      "date": "2025-02-28",
+      "fold_id": 58,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.07955576531223785
+    },
+    {
+      "date": "2025-03-31",
+      "fold_id": 58,
+      "pred_ticker": "SOXX",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.051809225325366026
+    },
+    {
+      "date": "2025-04-30",
+      "fold_id": 59,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.015909342193737852
+    },
+    {
+      "date": "2025-05-31",
+      "fold_id": 59,
+      "pred_ticker": "XLE",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.04531531853206028
+    },
+    {
+      "date": "2025-06-30",
+      "fold_id": 59,
+      "pred_ticker": "IGV",
+      "actual_ticker": "VGT",
+      "correct": 0,
+      "fwd_ret": 0.045652834291485256
+    },
+    {
+      "date": "2025-07-31",
+      "fold_id": 60,
+      "pred_ticker": "IGV",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.055900050603542084
+    },
+    {
+      "date": "2025-08-31",
+      "fold_id": 60,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.07271374378533624
+    },
+    {
+      "date": "2025-09-30",
+      "fold_id": 60,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.001825920185827945
+    },
+    {
+      "date": "2025-10-31",
+      "fold_id": 61,
+      "pred_ticker": "IGV",
+      "actual_ticker": "GLD",
+      "correct": 0,
+      "fwd_ret": -0.07796021504738204
+    },
+    {
+      "date": "2025-11-30",
+      "fold_id": 61,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": 0.05869118461290812
+    },
+    {
+      "date": "2025-12-31",
+      "fold_id": 61,
+      "pred_ticker": "IGV",
+      "actual_ticker": "SOXX",
+      "correct": 0,
+      "fwd_ret": -0.1529946581967805
+    },
+    {
+      "date": "2026-01-31",
+      "fold_id": 62,
+      "pred_ticker": "GLD",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.021857808176879545
+    },
+    {
+      "date": "2026-02-28",
+      "fold_id": 62,
+      "pred_ticker": "GLD",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.13148194130600888
+    },
+    {
+      "date": "2026-03-31",
+      "fold_id": 62,
+      "pred_ticker": "GLD",
+      "actual_ticker": "XLE",
+      "correct": 0,
+      "fwd_ret": -0.08255210045103667
+    }
+  ]
+}

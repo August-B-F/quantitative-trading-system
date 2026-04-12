@@ -1,0 +1,847 @@
+core:
+- returns_12_1_mom__DBC
+- inflation_features__cpi_mom
+- atr_14d__DBC
+- vol_42d__XLV
+- returns_12_1_mom__XLE
+- vol_42d__XLI
+- quality_52w_high_ratio__XLE
+- quality_52w_high_ratio__IWM
+- vol_42d__SOXX
+- cross_asset_oil_gold__oil_gold_ratio
+- consumer_features__consumer_credit_yoy
+- vol_42d__TLT
+- vol_21d__XLI
+- vol_63d__TLT
+- quality_dist_sma200__XLE
+- inflation_features__breakeven_10y
+- vol_63d__SOXX
+- vol_63d__XLV
+- activity_features__capacity_utilization
+- atr_14d__XLE
+- returns_126d__XLE
+- vol_42d__QQQ
+- positioning_margin_debt_per_spy_px__margin_debt_per_spy_px
+- vol_21d__XLV
+- quality_52w_high_ratio__XLI
+- activity_features__oecd_cli
+- vol_21d__IWM
+- volume_trend_21_63__SOXX
+- activity_features__initial_claims_4wma
+- regime_growth_inflation__regime_lg_hi_stagflation
+- quality_golden_cross__DBC
+- vol_features__vix
+- vol_21d__SOXX
+- vol_21d__TLT
+- returns_126d__XLV
+- quality_voladj_mom_126d__XLE
+- vol_42d__XLE
+- atr_14d__SPY
+- cross_asset_eem_spy__eem_minus_spy_63d
+- quality_voladj_mom_126d__XLV
+- inflation_features__cpi_yoy
+- returns_42d__XLV
+- quality_52w_high_ratio__XLV
+- activity_features__ism_pmi
+- vol_63d__QQQ
+- activity_rail_traffic__rail_traffic_ma4w
+- cross_sectional_mom_rank_126d__GLD
+- inflation_features__breakeven_5y
+- quality_voladj_mom_126d__SHY
+- returns_126d__AGG
+extended:
+- experimental_github_commits__github_nvidia_ma4w
+- activity_tsa_passengers__tsa_passengers_ma7
+- experimental_github_commits__github_apple_trend
+- experimental_github_commits__github_amd_trend
+- wikipedia_bear_market__wiki_bear_market_ma21
+- experimental_github_commits__github_microsoft_ma4w
+- experimental_github_commits__github_meta_trend
+- sia_semi_yoy
+- wikipedia_stock_market_crash__wiki_stock_market_crash_ma21
+- wikipedia_bear_market__wiki_bear_market_trend
+- wikipedia_quantitative_easing__wiki_quantitative_easing_ma21
+- returns_12_1_mom__DBC
+- inflation_features__cpi_mom
+- atr_14d__DBC
+- gtrends_unemployment__gtrends_unemployment_ma4w
+- vol_42d__XLV
+- returns_12_1_mom__XLE
+- vol_42d__XLI
+- wikipedia_quantitative_easing__wiki_quantitative_easing_trend
+- quality_52w_high_ratio__XLE
+- quality_52w_high_ratio__IWM
+- vol_42d__SOXX
+- activity_port_la__port_la_teu_yoy
+- cross_asset_oil_gold__oil_gold_ratio
+- consumer_features__consumer_credit_yoy
+- news_energy_sent_accel
+- gtrends_bear_market__gtrends_bear_market_ma4w
+- vol_42d__TLT
+- vol_21d__XLI
+- experimental_github_commits__github_amd_ma4w
+- vol_63d__TLT
+- quality_dist_sma200__XLE
+- inflation_features__breakeven_10y
+- vol_63d__SOXX
+- vol_63d__XLV
+- gtrends_bull_market__gtrends_bull_market_ma4w
+- activity_features__capacity_utilization
+- experimental_github_commits__github_meta_ma4w
+- atr_14d__XLE
+- gtrends_unemployment__gtrends_unemployment_accel
+- returns_126d__XLE
+- news_recession_sent_63d_ma
+- vol_42d__QQQ
+- news_div_XLE_energy
+- positioning_margin_debt_per_spy_px__margin_debt_per_spy_px
+- vol_21d__XLV
+- quality_52w_high_ratio__XLI
+- activity_features__oecd_cli
+- vol_21d__IWM
+- volume_trend_21_63__SOXX
+- activity_features__initial_claims_4wma
+- wikipedia_federal_reserve__wiki_federal_reserve_ma21
+- regime_growth_inflation__regime_lg_hi_stagflation
+- quality_golden_cross__DBC
+- vol_features__vix
+- vol_21d__SOXX
+- vol_21d__TLT
+- wikipedia_short_selling__wiki_short_selling_trend
+- returns_126d__XLV
+- quality_voladj_mom_126d__XLE
+- vol_42d__XLE
+- atr_14d__SPY
+- news_energy_sent_21d_ma
+- gtrends_recession__gtrends_recession_ma4w
+- cross_asset_eem_spy__eem_minus_spy_63d
+- quality_voladj_mom_126d__XLV
+- inflation_features__cpi_yoy
+- returns_42d__XLV
+- quality_52w_high_ratio__XLV
+- activity_features__ism_pmi
+- vol_63d__QQQ
+- activity_rail_traffic__rail_traffic_ma4w
+- cross_sectional_mom_rank_126d__GLD
+- inflation_features__breakeven_5y
+- quality_voladj_mom_126d__SHY
+- wikipedia_bank_run__wiki_bank_run_trend
+- returns_126d__AGG
+- wikipedia_quantitative_easing__wiki_quantitative_easing_spike
+- wikipedia_stagflation__wiki_stagflation_trend
+- wikipedia_semiconductor__wiki_semiconductor_ma21
+- gtrends_inflation__gtrends_inflation_accel
+- returns_63d__XLV
+- experimental_baltic_dry__baltic_dry
+- wikipedia_oil_crisis__wiki_oil_crisis_trend
+- atr_14d__EEM
+- gtrends_bull_market__gtrends_bull_market_accel
+- quality_dist_sma200__AGG
+- gtrends_interest_rates__gtrends_interest_rates_ma4w
+- mom63_when_cpi_cool__QQQ
+- relative_strength_126d__GLD
+- positioning_cot_sp500_mm_net_z52w__cot_sp500_mm_net_z52w
+- quality_voladj_mom_126d__IWM
+- mom63_when_cpi_cool__SHY
+- credit_features__nfci_chg21
+- quality_dist_sma200__IWM
+- quality_voladj_mom_63d__QQQ
+- quality_rsi_28d__SHY
+- sp500_pe
+- credit_features__ted_spread
+- quality_52w_high_ratio__SPY
+- quality_voladj_mom_42d__XLV
+- returns_126d__IWM
+- consumer_features__personal_savings_rate
+- positioning_short_volume_ratio_21d__short_volume_ratio_21d
+- returns_126d__SHY
+- gtrends_layoffs__gtrends_layoffs_accel
+- inflation_features__disinflation_flag
+- experimental_github_commits__github_nvidia_trend
+- quality_dist_sma200__XLV
+- cross_asset_oil_gold__oil_gold_chg_63d
+- cross_sectional_mom_zscore_63d__QQQ
+- inflation_features__cpi_yoy_3m_trend
+- relative_strength_126d__XLE
+- mom63_when_cpi_cool__XLE
+- vol_21d__IGV
+- quality_voladj_mom_63d__XLV
+- returns_42d__IWM
+- vol_21d__QQQ
+- quality_mom_accel__XLV
+- mom63_x_aaii_spread__GLD
+minimal:
+- returns_63d__SOXX
+- returns_63d__QQQ
+- returns_63d__XLK
+- returns_63d__VGT
+- returns_63d__IGV
+- returns_63d__XLE
+- returns_63d__GLD
+- returns_63d__SHY
+- vol_features__vix
+- yield_curve_features__yc_slope_10y_2y
+- credit_features__hy_ig_spread
+- cross_sectional_dispersion_63d__dispersion
+- momentum_spreads_63d__soxx_minus_xle_63d
+drop_log:
+- dropped: quality_drawdown_252d__QQQ
+  kept: quality_52w_high_ratio__QQQ
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__VGT
+  kept: quality_52w_high_ratio__VGT
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__XLE
+  kept: quality_52w_high_ratio__XLE
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__GLD
+  kept: quality_52w_high_ratio__GLD
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__SHY
+  kept: quality_52w_high_ratio__SHY
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__SPY
+  kept: quality_52w_high_ratio__SPY
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__XLI
+  kept: quality_52w_high_ratio__XLI
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__IWM
+  kept: quality_52w_high_ratio__IWM
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: momentum_spreads_63d__spy_minus_gld_63d
+  kept: relative_strength_63d__GLD
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: vol_features__vix_regime_low
+  kept: regime_vix__vix_regime_low
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5855 vs 5855)'
+- dropped: vol_features__vix_regime_medium
+  kept: regime_vix__vix_regime_medium
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5855 vs 5855)'
+- dropped: vol_features__vix_regime_high
+  kept: regime_vix__vix_regime_high
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5855 vs 5855)'
+- dropped: vol_features__vix_regime_extreme
+  kept: regime_vix__vix_regime_extreme
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5855 vs 5855)'
+- dropped: momentum_spreads_63d__spy_minus_eem_63d
+  kept: cross_asset_eem_spy__eem_minus_spy_63d
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: gtrends_gold_buy__gtrends_gold_buy_raw
+  kept: gtrends_buy_gold__gtrends_buy_gold_raw
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (2081 vs 2081)'
+- dropped: gtrends_gold_buy__gtrends_gold_buy_ma4w
+  kept: gtrends_buy_gold__gtrends_buy_gold_ma4w
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (4087 vs 4087)'
+- dropped: gtrends_gold_buy__gtrends_gold_buy_accel
+  kept: gtrends_buy_gold__gtrends_buy_gold_accel
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (4063 vs 4063)'
+- dropped: timing__is_sp_rebalance_week
+  kept: timing__is_quad_witching_week
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5784 vs 5784)'
+- dropped: quality_drawdown_252d__EEM
+  kept: quality_52w_high_ratio__EEM
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__XLK
+  kept: quality_52w_high_ratio__XLK
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__IGV
+  kept: quality_52w_high_ratio__IGV
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__XLV
+  kept: quality_52w_high_ratio__XLV
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__DBC
+  kept: quality_52w_high_ratio__DBC
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (4824 vs 4824)'
+- dropped: quality_drawdown_252d__XLF
+  kept: quality_52w_high_ratio__XLF
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__SOXX
+  kept: quality_52w_high_ratio__SOXX
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__TLT
+  kept: quality_52w_high_ratio__TLT
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: quality_drawdown_252d__AGG
+  kept: quality_52w_high_ratio__AGG
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: atr_21d__SHY
+  kept: atr_14d__SHY
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__AGG
+  kept: atr_14d__AGG
+  corr: 1.0
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__TLT
+  kept: atr_14d__TLT
+  corr: 0.9997
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__XLF
+  kept: atr_14d__XLF
+  corr: 0.9997
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__XLE
+  kept: atr_14d__XLE
+  corr: 0.9995
+  reason: '|corr|=1.000 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__EEM
+  kept: atr_14d__EEM
+  corr: 0.9995
+  reason: '|corr|=0.999 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__DBC
+  kept: atr_14d__DBC
+  corr: 0.9992
+  reason: '|corr|=0.999 >= 0.95, kept longer/equal history (5062 vs 5055)'
+- dropped: atr_21d__XLV
+  kept: atr_14d__XLV
+  corr: 0.9989
+  reason: '|corr|=0.999 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__XLI
+  kept: atr_14d__XLI
+  corr: 0.9987
+  reason: '|corr|=0.999 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__SPY
+  kept: atr_14d__SPY
+  corr: 0.9987
+  reason: '|corr|=0.999 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_21d__IWM
+  kept: atr_14d__IWM
+  corr: 0.9979
+  reason: '|corr|=0.998 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: mom63_when_yc_inverted__VGT
+  kept: mom63_when_yc_inverted__XLK
+  corr: 0.9965
+  reason: '|corr|=0.997 >= 0.95, kept longer/equal history (5351 vs 5351)'
+- dropped: mom63_when_cpi_hot__VGT
+  kept: mom63_when_cpi_hot__XLK
+  corr: 0.9944
+  reason: '|corr|=0.994 >= 0.95, kept longer/equal history (5351 vs 5351)'
+- dropped: vol_63d__VGT
+  kept: vol_63d__XLK
+  corr: 0.9943
+  reason: '|corr|=0.994 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: quality_52w_high_ratio__VGT
+  kept: quality_52w_high_ratio__XLK
+  corr: 0.9942
+  reason: '|corr|=0.994 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: vol_42d__VGT
+  kept: vol_42d__XLK
+  corr: 0.9938
+  reason: '|corr|=0.994 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: returns_63d__SPY
+  kept: relative_strength_63d__SHY
+  corr: 0.9937
+  reason: '|corr|=0.994 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: mom63_x_aaii_spread__VGT
+  kept: mom63_x_aaii_spread__XLK
+  corr: 0.9924
+  reason: '|corr|=0.992 >= 0.95, kept longer/equal history (4722 vs 4722)'
+- dropped: vol_21d__VGT
+  kept: vol_21d__XLK
+  corr: 0.9924
+  reason: '|corr|=0.992 >= 0.95, kept longer/equal history (5329 vs 5329)'
+- dropped: returns_126d__SPY
+  kept: relative_strength_126d__SHY
+  corr: 0.9918
+  reason: '|corr|=0.992 >= 0.95, kept longer/equal history (5224 vs 5224)'
+- dropped: mom63_x_pcr_total_z__VGT
+  kept: mom63_x_pcr_total_z__XLK
+  corr: 0.9918
+  reason: '|corr|=0.992 >= 0.95, kept longer/equal history (3656 vs 3656)'
+- dropped: mom63_when_yc_normal__VGT
+  kept: mom63_when_yc_normal__XLK
+  corr: 0.9914
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: quality_dist_sma50__VGT
+  kept: quality_dist_sma50__XLK
+  corr: 0.9912
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5301 vs 5301)'
+- dropped: returns_21d__VGT
+  kept: returns_21d__XLK
+  corr: 0.9912
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5329 vs 5329)'
+- dropped: returns_42d__VGT
+  kept: returns_42d__XLK
+  corr: 0.9911
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: quality_mom_accel__VGT
+  kept: quality_mom_accel__XLK
+  corr: 0.9911
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: returns_10d__VGT
+  kept: returns_10d__XLK
+  corr: 0.9911
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5340 vs 5340)'
+- dropped: returns_63d__VGT
+  kept: returns_63d__XLK
+  corr: 0.991
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: positioning_cot_ust10y_mm_net__cot_ust10y_mm_net
+  kept: positioning_cot_ust10y_comm_vs_spec__cot_ust10y_comm_vs_spec
+  corr: 0.9907
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (3952 vs 3952)'
+- dropped: returns_5d__VGT
+  kept: returns_5d__XLK
+  corr: 0.9906
+  reason: '|corr|=0.991 >= 0.95, kept longer/equal history (5345 vs 5345)'
+- dropped: mom63_when_cpi_cool__VGT
+  kept: mom63_when_cpi_cool__XLK
+  corr: 0.9901
+  reason: '|corr|=0.990 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: quality_dist_sma200__VGT
+  kept: quality_dist_sma200__XLK
+  corr: 0.9897
+  reason: '|corr|=0.990 >= 0.95, kept longer/equal history (5151 vs 5151)'
+- dropped: returns_126d__VGT
+  kept: returns_126d__XLK
+  corr: 0.9892
+  reason: '|corr|=0.989 >= 0.95, kept longer/equal history (5224 vs 5224)'
+- dropped: mom63_x_vix_regime__VGT
+  kept: mom63_x_vix_regime__XLK
+  corr: 0.9892
+  reason: '|corr|=0.989 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: gtrends_bankruptcy__gtrends_bankruptcy_raw
+  kept: gtrends_bankruptcy__gtrends_bankruptcy_ma4w
+  corr: 0.9887
+  reason: '|corr|=0.989 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: quality_rsi_28d__VGT
+  kept: quality_rsi_28d__XLK
+  corr: 0.9883
+  reason: '|corr|=0.988 >= 0.95, kept longer/equal history (5322 vs 5322)'
+- dropped: atr_21d__IGV
+  kept: atr_14d__IGV
+  corr: 0.9879
+  reason: '|corr|=0.988 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: returns_12_1_mom__VGT
+  kept: returns_12_1_mom__XLK
+  corr: 0.9878
+  reason: '|corr|=0.988 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: returns_252d__VGT
+  kept: returns_252d__XLK
+  corr: 0.9878
+  reason: '|corr|=0.988 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: returns_252d__SHY
+  kept: returns_12_1_mom__SHY
+  corr: 0.9873
+  reason: '|corr|=0.987 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: quality_rsi_14d__VGT
+  kept: quality_rsi_14d__XLK
+  corr: 0.9872
+  reason: '|corr|=0.987 >= 0.95, kept longer/equal history (5336 vs 5336)'
+- dropped: atr_21d__SOXX
+  kept: atr_14d__SOXX
+  corr: 0.987
+  reason: '|corr|=0.987 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: quality_voladj_mom_63d__VGT
+  kept: quality_voladj_mom_63d__XLK
+  corr: 0.987
+  reason: '|corr|=0.987 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: quality_voladj_mom_42d__VGT
+  kept: quality_voladj_mom_42d__XLK
+  corr: 0.987
+  reason: '|corr|=0.987 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: quality_52w_high_ratio__XLK
+  kept: quality_52w_high_ratio__QQQ
+  corr: 0.9869
+  reason: '|corr|=0.987 >= 0.95, kept longer/equal history (5099 vs 5099)'
+- dropped: intraday_range_21d__XLK
+  kept: intraday_range_21d__QQQ
+  corr: 0.9865
+  reason: '|corr|=0.987 >= 0.95, kept longer/equal history (5330 vs 5330)'
+- dropped: mom63_when_yc_inverted__XLK
+  kept: mom63_when_yc_inverted__QQQ
+  corr: 0.9862
+  reason: '|corr|=0.986 >= 0.95, kept longer/equal history (5351 vs 5351)'
+- dropped: quality_voladj_mom_21d__VGT
+  kept: quality_voladj_mom_21d__XLK
+  corr: 0.9853
+  reason: '|corr|=0.985 >= 0.95, kept longer/equal history (5329 vs 5329)'
+- dropped: quality_voladj_mom_126d__VGT
+  kept: quality_voladj_mom_126d__XLK
+  corr: 0.985
+  reason: '|corr|=0.985 >= 0.95, kept longer/equal history (5224 vs 5224)'
+- dropped: quality_bb_position__VGT
+  kept: quality_bb_position__XLK
+  corr: 0.9846
+  reason: '|corr|=0.985 >= 0.95, kept longer/equal history (5330 vs 5330)'
+- dropped: mom63_when_cpi_hot__XLK
+  kept: mom63_when_cpi_hot__QQQ
+  corr: 0.9846
+  reason: '|corr|=0.985 >= 0.95, kept longer/equal history (5351 vs 5351)'
+- dropped: gtrends_inflation__gtrends_inflation_raw
+  kept: gtrends_inflation__gtrends_inflation_ma4w
+  corr: 0.9834
+  reason: '|corr|=0.983 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: intraday_range_21d__XLI
+  kept: intraday_range_21d__SPY
+  corr: 0.9829
+  reason: '|corr|=0.983 >= 0.95, kept longer/equal history (5330 vs 5330)'
+- dropped: consumer_features__cb_consumer_conf
+  kept: consumer_features__umich_sentiment
+  corr: 0.9825
+  reason: '|corr|=0.983 >= 0.95, kept longer/equal history (5855 vs 5855)'
+- dropped: vol_63d__XLK
+  kept: vol_63d__QQQ
+  corr: 0.9816
+  reason: '|corr|=0.982 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: mom63_x_aaii_spread__XLK
+  kept: mom63_x_aaii_spread__QQQ
+  corr: 0.9813
+  reason: '|corr|=0.981 >= 0.95, kept longer/equal history (4722 vs 4722)'
+- dropped: mom63_x_pcr_total_z__XLK
+  kept: mom63_x_pcr_total_z__QQQ
+  corr: 0.9809
+  reason: '|corr|=0.981 >= 0.95, kept longer/equal history (3656 vs 3656)'
+- dropped: atr_21d__QQQ
+  kept: atr_14d__QQQ
+  corr: 0.9809
+  reason: '|corr|=0.981 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: vol_42d__XLK
+  kept: vol_42d__QQQ
+  corr: 0.9808
+  reason: '|corr|=0.981 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: atr_21d__VGT
+  kept: atr_14d__VGT
+  corr: 0.9806
+  reason: '|corr|=0.981 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: atr_14d__XLI
+  kept: atr_14d__SPY
+  corr: 0.9794
+  reason: '|corr|=0.979 >= 0.95, kept longer/equal history (5337 vs 5337)'
+- dropped: atr_21d__GLD
+  kept: atr_14d__GLD
+  corr: 0.9781
+  reason: '|corr|=0.978 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: vol_21d__XLK
+  kept: vol_21d__QQQ
+  corr: 0.978
+  reason: '|corr|=0.978 >= 0.95, kept longer/equal history (5329 vs 5329)'
+- dropped: mom63_when_yc_normal__XLK
+  kept: mom63_when_yc_normal__QQQ
+  corr: 0.9775
+  reason: '|corr|=0.977 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: gtrends_semiconductor_shortage__gtrends_semiconductor_shortage_raw
+  kept: gtrends_semiconductor_shortage__gtrends_semiconductor_shortage_ma4w
+  corr: 0.977
+  reason: '|corr|=0.977 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: atr_14d__AGG
+  kept: atr_14d__SHY
+  corr: 0.9762
+  reason: '|corr|=0.976 >= 0.95, kept longer/equal history (5337 vs 5337)'
+- dropped: gtrends_ai_stocks__gtrends_ai_stocks_raw
+  kept: gtrends_ai_stocks__gtrends_ai_stocks_ma4w
+  corr: 0.9762
+  reason: '|corr|=0.976 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: vol_63d__XLF
+  kept: vol_42d__XLF
+  corr: 0.9758
+  reason: '|corr|=0.976 >= 0.95, kept longer/equal history (5308 vs 5287)'
+- dropped: gtrends_housing_crash__gtrends_housing_crash_raw
+  kept: gtrends_housing_crash__gtrends_housing_crash_ma4w
+  corr: 0.9758
+  reason: '|corr|=0.976 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: intraday_range_21d__VGT
+  kept: intraday_range_21d__QQQ
+  corr: 0.9757
+  reason: '|corr|=0.976 >= 0.95, kept longer/equal history (5330 vs 5330)'
+- dropped: returns_63d__XLK
+  kept: returns_63d__QQQ
+  corr: 0.9754
+  reason: '|corr|=0.975 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: quality_dist_sma200__XLK
+  kept: quality_dist_sma200__QQQ
+  corr: 0.9754
+  reason: '|corr|=0.975 >= 0.95, kept longer/equal history (5151 vs 5151)'
+- dropped: quality_dist_sma50__XLK
+  kept: quality_dist_sma50__QQQ
+  corr: 0.9753
+  reason: '|corr|=0.975 >= 0.95, kept longer/equal history (5301 vs 5301)'
+- dropped: quality_mom_accel__XLK
+  kept: quality_mom_accel__QQQ
+  corr: 0.975
+  reason: '|corr|=0.975 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: returns_42d__XLK
+  kept: returns_42d__QQQ
+  corr: 0.9749
+  reason: '|corr|=0.975 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: returns_126d__XLK
+  kept: returns_126d__QQQ
+  corr: 0.9741
+  reason: '|corr|=0.974 >= 0.95, kept longer/equal history (5224 vs 5224)'
+- dropped: returns_21d__XLK
+  kept: returns_21d__QQQ
+  corr: 0.974
+  reason: '|corr|=0.974 >= 0.95, kept longer/equal history (5329 vs 5329)'
+- dropped: returns_12_1_mom__XLK
+  kept: returns_12_1_mom__QQQ
+  corr: 0.9734
+  reason: '|corr|=0.973 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: gtrends_unemployment__gtrends_unemployment_raw
+  kept: gtrends_unemployment__gtrends_unemployment_ma4w
+  corr: 0.9731
+  reason: '|corr|=0.973 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: quality_rsi_28d__XLK
+  kept: quality_rsi_28d__QQQ
+  corr: 0.9727
+  reason: '|corr|=0.973 >= 0.95, kept longer/equal history (5322 vs 5322)'
+- dropped: returns_252d__XLK
+  kept: returns_252d__QQQ
+  corr: 0.9726
+  reason: '|corr|=0.973 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: mom63_when_cpi_cool__XLK
+  kept: mom63_when_cpi_cool__QQQ
+  corr: 0.9726
+  reason: '|corr|=0.973 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: returns_252d__DBC
+  kept: returns_12_1_mom__DBC
+  corr: 0.9725
+  reason: '|corr|=0.973 >= 0.95, kept longer/equal history (4823 vs 4823)'
+- dropped: quality_dist_sma200__SHY
+  kept: returns_126d__SHY
+  corr: 0.9725
+  reason: '|corr|=0.972 >= 0.95, kept longer/equal history (5224 vs 5151)'
+- dropped: quality_voladj_mom_63d__XLK
+  kept: quality_voladj_mom_63d__QQQ
+  corr: 0.9707
+  reason: '|corr|=0.971 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: seasonality__woy_sin
+  kept: seasonality__month_sin
+  corr: 0.9706
+  reason: '|corr|=0.971 >= 0.95, kept longer/equal history (5785 vs 5785)'
+- dropped: relative_strength_63d__GLD
+  kept: cross_sectional_relative_mom_63d__GLD
+  corr: 0.9705
+  reason: '|corr|=0.971 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: returns_10d__XLK
+  kept: returns_10d__QQQ
+  corr: 0.9701
+  reason: '|corr|=0.970 >= 0.95, kept longer/equal history (5340 vs 5340)'
+- dropped: mom63_x_vix_regime__XLK
+  kept: mom63_x_vix_regime__QQQ
+  corr: 0.97
+  reason: '|corr|=0.970 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: intraday_range_21d__IWM
+  kept: intraday_range_21d__SPY
+  corr: 0.9696
+  reason: '|corr|=0.970 >= 0.95, kept longer/equal history (5330 vs 5330)'
+- dropped: seasonality__woy_cos
+  kept: seasonality__month_cos
+  corr: 0.9695
+  reason: '|corr|=0.969 >= 0.95, kept longer/equal history (5785 vs 5785)'
+- dropped: quality_voladj_mom_42d__XLK
+  kept: quality_voladj_mom_42d__QQQ
+  corr: 0.9693
+  reason: '|corr|=0.969 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: quality_rsi_14d__XLK
+  kept: quality_rsi_14d__QQQ
+  corr: 0.9688
+  reason: '|corr|=0.969 >= 0.95, kept longer/equal history (5336 vs 5336)'
+- dropped: returns_5d__XLK
+  kept: returns_5d__QQQ
+  corr: 0.9683
+  reason: '|corr|=0.968 >= 0.95, kept longer/equal history (5345 vs 5345)'
+- dropped: vol_63d__SHY
+  kept: vol_42d__SHY
+  corr: 0.9676
+  reason: '|corr|=0.968 >= 0.95, kept longer/equal history (5308 vs 5287)'
+- dropped: gtrends_tech_stocks__gtrends_tech_stocks_raw
+  kept: gtrends_tech_stocks__gtrends_tech_stocks_ma4w
+  corr: 0.9665
+  reason: '|corr|=0.967 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: quality_voladj_mom_126d__XLK
+  kept: quality_voladj_mom_126d__QQQ
+  corr: 0.9664
+  reason: '|corr|=0.966 >= 0.95, kept longer/equal history (5224 vs 5224)'
+- dropped: returns_252d__GLD
+  kept: returns_12_1_mom__GLD
+  corr: 0.9659
+  reason: '|corr|=0.966 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: quality_voladj_mom_21d__XLK
+  kept: quality_voladj_mom_21d__QQQ
+  corr: 0.9648
+  reason: '|corr|=0.965 >= 0.95, kept longer/equal history (5329 vs 5329)'
+- dropped: atr_14d__VGT
+  kept: atr_14d__QQQ
+  corr: 0.9642
+  reason: '|corr|=0.964 >= 0.95, kept longer/equal history (5337 vs 5337)'
+- dropped: relative_strength_63d__XLE
+  kept: cross_sectional_relative_mom_63d__XLE
+  corr: 0.964
+  reason: '|corr|=0.964 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: returns_252d__SOXX
+  kept: returns_12_1_mom__SOXX
+  corr: 0.9637
+  reason: '|corr|=0.964 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: atr_14d__IWM
+  kept: atr_14d__SPY
+  corr: 0.9636
+  reason: '|corr|=0.964 >= 0.95, kept longer/equal history (5337 vs 5337)'
+- dropped: returns_252d__EEM
+  kept: returns_12_1_mom__EEM
+  corr: 0.9635
+  reason: '|corr|=0.963 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: vol_63d__XLI
+  kept: vol_63d__SPY
+  corr: 0.9624
+  reason: '|corr|=0.962 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: returns_252d__XLF
+  kept: returns_12_1_mom__XLF
+  corr: 0.9619
+  reason: '|corr|=0.962 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: atr_21d__XLK
+  kept: atr_14d__XLK
+  corr: 0.9619
+  reason: '|corr|=0.962 >= 0.95, kept longer/equal history (5337 vs 5330)'
+- dropped: vol_63d__SPY
+  kept: vol_63d__QQQ
+  corr: 0.9613
+  reason: '|corr|=0.961 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: gtrends_interest_rates__gtrends_interest_rates_raw
+  kept: gtrends_interest_rates__gtrends_interest_rates_ma4w
+  corr: 0.9609
+  reason: '|corr|=0.961 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: gtrends_bitcoin_price__gtrends_bitcoin_price_raw
+  kept: gtrends_bitcoin_price__gtrends_bitcoin_price_ma4w
+  corr: 0.9605
+  reason: '|corr|=0.961 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: returns_252d__QQQ
+  kept: returns_12_1_mom__QQQ
+  corr: 0.9603
+  reason: '|corr|=0.960 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: vol_42d__SPY
+  kept: vol_42d__QQQ
+  corr: 0.96
+  reason: '|corr|=0.960 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: quality_bb_position__XLK
+  kept: quality_bb_position__QQQ
+  corr: 0.9597
+  reason: '|corr|=0.960 >= 0.95, kept longer/equal history (5330 vs 5330)'
+- dropped: quality_dist_sma200__DBC
+  kept: returns_126d__DBC
+  corr: 0.9592
+  reason: '|corr|=0.959 >= 0.95, kept longer/equal history (4949 vs 4876)'
+- dropped: vol_63d__IGV
+  kept: vol_63d__QQQ
+  corr: 0.9589
+  reason: '|corr|=0.959 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: vol_63d__EEM
+  kept: vol_42d__EEM
+  corr: 0.9585
+  reason: '|corr|=0.958 >= 0.95, kept longer/equal history (5308 vs 5287)'
+- dropped: returns_252d__AGG
+  kept: returns_12_1_mom__AGG
+  corr: 0.9584
+  reason: '|corr|=0.958 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: quality_golden_cross__VGT
+  kept: quality_golden_cross__XLK
+  corr: 0.9579
+  reason: '|corr|=0.958 >= 0.95, kept longer/equal history (5351 vs 5351)'
+- dropped: vol_63d__XLE
+  kept: vol_42d__XLE
+  corr: 0.9579
+  reason: '|corr|=0.958 >= 0.95, kept longer/equal history (5308 vs 5287)'
+- dropped: vol_63d__IWM
+  kept: vol_42d__IWM
+  corr: 0.9575
+  reason: '|corr|=0.957 >= 0.95, kept longer/equal history (5308 vs 5287)'
+- dropped: cross_sectional_mom_zscore_63d__GLD
+  kept: cross_sectional_mom_rank_63d__GLD
+  corr: 0.9574
+  reason: '|corr|=0.957 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: returns_252d__SPY
+  kept: returns_12_1_mom__SPY
+  corr: 0.9572
+  reason: '|corr|=0.957 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: gtrends_buy_gold__gtrends_buy_gold_raw
+  kept: gtrends_buy_gold__gtrends_buy_gold_ma4w
+  corr: 0.9568
+  reason: '|corr|=0.957 >= 0.95, kept longer/equal history (4087 vs 2081)'
+- dropped: vol_21d__SPY
+  kept: vol_21d__QQQ
+  corr: 0.9561
+  reason: '|corr|=0.956 >= 0.95, kept longer/equal history (5329 vs 5329)'
+- dropped: vol_63d__DBC
+  kept: vol_42d__DBC
+  corr: 0.9559
+  reason: '|corr|=0.956 >= 0.95, kept longer/equal history (5033 vs 5012)'
+- dropped: intraday_range_21d__SPY
+  kept: intraday_range_21d__QQQ
+  corr: 0.9557
+  reason: '|corr|=0.956 >= 0.95, kept longer/equal history (5330 vs 5330)'
+- dropped: vol_63d__GLD
+  kept: vol_42d__GLD
+  corr: 0.9554
+  reason: '|corr|=0.955 >= 0.95, kept longer/equal history (5308 vs 5287)'
+- dropped: vol_42d__IWM
+  kept: vol_42d__XLI
+  corr: 0.9552
+  reason: '|corr|=0.955 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: returns_252d__XLE
+  kept: returns_12_1_mom__XLE
+  corr: 0.9549
+  reason: '|corr|=0.955 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: vol_21d__XLF
+  kept: intraday_range_21d__XLF
+  corr: 0.9546
+  reason: '|corr|=0.955 >= 0.95, kept longer/equal history (5330 vs 5329)'
+- dropped: returns_252d__TLT
+  kept: returns_12_1_mom__TLT
+  corr: 0.9546
+  reason: '|corr|=0.955 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: returns_252d__XLI
+  kept: returns_12_1_mom__XLI
+  corr: 0.9544
+  reason: '|corr|=0.954 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: returns_126d__GLD
+  kept: quality_voladj_mom_126d__GLD
+  corr: 0.9543
+  reason: '|corr|=0.954 >= 0.95, kept longer/equal history (5224 vs 5224)'
+- dropped: returns_252d__IWM
+  kept: returns_12_1_mom__IWM
+  corr: 0.954
+  reason: '|corr|=0.954 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: vol_42d__IGV
+  kept: vol_42d__QQQ
+  corr: 0.9535
+  reason: '|corr|=0.954 >= 0.95, kept longer/equal history (5308 vs 5308)'
+- dropped: returns_252d__IGV
+  kept: returns_12_1_mom__IGV
+  corr: 0.9527
+  reason: '|corr|=0.953 >= 0.95, kept longer/equal history (5098 vs 5098)'
+- dropped: cross_sectional_mom_zscore_63d__XLE
+  kept: cross_sectional_mom_rank_63d__XLE
+  corr: 0.9519
+  reason: '|corr|=0.952 >= 0.95, kept longer/equal history (5287 vs 5287)'
+- dropped: inflation_features__inflation_surprise_5y
+  kept: inflation_features__cpi_yoy
+  corr: 0.9503
+  reason: '|corr|=0.950 >= 0.95, kept longer/equal history (5855 vs 5855)'
