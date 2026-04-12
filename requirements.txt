@@ -1,48 +1,34 @@
-# Core
-torch>=2.2.0
+# Production requirements for the quant trading research pipeline.
+# Scoped to what `src/` and `scripts/` (excluding `archive/`) actually
+# import. The pre-Phase-3 codebase requirements are in
+# archive/old_codebase/requirements_old.txt.
+
+# Core numerics
 numpy>=1.26.0
 pandas>=2.1.0
-scikit-learn>=1.4.0
 scipy>=1.12.0
+scikit-learn>=1.4.0
 pyarrow>=14.0.0
 
-# Alpaca
-alpaca-trade-api>=3.0.0
-alpaca-py>=0.20.0
-
-# NLP / Sentiment
-transformers>=4.38.0
-sentencepiece
-
-# Feature Engineering
-hmmlearn>=0.3.0               # Hidden Markov Model for regime detection
-
-# Hyperparameter Search
-optuna>=3.5.0
-
-# Explainability
-shap>=0.44.0
-
-# Storage / Logging
-sqlalchemy>=2.0.0
+# Config / env
 pyyaml>=6.0.1
 python-dotenv>=1.0.0
-tqdm>=4.66.0
-joblib>=1.3.0
 
-# Alt data
+# HTTP / scraping (data fetchers)
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=5.0.0
+feedparser>=6.0.0
+
+# Market data
 yfinance>=0.2.36
+pandas-datareader>=0.10.0
+pandas-market-calendars>=4.4.0
+fredapi>=0.5.0
+pytrends>=4.9.0
 
-# GDELT news sentiment
-httpx>=0.27.0                 # async HTTP client for GDELT API
-gdeltdoc>=1.0.0               # GDELT Python client
-trafilatura>=1.9.0            # web scraping / article extraction
-curl_cffi>=0.7.0              # cURL-based HTTP (GDELT rate-limit friendly)
+# Sentiment / NLP utilities used by alt-data fetchers
+nltk>=3.8.0
 
-# Terminal UI
-textual>=0.60.0
-plotext>=5.2.8
-
-# Visualization (optional, for analysis)
+# Plotting (analysis / report generation)
 matplotlib>=3.8.0
-plotly>=5.19.0

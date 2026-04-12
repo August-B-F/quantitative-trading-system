@@ -1,3 +1,4 @@
+# ARCHIVED: pre-Phase-3 codebase, not imported by current pipeline.
 """iStock — entry point.
 
 Launches the Terminal UI directly.

@@ -59,6 +59,7 @@ def load_category(cat: str) -> dict[str, tuple[pd.Series, str]]:
 
 
 def load_all_features() -> tuple[dict[str, pd.Series], dict[str, str], dict[str, str]]:
+    """Load every per-source feature parquet and concatenate."""
     feats: dict[str, pd.Series] = {}
     cat_map: dict[str, str] = {}
     stem_map: dict[str, str] = {}
@@ -73,6 +74,7 @@ def load_all_features() -> tuple[dict[str, pd.Series], dict[str, str], dict[str,
 
 
 def load_targets() -> dict[str, pd.Series]:
+    """Load forward-return target columns."""
     out: dict[str, pd.Series] = {}
     for f in sorted(TARGETS_DIR.glob("*.parquet")):
         df = pd.read_parquet(f)
@@ -88,6 +90,7 @@ def load_targets() -> dict[str, pd.Series]:
 
 
 def inventory(feats: dict[str, pd.Series], cat_map: dict[str, str]) -> pd.DataFrame:
+    """Build a per-feature inventory (history length, category, NaN rate)."""
     rows = []
     for name, s in feats.items():
         s_valid = s.dropna()
@@ -106,6 +109,7 @@ def inventory(feats: dict[str, pd.Series], cat_map: dict[str, str]) -> pd.DataFr
 def dedupe_by_correlation(feats: dict[str, pd.Series],
                            inv: pd.DataFrame,
                            threshold: float = 0.95) -> tuple[set[str], list[dict]]:
+    """Drop features with pairwise correlation above threshold."""
     # Align to shared trading-day index (price calendar: use interaction file)
     idx = pd.date_range(min(s.dropna().index.min() for s in feats.values() if s.notna().any()),
                         max(s.dropna().index.max() for s in feats.values() if s.notna().any()),
@@ -132,6 +136,7 @@ def dedupe_by_correlation(feats: dict[str, pd.Series],
     pairs.sort(key=lambda x: -x[2])
 
     def history_len(name: str) -> int:
+        """Number of non-NaN observations for a feature."""
         return int(inv.at[name, "n"]) if name in inv.index else 0
 
     for a, b, c in pairs:
@@ -195,6 +200,7 @@ def adf_pvalues(feats: dict[str, pd.Series]) -> dict[str, float]:
 
 
 def autocorr_lag(feats: dict[str, pd.Series], lag: int = 21) -> dict[str, float]:
+    """Compute lag-k autocorrelation for each feature."""
     out: dict[str, float] = {}
     for name, s in feats.items():
         v = s.dropna()
@@ -211,6 +217,7 @@ def autocorr_lag(feats: dict[str, pd.Series], lag: int = 21) -> dict[str, float]
 def build_master_panel(feats: dict[str, pd.Series],
                        targets: dict[str, pd.Series],
                        surviving: list[str]) -> pd.DataFrame:
+    """Join surviving features with targets into the master panel."""
     # Use union index of price calendar (inferred from interaction files 2005-present)
     price_idx = None
     for cat in ["interaction", "price"]:
@@ -232,6 +239,7 @@ def build_master_panel(feats: dict[str, pd.Series],
 
 
 def compute_mi_top(panel: pd.DataFrame, target_col: str, feat_cols: list[str], k: int = 20):
+    """Return top-k features by mutual information against target_col."""
     from sklearn.feature_selection import mutual_info_classif
     sub = panel[feat_cols + [target_col]].dropna()
     if len(sub) < 200:
@@ -244,6 +252,7 @@ def compute_mi_top(panel: pd.DataFrame, target_col: str, feat_cols: list[str], k
 
 
 def main():
+    """CLI entry: assemble the master panel and write feature_sets.yaml."""
     print("=" * 70)
     print("Phase 5 feature assembly")
     print("=" * 70)
@@ -345,6 +354,7 @@ def main():
                     break
 
     def find_one(substrs: list[str]):
+        """Return the first feature whose name matches any substring."""
         for n in surviving:
             lname = n.lower()
             if all(s in lname for s in substrs):

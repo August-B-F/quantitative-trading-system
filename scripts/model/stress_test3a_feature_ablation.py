@@ -26,7 +26,10 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts/model"))
 
 from stress_harness import (  # noqa: E402
-    run_strategy_from_cache, stats, load_cache, ETFS, SPLIT_KW, REGIME_CLASSES, REGIME_FEATS,
+    run_strategy_from_cache,
+    load_cache,
+    SPLIT_KW,
+    REGIME_CLASSES,
 )
 
 OUT = ROOT / "results/stress"

@@ -15,9 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.data.utils import (
     CATALOG_PATH,
     DATA_DIR,
-    FAILED_PATH,
     align_to_trading_days,
-    log_failure,
     log_to_catalog,
     save_clean,
     validate_data,

@@ -33,6 +33,7 @@ def monthly_aggregate(
 
 
 def classification_metrics(y_true, y_pred) -> Dict[str, float]:
+    """Return accuracy / precision / recall / F1 for classification labels."""
     y_true = np.asarray(y_true)
     y_pred = np.asarray(y_pred)
     acc = float((y_true == y_pred).mean()) if len(y_true) else float("nan")
@@ -40,6 +41,7 @@ def classification_metrics(y_true, y_pred) -> Dict[str, float]:
 
 
 def strategy_metrics(monthly_returns: np.ndarray) -> Dict[str, float]:
+    """Return CAGR, Sharpe, MaxDD, etc. from a series of monthly returns."""
     r = np.asarray(monthly_returns, dtype=float)
     r = r[~np.isnan(r)]
     if len(r) == 0:

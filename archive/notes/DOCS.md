@@ -1,3 +1,4 @@
+<!-- ARCHIVED: stale pre-Phase-3 docs. See PROJECT_SUMMARY.md for canonical docs. -->
 # iStock -- AI-Driven Quantitative Trading System
 
 ## Complete Technical Documentation for AI Agents

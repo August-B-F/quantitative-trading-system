@@ -28,6 +28,7 @@ ALL_TICKERS = PRIMARY_UNIVERSE + EXTRA_TICKERS
 # ----------------------------- IO helpers -----------------------------
 
 def load_prices(tickers: Iterable[str]) -> dict[str, pd.DataFrame]:
+    """Load OHLCV price panels for the given tickers."""
     out = {}
     for t in tickers:
         path = DATA_DIR / "clean" / "prices" / f"{t}.parquet"
@@ -75,15 +76,18 @@ def save_features(df: pd.DataFrame, category: str, name: str) -> Path:
 # ------------------------- Feature primitives -------------------------
 
 def rolling_return(prices_wide: pd.DataFrame, n: int) -> pd.DataFrame:
+    """Rolling n-day total return for each ticker (wide format)."""
     return prices_wide.pct_change(n).shift(1)
 
 
 def rolling_vol(prices_wide: pd.DataFrame, n: int) -> pd.DataFrame:
+    """Rolling n-day return volatility for each ticker."""
     daily = prices_wide.pct_change()
     return daily.rolling(n).std().shift(1) * np.sqrt(252)
 
 
 def true_range(high: pd.DataFrame, low: pd.DataFrame, close: pd.DataFrame) -> pd.DataFrame:
+    """Wilder true range from high/low/close series."""
     prev_close = close.shift(1)
     a = high - low
     b = (high - prev_close).abs()
@@ -92,11 +96,13 @@ def true_range(high: pd.DataFrame, low: pd.DataFrame, close: pd.DataFrame) -> pd
 
 
 def atr(high, low, close, n: int) -> pd.DataFrame:
+    """Average true range over n days."""
     tr = true_range(high, low, close)
     return tr.rolling(n).mean().shift(1)
 
 
 def rsi(prices_wide: pd.DataFrame, n: int) -> pd.DataFrame:
+    """Wilder RSI(n) computed per ticker."""
     delta = prices_wide.diff()
     up = delta.clip(lower=0)
     down = -delta.clip(upper=0)
@@ -109,6 +115,7 @@ def rsi(prices_wide: pd.DataFrame, n: int) -> pd.DataFrame:
 # ------------------------------- Steps -------------------------------
 
 def step2_returns(close: pd.DataFrame) -> int:
+    """Build return-based features (multi-horizon momentum)."""
     n_files = 0
     for n in [5, 10, 21, 42, 63, 126, 252]:
         save_features(rolling_return(close, n), "price", f"returns_{n}d")
@@ -120,6 +127,7 @@ def step2_returns(close: pd.DataFrame) -> int:
 
 
 def step3_volatility(close: pd.DataFrame, high: pd.DataFrame, low: pd.DataFrame) -> int:
+    """Build volatility-based features (rolling vol, ATR)."""
     n_files = 0
     for n in [21, 42, 63]:
         save_features(rolling_vol(close, n), "price", f"vol_{n}d")
@@ -133,6 +141,7 @@ def step3_volatility(close: pd.DataFrame, high: pd.DataFrame, low: pd.DataFrame)
 
 
 def step4_quality(close: pd.DataFrame, high: pd.DataFrame, low: pd.DataFrame) -> int:
+    """Build trend-quality features (RSI, drawdown, smoothness)."""
     n_files = 0
     daily = close.pct_change()
     for n in [21, 42, 63, 126]:
@@ -172,6 +181,7 @@ def step4_quality(close: pd.DataFrame, high: pd.DataFrame, low: pd.DataFrame) ->
 
 
 def step5_cross_sectional(close: pd.DataFrame) -> int:
+    """Build cross-sectional rank features across the universe."""
     n_files = 0
     primary = close[PRIMARY_UNIVERSE]
     for n in [21, 42, 63, 126]:
@@ -208,6 +218,7 @@ def step5_cross_sectional(close: pd.DataFrame) -> int:
 
 
 def step6_volume(prices: dict[str, pd.DataFrame]) -> int:
+    """Build volume-based features (relative volume, dollar volume)."""
     tickers = PRIMARY_UNIVERSE + ["SPY"]
     vol = pd.DataFrame({t: prices[t]["volume"] for t in tickers}).sort_index()
     close = pd.DataFrame({t: prices[t]["adj_close"] for t in tickers}).sort_index()
@@ -236,6 +247,7 @@ def step6_volume(prices: dict[str, pd.DataFrame]) -> int:
 
 
 def step7_relative_strength(close: pd.DataFrame) -> int:
+    """Build relative strength features vs. benchmark."""
     spy = close["SPY"]
     primary = close[PRIMARY_UNIVERSE]
     n_files = 0
@@ -259,6 +271,7 @@ def step7_relative_strength(close: pd.DataFrame) -> int:
 # ------------------------------ Validation ------------------------------
 
 def validate(close: pd.DataFrame) -> None:
+    """Run sanity checks on the assembled feature panel."""
     print("\n=== VALIDATION ===")
 
     # Lookahead check on a random date
@@ -293,6 +306,7 @@ def validate(close: pd.DataFrame) -> None:
 # ---------------------------------- Main ----------------------------------
 
 def main() -> None:
+    """CLI entry: build the full feature panel and write to disk."""
     prices = load_prices(ALL_TICKERS)
     close = _stack("adj_close", prices)
     high = _stack("high", prices)

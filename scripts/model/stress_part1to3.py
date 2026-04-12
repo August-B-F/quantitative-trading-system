@@ -16,9 +16,17 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/model"))
 
 from stress_harness import (  # noqa: E402
-    load_cache, run_strategy_from_cache, stats, ETFS,
-    LB_STABLE, LB_TRANS, K, W_TOP1, W_TOPK, SMA_GATE,
-    M26_POST_DAYS, M26_WINDOW_POST, fomc_window_mask_from_idx,
+    load_cache,
+    run_strategy_from_cache,
+    stats,
+    ETFS,
+    K,
+    W_TOP1,
+    W_TOPK,
+    SMA_GATE,
+    M26_POST_DAYS,
+    M26_WINDOW_POST,
+    fomc_window_mask_from_idx,
 )
 
 OUT = ROOT / "results/stress"

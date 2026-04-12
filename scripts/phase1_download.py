@@ -10,7 +10,7 @@ sys.path.insert(0, str(ROOT))
 import numpy as np
 import pandas as pd
 
-from src.data.fetchers.yahoo import fetch_universe, CLEAN_DIR, _safe_name
+from src.data.fetchers.yahoo import fetch_universe, CLEAN_DIR
 from src.data.utils import load_clean
 
 PRIMARY = ["SOXX", "QQQ", "XLK", "VGT", "IGV", "XLE", "GLD", "SHY"]

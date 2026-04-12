@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import io
 import time
-from datetime import date, timedelta
+from datetime import date
 
 import pandas as pd
 import requests

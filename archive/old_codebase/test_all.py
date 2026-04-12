@@ -1,3 +1,4 @@
+# ARCHIVED: pre-Phase-3 codebase, not imported by current pipeline.
 """Comprehensive test suite for iStock quantitative trading system.
 
 Tests all modules with synthetic data — no API keys required.

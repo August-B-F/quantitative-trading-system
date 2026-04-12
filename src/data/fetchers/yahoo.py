@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import time
-from pathlib import Path
 from typing import Iterable, Optional
 
 import pandas as pd
@@ -16,7 +15,6 @@ from src.data.utils import (
     log_failure,
     log_to_catalog,
     save_clean,
-    validate_data,
 )
 
 

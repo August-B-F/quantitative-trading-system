@@ -5,7 +5,6 @@ import json
 import os
 import urllib.parse
 import urllib.request
-from typing import Optional
 
 import pandas as pd
 

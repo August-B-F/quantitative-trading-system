@@ -6,7 +6,6 @@ import os
 import time
 import urllib.request
 import urllib.error
-from pathlib import Path
 from typing import Optional
 
 import pandas as pd

@@ -11,7 +11,6 @@ are skipped — see SKIPPED at bottom.
 """
 from __future__ import annotations
 
-from datetime import datetime
 from pathlib import Path
 
 import numpy as np

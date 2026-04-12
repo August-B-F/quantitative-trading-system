@@ -13,8 +13,6 @@ Signal semantics follow Phase 4 spec:
 """
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Iterable
 
 import numpy as np
 import pandas as pd

@@ -21,6 +21,7 @@ class FeaturePreprocessor:
         X_train: pd.DataFrame,
         sample_weights: Optional[np.ndarray] = None,
     ) -> pd.DataFrame:
+        """Fit scalers/encoders on X_train and return the transformed matrix."""
         self.columns_ = list(X_train.columns)
         X = X_train.to_numpy(dtype=float)
         # Median impute (computed on train only)
@@ -47,6 +48,7 @@ class FeaturePreprocessor:
         return pd.DataFrame(Z, index=X_train.index, columns=self.columns_)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """Apply the fitted preprocessing to X."""
         assert self.mean_ is not None, "Preprocessor not fit"
         X = X[self.columns_]
         arr = X.to_numpy(dtype=float)

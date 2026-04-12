@@ -17,9 +17,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/model"))
 
-from stress_harness import (  # type: ignore
-    load_cache, run_strategy_from_cache, LB_STABLE, LB_TRANS, ETFS,
-)
+from stress_harness import load_cache, run_strategy_from_cache, ETFS
 
 OUT_JSON = ROOT / "results/stress/lookback_curve.json"
 OUT_PNG = ROOT / "results/stress/lookback_curve.png"

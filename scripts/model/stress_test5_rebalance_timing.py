@@ -24,7 +24,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/model"))
 
-from stress_harness import load_cache, run_strategy_from_cache  # noqa: E402
 
 OUT = ROOT / "results/stress"
 

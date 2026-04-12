@@ -1,10 +1,8 @@
 """Phase 3 PARTS B/C/D: cross-source integration, health check, catalog reconcile."""
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
-from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -12,7 +10,6 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.data.utils import (
     get_trading_calendar,
-    align_to_trading_days,
     load_clean,
     validate_data,
     DATA_DIR,

@@ -53,6 +53,7 @@ NDAYS = len(df)
 
 # Load returns @ multiple lookbacks for all tickers
 def load_ret(days):
+    """Load n-day forward returns for the universe."""
     return pd.read_parquet(ROOT / f"data/features/price/returns_{days}d.parquet").reindex(DATES)
 
 R = {d: load_ret(d) for d in (10, 21, 42, 63, 126)}
@@ -60,6 +61,7 @@ ALL_TICKERS = sorted(set(ETFS) | set(UNIVERSE_EXTRAS))
 
 # Forward 21d returns for any ticker: shift returns_21d by -21
 def fwd21(ticker):
+    """21-day forward return for a single ticker."""
     if f"TARGET_FWD21_{ticker}" in df.columns:
         return df[f"TARGET_FWD21_{ticker}"].values
     s = R[21][ticker].shift(-21)
@@ -125,6 +127,7 @@ print(f"  WF regime accuracy: {regime_acc:.3f}")
 # Helpers
 # ---------------------------------------------------------------------------
 def stats(r):
+    """Compute CAGR / Sharpe / MaxDD for a return series."""
     r = np.asarray(r, float)
     r = r[~np.isnan(r)]
     if len(r) == 0:
@@ -139,11 +142,13 @@ def stats(r):
     return dict(cagr=cagr, sharpe=sh, max_dd=dd, n=int(len(r)))
 
 def to_monthly(daily, dates=None):
+    """Resample a daily return series to month-end."""
     dates = test_dates if dates is None else dates
     s = pd.Series(daily, index=dates).dropna()
     return s.groupby(s.index.to_period("M")).tail(1)
 
 def trend_gate(base):
+    """Apply the trend filter to a base strategy spec."""
     return np.where(spy_dist > -0.04, base, shy_ret)
 
 def build_mom_array(universe, lookback):
@@ -155,12 +160,14 @@ def build_mom_array(universe, lookback):
     return arr
 
 def build_fwd_array(universe):
+    """Build a forward-return array aligned to the universe."""
     arr = np.full((NDAYS, len(universe)), np.nan)
     for j, t in enumerate(universe):
         arr[:, j] = FWD[t]
     return arr
 
 def topk_returns(mom, fwd_arr, k):
+    """Return the top-k average forward return at each rebalance."""
     sf = np.where(np.isnan(mom), -np.inf, mom)
     if k == 1:
         idx = np.argmax(sf, axis=1)
@@ -170,6 +177,7 @@ def topk_returns(mom, fwd_arr, k):
     return np.nanmean(rows, axis=1)
 
 def topk_indices(mom, k):
+    """Return the indices of the top-k momentum names."""
     sf = np.where(np.isnan(mom), -np.inf, mom)
     return np.argsort(-sf, axis=1)[:, :k]
 
@@ -346,16 +354,19 @@ def apply_gate(daily, scale_arr):
     return scale_arr * daily + (1 - scale_arr) * shy_ret
 
 def credit_gate_scale():
+    """Position-size scale from the credit-spread gate."""
     s = np.ones(NDAYS)
     s[hy_z > 1.5] = 0.6
     return s
 
 def vix_gate_scale():
+    """Position-size scale from the VIX gate."""
     s = np.ones(NDAYS)
     s[vix > 30] = 0.5
     return s
 
 def yc_gate_scale():
+    """Position-size scale from the yield-curve gate."""
     inv = (yc_slope < 0).astype(float)
     inv = pd.Series(inv, index=DATES).rolling(63).sum().values
     s = np.ones(NDAYS)
@@ -473,6 +484,7 @@ def monthly_simulate(universe, lookback_stable=63, lookback_trans=21,
 RESULTS = {}
 
 def run_daily(name, daily, desc):
+    """Run a daily-rebalance strategy and record metrics."""
     s = to_monthly(daily[te_pos])
     st = stats(s.values)
     RESULTS[name] = {
@@ -484,6 +496,7 @@ def run_daily(name, daily, desc):
     print(f"  {name}: CAGR {st['cagr']*100:5.2f}%  Sharpe {st['sharpe']:.2f}  MaxDD {st['max_dd']*100:6.2f}%")
 
 def run_monthly(name, sm, desc):
+    """Run a monthly-rebalance strategy and record metrics."""
     st = stats(sm.values)
     RESULTS[name] = {
         "description": desc,
@@ -563,6 +576,7 @@ for name, payload in RESULTS.items():
 # ---------------------------------------------------------------------------
 ctrl_st = RESULTS["E-R1"]["stats"]
 def haircut_pass(name):
+    """Apply transaction-cost haircut and return whether the strategy still beats baseline."""
     s = RESULTS[name]["stats"]
     d_cagr = s["cagr"] - ctrl_st["cagr"]
     d_sh = s["sharpe"] - ctrl_st["sharpe"]
@@ -585,6 +599,7 @@ BLOCK_MODS = {
     "B5": ["M24","M25","M26","M27"],
 }
 def best_pass(mods):
+    """Pick the best-passing modification from a candidate list."""
     pas = [m for m in mods if haircut_pass(m)[0]]
     if not pas:
         return None
@@ -600,6 +615,7 @@ combo_spec = {
     "universe": ETFS, "gate": None, "rebalance": None,
 }
 def apply_mod_to_spec(mod, spec):
+    """Apply a single modification to a base strategy spec."""
     s = dict(spec)
     if mod == "M01": s.update(lookback_trans=42)
     elif mod == "M02": s.update(lookback_stable=126)
@@ -624,6 +640,7 @@ def apply_mod_to_spec(mod, spec):
     return s
 
 def run_combo(spec):
+    """Run a combined modification spec end-to-end."""
     daily = build_strategy(
         universe=spec["universe"],
         lookback_stable=spec["lookback_stable"], lookback_trans=spec["lookback_trans"],
@@ -681,6 +698,7 @@ RESULTS["OPTIMIZED"] = {
 # OPTIMIZATION_REPORT.md
 # ---------------------------------------------------------------------------
 def fmt_pct(v):
+    """Format a float as a percentage string."""
     return "n/a" if v is None or v != v else f"{v*100:.1f}%"
 
 lines = []

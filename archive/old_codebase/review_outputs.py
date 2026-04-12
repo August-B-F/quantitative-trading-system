@@ -1,3 +1,4 @@
+# ARCHIVED: pre-Phase-3 codebase, not imported by current pipeline.
 """Review all pipeline outputs for correctness."""
 import pandas as pd, json, os, torch
 

@@ -9,8 +9,7 @@ Both splitters:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import List, Dict
 
 import numpy as np
 import pandas as pd
@@ -76,6 +75,7 @@ class OverlappingSplitter:
         self.target_horizon = target_horizon
 
     def split(self, panel_dates) -> List[Dict]:
+        """Yield (train_idx, test_idx) splits over panel_dates."""
         all_dates = _as_sorted_dti(panel_dates)
         folds: List[Dict] = []
 
@@ -157,6 +157,7 @@ class ExpandingSplitter:
         self.decay_halflife_months = decay_halflife_months
 
     def split(self, panel_dates) -> List[Dict]:
+        """Yield (train_idx, test_idx) splits over panel_dates."""
         all_dates = _as_sorted_dti(panel_dates)
         folds: List[Dict] = []
 

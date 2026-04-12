@@ -13,9 +13,12 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "scripts/model"))
 from stress_harness import (  # noqa: E402
-    load_cache, run_strategy_from_cache, stats, daily_stats,
-    fomc_window_mask_from_idx, ETFS, LB_STABLE, LB_TRANS, M26_POST_DAYS,
-    M26_WINDOW_POST, SMA_GATE, W_TOP1, W_TOPK, K,
+    load_cache,
+    run_strategy_from_cache,
+    stats,
+    W_TOP1,
+    W_TOPK,
+    K,
 )
 
 OUT = ROOT / "results/stress"
