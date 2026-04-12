@@ -1,40 +1,131 @@
+# ──────────────────────────────────────────────────────────────────
 # secrets
+# ──────────────────────────────────────────────────────────────────
 .env
+.env.*
+!.env.example
 config/secrets.yaml
+config/*.local.yaml
+*.key
+*.pem
 
-# data (too large for git)
+# ──────────────────────────────────────────────────────────────────
+# data
+# Everything under /data/ is reproducible from the fetchers — don't
+# track it. Human-maintained docs at the data root are whitelisted.
+# ──────────────────────────────────────────────────────────────────
 data/raw/
+data/clean/
+data/features/
 data/processed/
 data/scalers/
 data/logs/
-data/performance.db
+data/strategy_cache/
+data/backtest_results/
+data/models/
+data/*.db
+data/*.duckdb
+data/*.sqlite*
 
-# keep model dir but not weights
-data/models/*.pt
-data/models/*.pth
+!data/DATA_CATALOG.md
+!data/DATA_HEALTH.md
+!data/FAILED_SOURCES.md
+!data/README.md
 
+# ──────────────────────────────────────────────────────────────────
+# models / large binaries
+# ──────────────────────────────────────────────────────────────────
+models/
+*.pt
+*.pth
+*.onnx
+*.ckpt
+*.safetensors
+*.joblib
+*.pkl
+*.h5
+*.hdf5
+
+# ──────────────────────────────────────────────────────────────────
+# results
+# Strategy CSVs/JSONs under results/ are tracked (historical
+# artifacts). Generated charts and scratch dumps are not.
+# ──────────────────────────────────────────────────────────────────
+results/chart_*.png
+results/*.tmp
+results/scratch/
+
+# ──────────────────────────────────────────────────────────────────
 # python
+# ──────────────────────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
 *.egg-info/
+*.egg
 dist/
 build/
 .eggs/
+pip-wheel-metadata/
 
-# venv
-venv/
-.venv/
-env/
+# test / lint / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.dmypy.json
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
 
-# IDE
-.vscode/
-.idea/
-*.swp
+# ──────────────────────────────────────────────────────────────────
+# ml experiment trackers
+# ──────────────────────────────────────────────────────────────────
+mlruns/
+wandb/
+runs/
+lightning_logs/
+tb_logs/
+tensorboard/
 
+# ──────────────────────────────────────────────────────────────────
 # jupyter
+# ──────────────────────────────────────────────────────────────────
 .ipynb_checkpoints/
 *.ipynb
 
-# OS
+# ──────────────────────────────────────────────────────────────────
+# logs
+# ──────────────────────────────────────────────────────────────────
+logs/
+*.log
+
+# ──────────────────────────────────────────────────────────────────
+# ide / tooling
+# ──────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.claude/
+.aider*
+
+# ──────────────────────────────────────────────────────────────────
+# os
+# ──────────────────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+ehthumbs.db
