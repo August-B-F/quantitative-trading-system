@@ -1,3 +1,4 @@
+# ARCHIVED: M26 post-3d LOO exploration — superseded by run_m26_followup
 """Leave-one-out 2018 for the winning M26_post_3d variant."""
 from pathlib import Path
 import pandas as pd

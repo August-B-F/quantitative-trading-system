@@ -1,3 +1,4 @@
+# ARCHIVED: 8-ETF sandbox exploration — superseded by run_tier1/run_tier2
 """Use raw returns_63d.parquet (which has ALL 8 ETFs) instead of master_panel
 which is missing XLK/VGT. Test if full 8-ETF rotation is materially better.
 """

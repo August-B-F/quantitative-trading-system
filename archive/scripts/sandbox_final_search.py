@@ -1,3 +1,4 @@
+# ARCHIVED: final search sandbox — superseded by run_optimization_block
 """Final search for the best ensemble: hybrid two-leg + soft trend gate +
 ML drawdown overlay (optional). Tests the most promising configurations.
 """

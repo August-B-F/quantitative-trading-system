@@ -1,3 +1,4 @@
+# ARCHIVED: drawdown sandbox v2 — superseded by stress_* scripts
 """Drawdown gate v2: pick-aware features. Inject the current top-1 pick's
 technical features into the row, so the model can reason about WHICH ETF is
 about to be held.

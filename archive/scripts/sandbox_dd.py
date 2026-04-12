@@ -1,3 +1,4 @@
+# ARCHIVED: drawdown sandbox v1 — superseded by stress_* scripts
 """ML drawdown gate sandbox: top-K base + macro feature gate."""
 import sys
 import numpy as np

@@ -1,3 +1,4 @@
+# ARCHIVED: early E00 experiment runner — superseded by run_tier1/run_tier2
 """E00 label-shuffle diagnostic.
 
 Runs HistGradientBoosting (xgboost-style) on MINIMAL features for T1

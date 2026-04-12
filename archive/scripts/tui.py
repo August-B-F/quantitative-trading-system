@@ -1,3 +1,4 @@
+# ARCHIVED: legacy TUI — not used in research pipeline
 """iStock - Terminal UI
 
 A rich, animated terminal dashboard for monitoring and controlling the bot.

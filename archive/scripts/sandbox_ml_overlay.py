@@ -1,3 +1,4 @@
+# ARCHIVED: ML overlay sandbox — superseded by run_regime_integration
 """ML overlay on the winning ensemble: train a regression model to predict
 short-horizon return of the ensemble itself, use it to scale exposure.
 """

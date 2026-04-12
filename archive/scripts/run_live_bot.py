@@ -1,3 +1,4 @@
+# ARCHIVED: legacy live bot — not used in research pipeline
 """Daily live / paper trading bot.
 
 Full pipeline per run:

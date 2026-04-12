@@ -1,3 +1,4 @@
+# ARCHIVED: lookback trigger sweep — results in LOOKBACK_TRIGGER_REPORT.md
 """Test alternative lookback triggers for OPTIMIZED strategy.
 
 Replaces the ML regime classifier with rule-based triggers (T01-T09) and a

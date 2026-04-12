@@ -1,3 +1,4 @@
+# ARCHIVED: regime 3-feature experiment — superseded by run_regime_integration
 """Quick test: retrain regime classifier with only top-3 SHAP features and
 rerun the OPTIMIZED strategy (E-R1 + M11 + M26_post_3d)."""
 from __future__ import annotations

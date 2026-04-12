@@ -1,3 +1,4 @@
+# ARCHIVED: tier1b report builder — superseded by TIER1B_REPORT.md already produced
 """Assemble TIER1B_REPORT.md and TIER1B_VERDICT.md from all Block A/B/C/D JSON."""
 from __future__ import annotations
 

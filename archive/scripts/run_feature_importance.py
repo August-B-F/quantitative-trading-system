@@ -1,3 +1,4 @@
+# ARCHIVED: feature-importance exploration — results in FEATURE_IMPORTANCE_REPORT.md
 """Part A — Regime classifier internals.
 
 A1: SHAP values across walk-forward folds (top features, mean |SHAP|, direction)

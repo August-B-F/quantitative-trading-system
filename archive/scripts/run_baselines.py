@@ -1,3 +1,4 @@
+# ARCHIVED: baseline runner — results captured in BASELINE_REPORT.md
 """Compute B0-B3 baselines for T1 (winner selection) on walk-forward test folds.
 
 All baselines are evaluated at the monthly decision cadence (one trade per month)

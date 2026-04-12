@@ -1,3 +1,4 @@
+# ARCHIVED: one-off retry script — superseded by phase1_* pipeline
 """Session 3.5 retry: fetch buyback/rail/bond-issuance/bankruptcy via FRED curl.
 
 Uses curl subprocess because Python requests/urllib hangs on fredgraph.csv in

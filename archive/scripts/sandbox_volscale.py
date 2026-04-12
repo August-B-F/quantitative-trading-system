@@ -1,3 +1,4 @@
+# ARCHIVED: vol-scaling sandbox — superseded by stress_* scripts
 """Volatility-targeted exposure scaling on top of momentum.
 
 Idea: don't try to predict drawdowns. Just scale exposure inversely to realized

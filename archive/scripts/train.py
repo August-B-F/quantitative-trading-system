@@ -1,3 +1,4 @@
+# ARCHIVED: legacy training harness — superseded by scripts/model/* runners
 """Walk-forward model training.
 
 Training strategy:

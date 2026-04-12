@@ -1,3 +1,4 @@
+# ARCHIVED: tier1b block B — superseded by run_tier2
 """Tier 1B Block B — BIGGER MODELS.
 
 E-B1: Large HistGB, EXTENDED (120), T2, cross-sectional

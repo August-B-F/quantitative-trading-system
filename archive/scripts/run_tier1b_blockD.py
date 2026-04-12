@@ -1,3 +1,4 @@
+# ARCHIVED: tier1b block D — superseded by run_tier2
 """Tier 1B Block D — UNCONVENTIONAL / EXPERIMENTAL.
 
 E-D1 Similarity-based prediction (k-NN on CORE features)

@@ -1,3 +1,4 @@
+# ARCHIVED: one-off phase1 audit — pipeline now uses phase1_download/fred
 """Quality audit of downloaded Yahoo data."""
 from __future__ import annotations
 import sys

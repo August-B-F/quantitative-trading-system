@@ -1,3 +1,4 @@
+# ARCHIVED: tier1b block A — superseded by run_tier2
 """Tier 1B Block A — DIFFERENT QUESTIONS.
 
 E-A1: Regime (4-class) prediction → ETF mapping

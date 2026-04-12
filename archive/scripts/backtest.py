@@ -1,3 +1,4 @@
+# ARCHIVED: legacy backtest harness — superseded by scripts/model/* runners
 """Run a full historical backtest.
 
 Steps:

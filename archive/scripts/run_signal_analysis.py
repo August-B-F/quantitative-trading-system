@@ -1,3 +1,4 @@
+# ARCHIVED: signal analysis runner — results in SIGNAL_ANALYSIS_REPORT.md
 """Parts B + C — Strategy attribution and correlation analysis.
 
 Reconstructs the OPTIMIZED strategy (E-R1 + M11 + M26_post_3d) at monthly rebalance

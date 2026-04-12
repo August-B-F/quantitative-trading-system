@@ -1,3 +1,4 @@
+# ARCHIVED: ensemble sandbox — superseded by run_m26_deep
 """Strategy ensembles + ML overlay on top of full 8-ETF portfolios."""
 import sys
 import numpy as np

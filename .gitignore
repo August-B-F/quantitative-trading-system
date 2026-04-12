@@ -46,6 +46,9 @@ models/
 *.h5
 *.hdf5
 
+# Parquet/CSV are gated by directory above (data/raw, data/clean,
+# data/features) so tracked artifacts under results/ stay tracked.
+
 # ──────────────────────────────────────────────────────────────────
 # results
 # Strategy CSVs/JSONs under results/ are tracked (historical

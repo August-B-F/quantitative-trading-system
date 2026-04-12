@@ -1,3 +1,4 @@
+# ARCHIVED: tier1b block C — superseded by run_tier2
 """Tier 1B Block C — SPECIALIST TEAM.
 
 E-C1: Build 5 specialists + combine with rules.

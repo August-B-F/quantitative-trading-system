@@ -1,3 +1,4 @@
+# ARCHIVED: combo sandbox exploration — superseded by run_optimization_block
 """Combine the winning ideas: top-3 base + ML soft gate + regression EV gate
 calibrated on validation fold.
 """
