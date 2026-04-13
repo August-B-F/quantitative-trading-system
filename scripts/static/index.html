@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iStock — AI Stock Trader</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════ SIDEBAR -->
+<aside id="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-i">i</span><span class="brand-stock">Stock</span>
+  </div>
+  <nav>
+    <div class="nav-section">
+      <button class="nav-item active" data-page="overview">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Pipeline</div>
+      <button class="nav-item" data-page="download">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </button>
+      <button class="nav-item" data-page="train">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        Training
+      </button>
+      <button class="nav-item" data-page="backtest">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Backtest
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Data</div>
+      <button class="nav-item" data-page="data">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Data Browser
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Trading</div>
+      <button class="nav-item" data-page="live">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Live Trading
+      </button>
+      <button class="nav-item" data-page="signals">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Signals
+      </button>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">System</div>
+      <button class="nav-item" data-page="system">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        System
+      </button>
+    </div>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="process-badge">
+      <div class="process-dot" id="proc-dot"></div>
+      <span class="proc-text" id="proc-label">No process running</span>
+    </div>
+  </div>
+</aside>
+
+<!-- ═══════════════════════════════════════════════════════════════ MAIN -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+<div id="main">
+  <header id="topbar">
+    <div class="topbar-left">
+      <button class="hamburger" id="btn-hamburger" aria-label="Menu">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <span class="page-title">Overview</span>
+      <span class="regime-pill unknown" id="regime-pill">Unknown</span>
+    </div>
+    <div class="topbar-right">
+      <span class="clock" id="clock">--:--:--</span>
+      <button class="refresh-btn" id="btn-refresh">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+        Refresh
+      </button>
+    </div>
+  </header>
+
+  <div id="content">
+
+<!-- ══════════════════════════════════════════════════════ PAGE: OVERVIEW -->
+<div class="page active" id="page-overview">
+
+  <div class="metric-grid mb-20">
+    <div class="metric-card">
+      <div class="card-label">Equity</div>
+      <div class="card-value" id="ov-equity">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Total Return</div>
+      <div class="card-value" id="ov-return">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Sharpe Ratio</div>
+      <div class="card-value" id="ov-sharpe">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Max Drawdown</div>
+      <div class="card-value" id="ov-drawdown">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Win Rate</div>
+      <div class="card-value" id="ov-winrate">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Total Trades</div>
+      <div class="card-value" id="ov-trades">—</div>
+    </div>
+  </div>
+
+  <div class="layout-main">
+    <div class="card">
+      <div class="card-label mb-12">Equity Curve</div>
+      <div class="chart-wrap"><canvas id="ov-chart"></canvas></div>
+    </div>
+    <div class="flex-col gap-12" style="min-width:0">
+      <div class="card flex-1">
+        <div class="card-label mb-12">Model Checkpoint</div>
+        <div id="ov-model"><p class="text-muted text-xs mono">No checkpoint.</p></div>
+      </div>
+      <div class="card">
+        <div class="card-label mb-8">GPU</div>
+        <div id="ov-gpu"><p class="text-muted text-xs mono">N/A</p></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="mono text-xs text-muted mb-20" id="ov-updated"></p>
+
+  <div class="layout-split mb-0">
+    <div style="padding:18px 20px">
+      <div class="card-label mb-12">Tracked Symbols <span class="ov-count" id="ov-sym-count"></span></div>
+      <div id="ov-symbols"><p class="mono text-xs text-muted">Loading…</p></div>
+    </div>
+    <div style="padding:18px 20px">
+      <div class="flex items-center justify-between mb-12">
+        <span class="card-label" style="margin-bottom:0">Latest Predictions</span>
+        <span class="mono text-xs text-muted" id="ov-sig-date"></span>
+      </div>
+      <div id="ov-signals"><p class="mono text-xs text-muted">Loading…</p></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ PAGE: DOWNLOAD -->
+<div class="page" id="page-download">
+
+  <div class="run-bar mb-20">
+    <div class="flex items-center gap-12 wrap">
+      <span class="status-tag" id="dl-status">Idle</span>
+      <button class="btn btn-primary btn-sm page-run-btn" id="btn-run-download">Run Download</button>
+      <button class="btn btn-danger btn-sm page-stop-btn" id="btn-stop-download" disabled>Stop</button>
+      <span class="mono text-xs text-muted" id="dl-pid"></span>
+    </div>
+  </div>
+
+  <div class="metric-grid mb-20">
+    <div class="metric-card"><div class="card-label">Symbols</div><div class="card-value" id="dl-nsymbols">—</div></div>
+    <div class="metric-card"><div class="card-label">Total Rows</div><div class="card-value" id="dl-rows">—</div></div>
+    <div class="metric-card"><div class="card-label">Disk Usage</div><div class="card-value" id="dl-disk">—</div></div>
+    <div class="metric-card"><div class="card-label">Bar Files</div><div class="card-value" id="dl-bars">—</div></div>
+    <div class="metric-card"><div class="card-label">News Files</div><div class="card-value" id="dl-news">—</div></div>
+    <div class="metric-card"><div class="card-label">Last Sync</div><div class="card-value" id="dl-updated" style="font-size:16px">—</div></div>
+  </div>
+
+  <div class="layout-main mb-20">
+    <div style="padding:18px 20px">
+      <div class="card-label mb-12">Live Log</div>
+      <div class="log-panel" id="dl-log" style="height:260px"><span class="log-plain">Start a download to see live output.</span></div>
+    </div>
+    <div style="padding:18px 20px">
+      <div class="card-label mb-16">Data Sources</div>
+      <div class="source-list">
+        <div class="source-row">
+          <div class="source-info"><div class="source-name">OHLCV Bars</div><div class="source-sub" id="src-bars-detail">—</div></div>
+          <span class="status-tag" id="src-bars">—</span>
+        </div>
+        <div class="source-row">
+          <div class="source-info"><div class="source-name">News + FinBERT</div><div class="source-sub" id="src-news-detail">—</div></div>
+          <span class="status-tag" id="src-news">—</span>
+        </div>
+        <div class="source-row">
+          <div class="source-info"><div class="source-name">Fundamentals</div><div class="source-sub" id="src-fund-detail">—</div></div>
+          <span class="status-tag" id="src-fund">—</span>
+        </div>
+        <div class="source-row">
+          <div class="source-info"><div class="source-name">GDELT Macro</div><div class="source-sub" id="src-gdelt-detail">—</div></div>
+          <span class="status-tag" id="src-gdelt">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-header">
+      <span class="tbl-title">Symbol Coverage</span>
+      <button class="btn btn-outline btn-xs" id="btn-dl-scan">Refresh Scan</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Symbol</th><th>Rows</th><th>From</th><th>To</th><th>Days</th><th>Size</th><th>Updated</th><th>Coverage</th></tr>
+      </thead>
+      <tbody id="dl-sym-body">
+        <tr><td colspan="8" class="empty-state">Scanning…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ PAGE: TRAINING -->
+<div class="page" id="page-train">
+
+  <div class="run-bar mb-20">
+    <div class="flex items-center gap-12 wrap">
+      <span class="status-tag" id="train-status">Idle</span>
+      <button class="btn btn-primary btn-sm page-run-btn" id="btn-run-train">Run Training</button>
+      <button class="btn btn-danger btn-sm page-stop-btn" id="btn-stop-train" disabled>Stop</button>
+      <span class="mono text-xs text-muted" id="train-pid"></span>
+    </div>
+  </div>
+
+  <div class="metric-grid mb-20">
+    <div class="metric-card"><div class="card-label">Val Accuracy</div><div class="card-value" id="train-vacc">—</div></div>
+    <div class="metric-card"><div class="card-label">Val Sharpe</div><div class="card-value" id="train-vsharpe">—</div></div>
+    <div class="metric-card"><div class="card-label">Best Fold</div><div class="card-value" id="train-fold">—</div></div>
+    <div class="metric-card"><div class="card-label">Epoch</div><div class="card-value" id="train-epoch">—</div></div>
+    <div class="metric-card"><div class="card-label">Temperature</div><div class="card-value" id="train-temp">—</div></div>
+    <div class="metric-card"><div class="card-label">Checkpoint Age</div><div class="card-value" id="train-age" style="font-size:16px">—</div></div>
+  </div>
+
+  <div class="layout-main">
+    <div style="padding:18px 20px; display:flex; flex-direction:column; gap:14px">
+      <div>
+        <div class="flex items-center justify-between mb-6">
+          <span class="card-label" style="margin-bottom:0">Epoch Progress</span>
+          <span class="mono text-xs text-muted" id="train-prog-label">—</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="train-pbar" style="width:0%"></div></div>
+        <div class="flex items-center justify-between mt-12 mb-6">
+          <span class="card-label" style="margin-bottom:0">Fold Progress</span>
+          <span class="mono text-xs text-muted" id="train-fold-label">—</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" id="train-fold-bar" style="width:0%"></div></div>
+      </div>
+      <div class="card-label mb-4" style="margin-top:4px">Live Log</div>
+      <div class="log-panel" id="train-log" style="flex:1; min-height:200px"><span class="log-plain">Start training to see live output.</span></div>
+    </div>
+    <div style="padding:18px 20px">
+      <div class="card-label mb-12">Model Checkpoint</div>
+      <div id="train-checkpoint"><p class="mono text-xs text-muted">No checkpoint found.<br>Run Training first.</p></div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════ PAGE: DATA -->
+<div class="page" id="page-data">
+
+  <div class="metric-grid mb-20">
+    <div class="metric-card">
+      <div class="card-label">Symbols</div>
+      <div class="card-value" id="data-nsymbols">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Total Rows</div>
+      <div class="card-value" id="data-nrows">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Disk Usage</div>
+      <div class="card-value" id="data-disk">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="card-label">Last Sync</div>
+      <div class="card-value" id="data-lastsync" style="font-size:18px">—</div>
+    </div>
+  </div>
+
+  <!-- Per-symbol coverage table -->
+  <div class="tbl-wrap mb-20">
+    <div class="tbl-header">
+      <span class="tbl-title">Symbol Coverage</span>
+      <button class="btn btn-outline btn-xs" id="btn-data-refresh">Refresh Scan</button>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Symbol</th>
+          <th>File</th>
+          <th>Rows</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Days</th>
+          <th>Size</th>
+          <th>Updated</th>
+          <th>Coverage</th>
+        </tr>
+      </thead>
+      <tbody id="data-sym-body">
+        <tr><td colspan="9" class="empty-state">Scanning…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- All data files (flat) -->
+  <div class="tbl-wrap">
+    <div class="tbl-header">
+      <span class="tbl-title">All Data Files</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>File</th><th>Rows</th><th>From</th><th>To</th><th>Size</th><th>Updated</th></tr>
+      </thead>
+      <tbody id="data-files-body">
+        <tr><td colspan="6" class="empty-state">Scanning…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: BACKTEST -->
+<div class="page" id="page-backtest">
+
+  <div class="run-bar mb-20">
+    <div class="flex items-center gap-12 wrap">
+      <span class="status-tag" id="bt-run-status">Idle</span>
+      <button class="btn btn-primary btn-sm page-run-btn" id="btn-run-backtest">Run Backtest</button>
+      <button class="btn btn-danger btn-sm page-stop-btn" id="btn-stop-backtest" disabled>Stop</button>
+    </div>
+    <div class="log-panel" id="bt-log" style="max-height:100px; margin-top:12px; display:none"></div>
+  </div>
+
+  <div class="metric-grid mb-20">
+    <div class="metric-card"><div class="card-label">Total Return</div><div class="card-value" id="bt-ret">—</div></div>
+    <div class="metric-card"><div class="card-label">Sharpe Ratio</div><div class="card-value" id="bt-sharpe">—</div></div>
+    <div class="metric-card"><div class="card-label">Sortino</div><div class="card-value" id="bt-sortino">—</div></div>
+    <div class="metric-card"><div class="card-label">Max Drawdown</div><div class="card-value" id="bt-dd">—</div></div>
+    <div class="metric-card"><div class="card-label">Win Rate</div><div class="card-value" id="bt-wr">—</div></div>
+    <div class="metric-card"><div class="card-label">Trades</div><div class="card-value" id="bt-ntrades">—</div></div>
+  </div>
+
+  <div class="layout-split mb-20">
+    <div style="padding:18px 20px">
+      <div class="card-label mb-12">Equity Curve</div>
+      <div class="chart-wrap"><canvas id="bt-equity-chart"></canvas></div>
+    </div>
+    <div style="padding:18px 20px">
+      <div class="card-label mb-12">Daily P&amp;L</div>
+      <div class="chart-wrap"><canvas id="bt-pnl-chart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-header">
+      <span class="tbl-title">Trade History</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Symbol</th><th>Entry</th><th>Exit</th><th>P&amp;L %</th><th>P&amp;L $</th><th>Reason</th><th>Regime</th></tr>
+      </thead>
+      <tbody id="bt-trades-body">
+        <tr><td colspan="7" class="empty-state">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════ PAGE: LIVE TRADING -->
+<div class="page" id="page-live">
+
+  <div class="metric-grid mb-20">
+    <div class="metric-card"><div class="card-label">Account Equity</div><div class="card-value" id="live-equity">—</div></div>
+    <div class="metric-card"><div class="card-label">Cash</div><div class="card-value" id="live-cash">—</div></div>
+    <div class="metric-card"><div class="card-label">Buying Power</div><div class="card-value" id="live-bp">—</div></div>
+    <div class="metric-card"><div class="card-label">Exposure</div><div class="card-value" id="live-exp">—</div></div>
+  </div>
+
+  <div class="tbl-wrap mb-20">
+    <div class="tbl-header">
+      <span class="tbl-title">Open Positions</span>
+      <button class="btn btn-outline btn-xs" id="btn-pos-refresh">Refresh</button>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Symbol</th><th>Qty</th><th>Avg Entry</th><th>Current</th><th>Mkt Value</th><th>Unrealised P&amp;L</th><th>P&amp;L %</th></tr>
+      </thead>
+      <tbody id="live-pos-body">
+        <tr><td colspan="7" class="empty-state">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card mb-20">
+    <div class="flex items-center justify-between mb-16">
+      <div class="card-label" style="margin-bottom:0">Bot Control</div>
+      <div class="flex items-center gap-12">
+        <span class="status-tag" id="bot-status-badge">Idle</span>
+        <span class="mono text-xs text-muted" id="bot-pid"></span>
+        <button class="btn btn-primary btn-sm" id="btn-bot-start">Start Bot</button>
+        <button class="btn btn-danger btn-sm" id="btn-bot-stop" disabled>Stop</button>
+      </div>
+    </div>
+    <div class="log-panel" id="live-log" style="min-height:100px">
+      <span class="log-plain">Waiting…</span>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <div class="tbl-header">
+      <span class="tbl-title">Recent Trades</span>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Symbol</th><th>Entry</th><th>Exit</th><th>P&amp;L %</th><th>P&amp;L $</th><th>Reason</th><th>Regime</th></tr>
+      </thead>
+      <tbody id="live-trades-body">
+        <tr><td colspan="7" class="empty-state">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: SIGNALS -->
+<div class="page" id="page-signals">
+
+  <div class="metric-grid mb-16">
+    <div class="metric-card"><div class="card-label">Signal Date</div><div class="card-value" id="sig-date" style="font-size:16px">—</div></div>
+    <div class="metric-card"><div class="card-label">Buy Signals</div><div class="card-value t-pos" id="sig-nbuys">—</div></div>
+    <div class="metric-card"><div class="card-label">Sell Signals</div><div class="card-value t-neg" id="sig-nsells">—</div></div>
+    <div class="metric-card"><div class="card-label">Hold / Neutral</div><div class="card-value" id="sig-nholds">—</div></div>
+    <div class="metric-card"><div class="card-label">Avg Confidence</div><div class="card-value" id="sig-conf">—</div></div>
+  </div>
+
+  <div class="flex items-center justify-between mb-16">
+    <div class="chip-group">
+      <button class="chip active" data-sig="all">All</button>
+      <button class="chip chip-buy" data-sig="buys">Buys</button>
+      <button class="chip chip-sell" data-sig="sells">Sells</button>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>Symbol</th><th>Signal</th><th>Confidence</th><th>Uncertainty</th><th>Probs</th></tr>
+      </thead>
+      <tbody id="sig-tbody">
+        <tr><td colspan="5" class="empty-state">Loading…</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════ PAGE: SYSTEM -->
+<div class="page" id="page-system">
+
+  <!-- System status banner -->
+  <div class="sys-banner ok" id="sys-banner">System Nominal</div>
+
+  <!-- Health grid -->
+  <div class="health-grid mb-20">
+    <div class="health-card">
+      <div class="health-label">CPU</div>
+      <div class="health-val" id="sys-cpu">—</div>
+      <div class="bar-track"><div class="bar-fill" id="sys-cpu-bar" style="width:0%"></div></div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">Memory</div>
+      <div class="health-val" id="sys-mem">—</div>
+      <div class="health-sub" id="sys-mem-detail"></div>
+      <div class="bar-track"><div class="bar-fill" id="sys-mem-bar" style="width:0%"></div></div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">Disk</div>
+      <div class="health-val" id="sys-disk">—</div>
+      <div class="health-sub" id="sys-disk-detail"></div>
+      <div class="bar-track"><div class="bar-fill" id="sys-disk-bar" style="width:0%"></div></div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">GPU VRAM</div>
+      <div class="health-val" id="sys-gpu">—</div>
+      <div class="health-sub" id="sys-gpu-name"></div>
+      <div class="bar-track"><div class="bar-fill" id="sys-gpu-bar" style="width:0%"></div></div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">System Uptime</div>
+      <div class="health-val" id="sys-uptime" style="font-size:16px">—</div>
+    </div>
+    <div class="health-card">
+      <div class="health-label">Performance DB</div>
+      <div class="health-val" id="sys-db-size" style="font-size:16px">—</div>
+    </div>
+  </div>
+
+  <!-- Model checkpoint -->
+  <div class="layout-main mb-20">
+    <div class="card">
+      <div class="card-label mb-12">Model Checkpoint</div>
+      <div id="sys-model-info"><p class="mono text-xs text-muted">No checkpoint.</p></div>
+    </div>
+    <div class="card">
+      <div class="card-label mb-12">GPU Detail</div>
+      <div id="sys-gpu-detail"><p class="mono text-xs text-muted">N/A</p></div>
+    </div>
+  </div>
+
+  <!-- Log tabs -->
+  <div class="mb-12 flex gap-8">
+    <button class="chip active" data-log="app" id="logtab-app">App Logs (7d)</button>
+    <button class="chip" data-log="access" id="logtab-access">Access Logs</button>
+    <div style="flex:1"></div>
+    <div class="flex items-center gap-8">
+      <span class="mono text-xs text-muted">Filter:</span>
+      <button class="chip active" data-loglevel="all" id="ll-all">All</button>
+      <button class="chip" data-loglevel="error">Errors</button>
+      <button class="chip" data-loglevel="warning">Warnings</button>
+    </div>
+  </div>
+
+  <div class="tbl-wrap" id="sys-log-wrap">
+    <div class="tbl-header">
+      <span class="tbl-title" id="sys-log-title">Application Logs — Last 7 Days</span>
+      <button class="btn btn-outline btn-xs" id="btn-sys-refresh">Refresh</button>
+    </div>
+    <div class="log-panel" id="sys-log" style="max-height:420px;border:none">
+      <span class="log-plain mono text-xs">Loading…</span>
+    </div>
+  </div>
+
+</div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script src="/static/app.js"></script>
+</body>
+</html>
