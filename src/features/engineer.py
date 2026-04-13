@@ -328,3 +328,23 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# ======================================================================
+# Production helpers (added for layered production port, keep side-effect free)
+# ======================================================================
+
+def load_core_feature_list(root: Path, key: str = "core") -> list[str]:
+    """Load the CORE feature set from configs/feature_sets.yaml."""
+    import yaml
+    with open(Path(root) / "configs/feature_sets.yaml", "r") as f:
+        fs = yaml.safe_load(f)
+    if key not in fs:
+        raise KeyError(f"feature set key {key!r} not in feature_sets.yaml")
+    return list(fs[key])
+
+
+def select_core_features(df: pd.DataFrame, core: list[str]) -> list[str]:
+    """Return CORE features present in the panel, preserving declared order."""
+    present = [c for c in core if c in df.columns]
+    return present

@@ -1,34 +1,35 @@
 # Production requirements for the quant trading research pipeline.
-# Scoped to what `src/` and `scripts/` (excluding `archive/`) actually
-# import. The pre-Phase-3 codebase requirements are in
-# archive/old_codebase/requirements_old.txt.
+# Pinned to versions installed in the working environment.
+# pandas_datareader removed (incompatible with current pandas); FRED is now
+# fetched via requests against the JSON API + public CSV endpoint, see
+# src/data/fetchers/fred_macro.py. fredapi remains optional and is no
+# longer required because src/data/fetchers/fred.py falls through to the
+# requests-based path on its own.
 
 # Core numerics
-numpy>=1.26.0
-pandas>=2.1.0
-scipy>=1.12.0
-scikit-learn>=1.4.0
-pyarrow>=14.0.0
+numpy==2.2.6
+pandas==3.0.2
+scipy==1.14.1
+scikit-learn==1.5.1
+pyarrow==23.0.1
 
 # Config / env
-pyyaml>=6.0.1
-python-dotenv>=1.0.0
+pyyaml==6.0.1
+python-dotenv==1.0.1
 
-# HTTP / scraping (data fetchers)
-requests>=2.31.0
-beautifulsoup4>=4.12.0
-lxml>=5.0.0
-feedparser>=6.0.0
+# HTTP / scraping (data fetchers, including FRED)
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
+feedparser==6.0.11
 
 # Market data
-yfinance>=0.2.36
-pandas-datareader>=0.10.0
-pandas-market-calendars>=4.4.0
-fredapi>=0.5.0
-pytrends>=4.9.0
+yfinance==0.2.55
+pandas-market-calendars==5.3.2
+pytrends==4.9.2
 
 # Sentiment / NLP utilities used by alt-data fetchers
-nltk>=3.8.0
+nltk==3.9.1
 
 # Plotting (analysis / report generation)
-matplotlib>=3.8.0
+matplotlib==3.10.0

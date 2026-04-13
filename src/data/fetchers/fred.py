@@ -32,12 +32,6 @@ try:
 except ImportError:
     _HAS_FREDAPI = False
 
-try:
-    import pandas_datareader.data as pdr  # type: ignore
-    _HAS_PDR = True
-except ImportError:
-    _HAS_PDR = False
-
 
 _FRED_CLIENT = None
 
@@ -79,7 +73,7 @@ def download_fred(
     start: Optional[str] = None,
     end: Optional[str] = None,
 ) -> pd.DataFrame:
-    """Download a single FRED series. Tries fredapi -> pandas_datareader -> CSV.
+    """Download a single FRED series. Tries fredapi -> public CSV endpoint.
     Returns a DataFrame indexed by date with one column named series_id."""
     df = pd.DataFrame()
 
@@ -91,13 +85,6 @@ def download_fred(
             df.index = pd.to_datetime(df.index)
         except Exception as e:
             print(f"  ! {series_id}: fredapi failed: {e}")
-            df = pd.DataFrame()
-
-    if df.empty and _HAS_PDR:
-        try:
-            df = pdr.DataReader(series_id, "fred", start=start, end=end)
-        except Exception as e:
-            print(f"  ! {series_id}: pdr failed: {e}")
             df = pd.DataFrame()
 
     if df.empty:

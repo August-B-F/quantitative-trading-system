@@ -1,0 +1,71 @@
+# Strategy parameters — pinned production spec (MASTER_ARCHITECTURE §2, §9.2).
+# Nothing that affects backtest numbers lives in code; everything is here.
+
+universe: [SOXX, QQQ, XLK, VGT, IGV, XLE, GLD, SHY]
+cash_proxy: SHY
+reference_index: SPY
+feature_extras: [TLT, DBC, XLF, XLI, XLV, AGG, EEM, IWM]
+
+# --- momentum / ranking ---
+lookback_stable: 63            # trading days; NON-NEGOTIABLE (§2.5 cliff)
+lookback_transition: 21
+
+# --- position sizing ---
+top1_weight: 0.50
+top3_weight: 0.50
+top_k: 3
+top3_weighting: inverse_vol    # M11 (§2.4)
+inv_vol_lookback: 63           # spec window; research code uses atr_21d proxy (see vol_proxy)
+vol_proxy: atr_21d             # matches research canonical path (run_m26_deep:125)
+
+# --- SMA200 trend gate ---
+sma_gate_index: SPY
+sma_gate_window: 200
+sma_gate_buffer: -0.04         # fire if SPY distance < -4%
+
+# --- rebalance schedule ---
+rebalance_day: month_end       # NON-NEGOTIABLE (§2.7, STRESS Test 5)
+
+# --- FOMC deferral (M26_post_3d) ---
+fomc_defer_enabled: true
+fomc_defer_days: 3
+fomc_window_pre: 0             # post-only window
+fomc_window_after: 2
+
+# --- transaction costs (informational only; canonical backtest is gross) ---
+transaction_cost_bps: 10       # round-trip; haircut budget 20bps (§3.4)
+
+# --- classifier ---
+classifier:
+  model: HistGradientBoostingClassifier
+  max_iter: 200
+  max_depth: 4
+  learning_rate: 0.05
+  min_samples_leaf: 20
+  l2_regularization: 1.0
+  random_state: 0
+  feature_set: core            # key into configs/feature_sets.yaml
+  regime_classes: [regime_hg_li, regime_hg_hi, regime_lg_li, regime_lg_hi_stagflation]
+  target_col: TARGET_TREG_growth_inflation_fwd21
+  fallback: lookback_stable_always
+
+# --- walk-forward splitter (§5.4) ---
+splitter:
+  min_train_months: 60
+  val_months: 6
+  test_months: 3
+  step_months: 3
+  sample_every_n_days: 5
+  embargo_days: 5
+  target_horizon: 21
+  decay_halflife_months: 36
+
+# --- paths ---
+paths:
+  master_panel: data/features/master_panel.parquet
+  returns_dir: data/features/price          # returns_21d.parquet, returns_63d.parquet, atr_21d.parquet
+  prices_clean: data/clean/prices
+  macro_clean: data/clean/macro
+  fomc_calendar: data/clean/calendar/events.parquet
+  model_dir: data/models
+  results_dir: results/production

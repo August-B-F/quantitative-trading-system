@@ -1,0 +1,33 @@
+# Data source IDs — MASTER_ARCHITECTURE §10.2 / §10.3.
+
+yahoo:
+  universe: [SOXX, QQQ, XLK, VGT, IGV, XLE, GLD, SHY]
+  reference: [SPY]
+  feature_extras: [TLT, DBC, XLF, XLI, XLV, AGG, EEM, IWM]
+  vix: "^VIX"
+  field: Adj Close
+
+fred:
+  cpi_yoy: CPIAUCSL              # 12m pct chg
+  cpi_mom: CPIAUCSL              # 1m pct chg
+  breakeven_5y: T5YIE
+  breakeven_10y: T10YIE
+  ism_pmi_proxy_indpro: INDPRO   # composite with TCU
+  ism_pmi_proxy_tcu: TCU
+  capacity_utilization: TCU
+  initial_claims: ICSA           # 4wk MA at feature build
+  oecd_cli: USALOLITONOSTSAM     # STOPPED PUBLISHING 2023-12 (see §8.1)
+  rail_traffic: RAILFRTCARLOADSD11
+  consumer_credit: TOTALSL
+  margin_debt: BOGZ1FL663067003Q
+  wti_crude: DCOILWTICO
+  # gold reference price: FRED retired both GOLDAMGBD228NLBM (AM) and
+  # GOLDPMGBD228NLBM (PM) London-fix series. The CORE feature
+  # cross_asset_oil_gold__oil_gold_ratio is built from the GLD ETF via
+  # Yahoo (already in `yahoo.universe`), so no FRED gold input is needed.
+
+fomc:
+  source: federalreserve.gov
+  file: data/clean/calendar/events.parquet
+  event_filter: fomc_decision
+  refresh: manual_annual

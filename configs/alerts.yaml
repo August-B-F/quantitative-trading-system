@@ -1,0 +1,38 @@
+# Alert thresholds — MASTER_ARCHITECTURE §6.4.
+
+immediate:
+  price_feed_lag_days: 1
+  drawdown_investigate_pct: -15.0
+  drawdown_kill_switch_pct: -25.0
+
+warning:
+  trailing_12m_sharpe_floor: 1.0
+  trailing_12m_vs_spy_pp: -10.0
+  wf_classifier_accuracy_12m: 0.60
+  cpi_feed_stale_days: 30
+  fomc_defer_rate_min_annual: 0.02
+  fomc_defer_rate_max_annual: 0.10
+  # OECD CLI feature is a Tier-C CORE feature on a discontinued FRED
+  # series (USALOLITONOSTSAM stopped 2023-12). Replacements rejected
+  # 2026-04-12 (CFNAI corr 0.36, USPHCI corr 0.64). Forward-filled.
+  # Monitor staleness as a recurring WARNING, not a kill-switch.
+  # See MASTER_ARCHITECTURE §8.1.
+  oecd_cli_age_days: 90
+  oecd_cli_age_recurring_days: 365
+
+disable:
+  classifier_wf_accuracy_sustained: 0.55   # over 2 consecutive retrain windows
+  classifier_wf_windows: 2
+  trailing_12m_sharpe: 0.8
+  core_feature_stale_days: 60
+
+staleness:
+  daily_price_max_days: 2
+  weekly_macro_max_days: 5
+  monthly_macro_max_days: 45
+  quarterly_macro_max_days: 60
+
+info:
+  log_sma_gate_events: true
+  log_fomc_defer_events: true
+  log_regime_switch_events: true
