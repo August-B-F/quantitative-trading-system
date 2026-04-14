@@ -1784,3 +1784,98 @@ For the *next* month (2019-02-28), the FOMC on 2019-01-30 lands in
 the `[D, D-2td]` preceding window at end-February, and M26_post_3d
 fires — which is part of the aggregate "3 deferrals across the
 2018-01-25 → 2019-03-25 DD window" reported in STRESS_TEST Test 7.
+
+## Operations / TUI
+
+`scripts/tui.py` is a Textual-based read-only viewer for the strategy.
+It never re-runs the backtest; it only reads
+`results/backtest_presentation.json` (single source of truth) and
+`configs/holdings.json`, and reloads automatically on file mtime change.
+
+**Tabs.**
+- **Overview** — headline stats (CAGR / Sharpe / MaxDD), validated badge,
+  current regime, last rebalance, FOMC-deferred flag, equity sparkline.
+- **Performance** — full strategy-vs-SPY key-stats table, annual return
+  bars, rolling-Sharpe sparkline.
+- **Holdings** — current target weights from `configs/holdings.json` plus
+  the most recent `trade_log` entry (allocation, lookback, regime, deltas).
+- **Backtest** — last 50 trade-log rebalances and the full monthly
+  heatmap (`rich.Table`, cells colored by sign).
+- **Control** — buttons that shell out to
+  `scripts/generate_presentation.py`, `scripts/generate_pdf_report.py`,
+  and `scripts/model/stress_harness.py --validate`. Output streams to a
+  `RichLog`. After a successful run the snapshot is auto-reloaded.
+
+**Run locally (TTY).**
+
+```
+py scripts/tui.py
+```
+
+Keys: `1..5` switch tabs, `r` reload snapshot, `q` quit.
+
+**Run as a web server (browser, phone, ZeroTier).**
+
+```
+py scripts/tui.py --serve              # binds 0.0.0.0:8765
+```
+
+Backed by `textual-serve` — exposes the TUI over HTTP+WebSocket; any
+modern browser works, no client install. Override host/port with
+`--host` / `--port`.
+
+**Always-on background service (Windows Task Scheduler).**
+
+```
+powershell -ExecutionPolicy Bypass -File scripts\install_tui_service.ps1
+powershell -ExecutionPolicy Bypass -File scripts\uninstall_tui_service.ps1
+```
+
+Registers the `QTS-TUI` task: `At log on` trigger, restart every 1 min on
+failure, no execution time limit, runs hidden, working dir = project root.
+Survives reboot once the user logs in.
+
+**ZeroTier access from another device.**
+
+```
+zerotier-cli listnetworks      # find this host's ZT-assigned IP
+```
+
+Then from the phone/laptop browser:
+
+```
+http://<zt-ip>:8765
+```
+
+**Firewall — restrict 8765 to the ZeroTier interface only.** Run elevated:
+
+```
+netsh advfirewall firewall add rule name="QTS-TUI 8765 (ZT)" ^
+       dir=in action=allow protocol=TCP localport=8765 ^
+       interfacetype=lan profile=private
+```
+
+Do *not* add the rule for the `public` profile. The ZeroTier interface
+shows up under the `private`/`lan` profile by default — confirm via
+`Get-NetConnectionProfile` and re-categorize the ZT adapter to `Private`
+if Windows tagged it as Public.
+
+**Auth token.** Set `TUI_TOKEN` to require a query-string token:
+
+```
+setx TUI_TOKEN "<random-string>"
+```
+
+The token is printed at server startup. Auth is a defence-in-depth layer
+on top of the firewall rule, not a replacement for it — never expose 8765
+on the public internet.
+
+**Data source.** The TUI reads exactly one file:
+`results/backtest_presentation.json`. Regenerate it with:
+
+```
+py scripts/generate_presentation.py
+```
+
+(The Control tab has a button for this.) The TUI polls the file mtime
+every 2 s and reloads automatically.

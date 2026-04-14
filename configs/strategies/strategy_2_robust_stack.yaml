@@ -1,0 +1,67 @@
+name: ROBUST_STACK
+slot: 2
+tier: confident_upgrade
+description: >
+  6-layer post-purge champion from tests/autonomous/purge. Each layer was
+  individually ablated (Test 1), held out per-half (Test 2), random-timed
+  (Test 3), parameter-swept (Test 4), re-built in isolation (Test 5), and
+  bootstrap-compared (Test 6). The four rejected layers (62/38 split,
+  FOMC tightening, self-DD trigger, warm boost) were stripped. What
+  remains is the subset that survived every purge test.
+type: ml_layered_validated
+universe_stable: [SOXX, QQQ, IGV, XLE, GLD, SHY]
+universe_transition: [SOXX, QQQ, IGV, XLE, GLD, SHY, TLT, AGG, XLV, XLF]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: month_end
+signal:
+  kind: rank_aggregation
+  lookbacks_and_weights: [[42, 1], [63, 3], [126, 1]]
+  transition_lookback: 21
+classifier:
+  model: HistGradientBoostingClassifier
+  feature_set: core_50_plus_7
+  extras: [hyg_minus_tlt_21d, hy_ig_spread, hy_ig_spread_z252,
+           yc_slope_10y_2y, yc_slope_10y_2y_chg63, real_rate_10y,
+           copper_gold_ratio]
+  signal_gate_max_proba: 0.40
+  universe_tier_max_proba: 0.50
+  retrain_cadence: quarterly
+sizing:
+  top1_weight_normal: 0.50
+  top1_weight_full_boost: 0.82
+  basket_weighting: inverse_vol
+boost:
+  trailing_9m_threshold: 0.30
+  spy_63d_threshold: 0.12
+gate:
+  kind: sma_distance
+  index: SPY
+  window: 200
+  threshold: -0.04
+  action: top1_to_cash
+fomc_defer:
+  enabled: true
+  pre_days: 0
+  post_days: 2
+  defer_days: 3
+backtest:
+  cagr: 0.2980
+  sharpe: 1.925
+  max_dd: -0.1284
+  period_a_sharpe: 2.255
+  period_b_sharpe: 1.802
+  source: tests/autonomous/champions/p_robust_champion.py
+  bootstrap_t_vs_canonical: 2.974
+  bootstrap_p_edge_pos: 0.9988
+  bootstrap_ci_lower_pp_yr: 1.79
+  per_layer_evidence: tests/autonomous/purge/{TEST1_ablation,TEST2_holdout,...}.md
+confidence: CONFIDENT
+notes: >
+  Each of the 6 surviving layers has either Test 2 OOS holdout evidence
+  of per-half positive contribution (L4 rank aggregation is the cleanest
+  example — helps both halves) OR strong single-test evidence with no
+  OOS contradiction. This is the canonical "upgrade OPTIMIZED after
+  purge" pick. Forward floor +1.79pp/yr annualized. Higher correlation
+  with OPT than other upgrades because it shares the FOMC-defer and
+  SMA-gate scaffolding.

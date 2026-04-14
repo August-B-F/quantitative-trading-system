@@ -1,0 +1,42 @@
+name: OPTIMIZED
+slot: 1
+description: >
+  E-R1 regime-conditional lookback + M11 inverse-vol top-3 + M26 FOMC post-3d
+  deferral. The validated production strategy.
+type: ml_regime_momentum
+universe: [SOXX, QQQ, XLK, VGT, IGV, XLE, GLD, SHY]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: month_end
+signal:
+  kind: regime_conditional_momentum
+  lookback_stable: 63
+  lookback_transition: 21
+sizing:
+  top1_weight: 0.50
+  top3_weight: 0.50
+  top_k: 3
+  top3_weighting: inverse_vol
+  vol_proxy: atr_21d
+gate:
+  kind: sma_distance
+  index: SPY
+  window: 200
+  threshold: -0.04
+  action: top1_to_cash
+fomc_defer:
+  enabled: true
+  pre_days: 0
+  post_days: 2
+  defer_days: 3
+classifier:
+  model: HistGradientBoostingClassifier
+  feature_set: core
+  classes: [hg_li, hg_hi, lg_li, lg_hi_stagflation]
+  retrain_cadence: quarterly
+backtest:
+  cagr: 0.2361
+  sharpe: 1.50
+  max_dd: -0.1294
+  window: 2008-05..2025-12
+  source: results/experiments/OPTIMIZED.json

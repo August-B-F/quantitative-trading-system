@@ -1,0 +1,43 @@
+name: DUAL_MOMENTUM
+slot: 6
+tier: neutral_benchmark
+description: >
+  Antonacci-style dual momentum. 12-1 month momentum (12m return
+  excluding the most recent month) ranks the 8-ETF universe. Pick the
+  top-ranked ETF. If its 12-1m return is negative (fails absolute
+  momentum), park in SHY instead.
+type: rules_dual_momentum
+universe: [SOXX, QQQ, XLK, VGT, IGV, XLE, GLD, SHY]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: month_end
+signal:
+  kind: dual_momentum_12m1
+  lookback_months: 12
+  skip_months: 1
+  absolute_filter: true
+  absolute_benchmark: cash_zero
+sizing:
+  allocation: 1.0
+  top_k: 1
+gate: null
+fomc_defer:
+  enabled: false
+classifier: null
+backtest:
+  cagr_est: 0.14
+  sharpe_est: 0.95
+  max_dd_est: -0.22
+  source: estimate
+  note: >
+    Never backtested in our pipeline (every internal experiment used
+    63d). Antonacci (2012) / Faber (2013) / Hurst-Ooi-Pedersen (2017)
+    put dual-momentum 12-1m on similar universes at 12-15% CAGR, 0.9-
+    1.0 Sharpe. P3.09_mom_12_1 in autonomous LOG tested 12-1 as a
+    rank-aggregation leg and got 21.59/1.27/-24.91 — but that's inside
+    the OPTIMIZED framework, not standalone.
+confidence: NEUTRAL
+notes: >
+  Academic benchmark. Tests whether our 63d lookback choice is
+  load-bearing or a local optimum against the canonical time-series
+  momentum signal.

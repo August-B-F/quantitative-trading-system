@@ -1,0 +1,67 @@
+name: P59_FULL_STACK
+slot: 8
+tier: skeptical_overfit_control
+description: >
+  Pre-purge 10-layer champion from the autonomous suite. Stacks every
+  layer the research process found interesting: 62/38 top-1 split,
+  tightened FOMC (0,1,4), self-DD trigger, warm boost, plus the 6
+  Robust layers. CAGR 30.73% / Sharpe 1.88 / MaxDD -12.66%. Higher
+  CAGR than ROBUST_STACK but lower Sharpe, because 4 of the 10 layers
+  leverage concentration without adding alpha.
+type: ml_layered_overfit_control
+universe_stable: [SOXX, QQQ, IGV, XLE, GLD, SHY]
+universe_transition: [SOXX, QQQ, IGV, XLE, GLD, SHY, TLT, AGG, XLV, XLF]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: month_end
+signal:
+  kind: rank_aggregation
+  lookbacks_and_weights: [[42, 1], [63, 3], [126, 1]]
+  transition_lookback: 21
+classifier:
+  model: HistGradientBoostingClassifier
+  feature_set: core_50_plus_7
+  signal_gate_max_proba: 0.40
+  universe_tier_max_proba: 0.50
+  retrain_cadence: quarterly
+sizing:
+  top1_weight_normal: 0.62
+  top1_weight_full_boost: 0.82
+  top1_weight_dd: 0.40
+  top1_weight_warm_boost: 0.70
+  basket_weighting: inverse_vol
+overrides:
+  self_dd_trigger:
+    trailing_3m_below: -0.02
+    top1_weight: 0.40
+  warm_boost:
+    trailing_6m_above: 0.25
+    spy_21d_above: 0.10
+    top1_weight: 0.70
+gate:
+  kind: sma_distance
+  index: SPY
+  window: 200
+  threshold: -0.04
+  action: top1_to_cash
+fomc_defer:
+  enabled: true
+  pre_days: 0
+  post_days: 1
+  defer_days: 4
+backtest:
+  cagr: 0.3073
+  sharpe: 1.88
+  max_dd: -0.1266
+  bootstrap_t_vs_canonical: 3.352
+  bootstrap_vs_robust: t=-1.22, NOT significant
+  source: tests/autonomous/champions/p59_champion.py
+confidence: SKEPTICAL
+notes: >
+  Head-to-head control against ROBUST_STACK. The purge found that the
+  4 extra layers (62/38 split, FOMC tightening, self-DD, warm boost)
+  cost -0.04 Sharpe and t=-1.22 is not statistically significant. If
+  P59 matches or beats ROBUST_STACK forward, the purge protocol was
+  too aggressive. If P59 lags ROBUST_STACK forward, the purge
+  protocol was correct and the rejection of concentration-leverage
+  layers should be canonised.

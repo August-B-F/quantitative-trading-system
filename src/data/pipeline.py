@@ -131,9 +131,72 @@ def _append_clean_parquet(path: Path, new_df: pd.DataFrame) -> pd.DataFrame:
     return merged
 
 
+def _panels_are_fresh(panels: dict[str, pd.DataFrame], max_staleness_days: int = 5) -> bool:
+    """True if the newest bar across all returned tickers is within `max_staleness_days`
+    calendar days of today. Used to decide whether a primary source is healthy enough
+    to skip the backup."""
+    if not panels:
+        return False
+    today = pd.Timestamp.utcnow().normalize().tz_localize(None)
+    latest_per_ticker = []
+    for _, df in panels.items():
+        d = df.dropna(subset=["adj_close"]) if "adj_close" in df.columns else df.dropna(how="all")
+        if d.empty:
+            continue
+        latest_per_ticker.append(d.index.max())
+    if not latest_per_ticker:
+        return False
+    newest = max(latest_per_ticker)
+    return (today - newest).days <= max_staleness_days
+
+
+def _write_panels(out_dir: Path, panels: dict[str, pd.DataFrame]) -> tuple[list, list]:
+    """Dedupe + write each ticker's DataFrame to the clean prices dir."""
+    latest_dates: list = []
+    gaps: list = []
+    for t, df in panels.items():
+        df = df.dropna(subset=["adj_close"]) if "adj_close" in df.columns else df.dropna(how="all")
+        if df.empty:
+            gaps.append(t)
+            continue
+        fname = "_VIX.parquet" if t == "^VIX" else f"{t}.parquet"
+        merged = _append_clean_parquet(out_dir / fname, df)
+        latest_dates.append(merged.index.max())
+    return latest_dates, gaps
+
+
+def _cache_staleness_days(out_dir: Path, tickers: list[str]) -> int | None:
+    """Newest date across the cached parquets, expressed in calendar days from today.
+    Returns None if no cached ticker exists."""
+    today = pd.Timestamp.utcnow().normalize().tz_localize(None)
+    newest: pd.Timestamp | None = None
+    for t in tickers:
+        fname = "_VIX.parquet" if t == "^VIX" else f"{t}.parquet"
+        p = out_dir / fname
+        if not p.exists():
+            continue
+        try:
+            df = pd.read_parquet(p)
+        except Exception:
+            continue
+        if df.empty:
+            continue
+        d = df.dropna(how="all").index.max()
+        if newest is None or d > newest:
+            newest = d
+    if newest is None:
+        return None
+    return int((today - newest).days)
+
+
 def _refresh_prices(root: Path, cfg: dict) -> dict:
-    """Fetch latest OHLCV for universe + reference + extras + VIX, append to /data/clean/prices/."""
-    from src.data.fetchers.yahoo_prices import fetch_ohlcv
+    """Fetch latest OHLCV with auto-failover: Yahoo → Twelve Data → cached parquets.
+
+    Returns a status dict. `source` is one of {"yahoo", "twelve_data", "cache", "none"}.
+    A degraded status with `source=cache` is still usable for a monthly strategy as
+    long as `staleness_days <= 2` (one missed trading day), per §6.4.
+    """
+    from src.data.fetchers.yahoo_prices import fetch_ohlcv as yahoo_fetch
 
     tickers = list(dict.fromkeys(
         list(cfg["universe"]) + [cfg["reference_index"]]
@@ -142,33 +205,66 @@ def _refresh_prices(root: Path, cfg: dict) -> dict:
     out_dir = root / cfg["paths"]["prices_clean"]
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # 6 months of history overlap is plenty to backfill any gap and recompute
-    # rolling stats; canonical history was built once in phase1_download.
     start = (pd.Timestamp.utcnow().normalize().tz_localize(None) - pd.Timedelta(days=180)).date().isoformat()
-    panels = fetch_ohlcv(tickers, start=start)
-    if panels is None:
-        return {"status": "error", "latest_date": None, "gaps": [], "error": "yahoo_unavailable"}
 
-    latest_dates = []
-    gaps = []
-    for t, df in panels.items():
-        df = df.dropna(subset=["adj_close"])
-        if df.empty:
-            gaps.append(t)
-            continue
-        fname = "_VIX.parquet" if t == "^VIX" else f"{t}.parquet"
-        merged = _append_clean_parquet(out_dir / fname, df)
-        latest_dates.append(merged.index.max())
+    # --- tier 1: Yahoo -------------------------------------------------
+    panels = None
+    try:
+        panels = yahoo_fetch(tickers, start=start)
+    except Exception as e:
+        log.warning("yahoo fetch raised: %s", e)
+        panels = None
 
-    if not latest_dates:
-        return {"status": "error", "latest_date": None, "gaps": gaps, "error": "all_tickers_empty"}
+    if panels is not None and _panels_are_fresh(panels):
+        latest_dates, gaps = _write_panels(out_dir, panels)
+        if latest_dates:
+            return {
+                "status": "ok" if not gaps else "degraded",
+                "source": "yahoo",
+                "latest_date": max(latest_dates).date().isoformat(),
+                "gaps": gaps,
+                "tickers": len(panels),
+            }
 
-    latest = max(latest_dates).date().isoformat()
+    # --- tier 2: Twelve Data ------------------------------------------
+    log.warning("yahoo price fetch failed or stale; trying twelve_data backup")
+    try:
+        from src.data.fetchers.twelve_data import fetch_ohlcv as td_fetch
+        backup_panels = td_fetch(tickers, start=start)
+    except Exception as e:
+        log.warning("twelve_data fetch raised: %s", e)
+        backup_panels = None
+
+    if backup_panels is not None and _panels_are_fresh(backup_panels):
+        latest_dates, gaps = _write_panels(out_dir, backup_panels)
+        if latest_dates:
+            return {
+                "status": "degraded",
+                "source": "twelve_data",
+                "latest_date": max(latest_dates).date().isoformat(),
+                "gaps": gaps,
+                "tickers": len(backup_panels),
+                "warning": "using backup price source (twelve_data)",
+            }
+
+    # --- tier 3: cached parquets --------------------------------------
+    log.error("both price sources unavailable; falling back to cache")
+    staleness = _cache_staleness_days(out_dir, tickers)
+    if staleness is not None and staleness <= 2:
+        return {
+            "status": "degraded",
+            "source": "cache",
+            "latest_date": None,
+            "staleness_days": staleness,
+            "warning": f"serving prices from cache, {staleness}d stale",
+        }
+
     return {
-        "status": "ok" if not gaps else "degraded",
-        "latest_date": latest,
-        "gaps": gaps,
-        "tickers": len(panels),
+        "status": "error",
+        "source": "none",
+        "latest_date": None,
+        "staleness_days": staleness,
+        "error": "all price sources unavailable",
     }
 
 
@@ -205,9 +301,22 @@ def _refresh_macro(root: Path, cfg: dict) -> dict:
     cal = _trading_calendar("2003-01-01", today)
 
     fetched, stale, errors = [], [], []
+    backup_used: list[str] = []
     for key, sid in ds["fred"].items():
         fname, freq = _MACRO_FILE_FREQ.get(key, (key, "monthly"))
         df = fetch_fred_series(sid, cache_dir=macro_dir)
+        if df.empty and sid == "CPIAUCSL":
+            # Tier-3 fallback for the most critical macro series: BLS direct.
+            try:
+                from src.data.fetchers.bls import fetch_cpi, CPI_SA
+                bls_df = fetch_cpi(CPI_SA)
+            except Exception as e:
+                log.warning("bls CPI fallback raised: %s", e)
+                bls_df = None
+            if bls_df is not None and not bls_df.empty:
+                df = bls_df.rename(columns={CPI_SA: sid})
+                backup_used.append(f"{key}=bls")
+                log.warning("CPI served from BLS fallback")
         if df.empty:
             errors.append(f"{key}({sid})")
             continue
@@ -228,11 +337,14 @@ def _refresh_macro(root: Path, cfg: dict) -> dict:
         fetched.append(key)
 
     status = "ok" if not errors else ("degraded" if fetched else "error")
+    if backup_used and status == "ok":
+        status = "degraded"
     return {
         "status": status,
         "series_count": len(fetched),
         "stale": stale,
         "errors": errors,
+        "backup_used": backup_used,
     }
 
 
@@ -313,6 +425,87 @@ def refresh_and_rebuild(root: Path | None = None) -> dict:
     else:
         status["rebuild"] = {"status": "skipped", "reason": "prices_unavailable"}
     return status
+
+
+def source_health_report(timeout: float = 10.0) -> dict:
+    """Probe every upstream data source and return a status dict per source.
+
+    Each entry has `status` in {"ok", "down", "skipped"}, plus `latency_ms`
+    and a short `detail` string when useful. Cheap probes only — a single
+    ticker / series per source. Intended for the daily health check.
+    """
+    import time as _time
+    report: dict[str, dict] = {}
+
+    # --- yahoo -----------------------------------------------------------
+    t0 = _time.monotonic()
+    try:
+        from src.data.fetchers.yahoo_prices import fetch_adj_close
+        df = fetch_adj_close(["SPY"], start=(pd.Timestamp.utcnow() - pd.Timedelta(days=10)).date().isoformat())
+        ok = df is not None and not df.empty
+        report["yahoo"] = {
+            "status": "ok" if ok else "down",
+            "latency_ms": int((_time.monotonic() - t0) * 1000),
+            "detail": f"rows={len(df)}" if ok else "empty/None",
+        }
+    except Exception as e:
+        report["yahoo"] = {"status": "down", "latency_ms": int((_time.monotonic() - t0) * 1000), "detail": str(e)[:80]}
+
+    # --- twelve_data -----------------------------------------------------
+    import os as _os
+    if not _os.environ.get("TWELVE_DATA_KEY"):
+        report["twelve_data"] = {"status": "skipped", "detail": "TWELVE_DATA_KEY not set"}
+    else:
+        t0 = _time.monotonic()
+        try:
+            from src.data.fetchers.twelve_data import fetch_daily
+            df = fetch_daily("SPY", start=(pd.Timestamp.utcnow() - pd.Timedelta(days=10)).date().isoformat())
+            ok = df is not None and not df.empty
+            report["twelve_data"] = {
+                "status": "ok" if ok else "down",
+                "latency_ms": int((_time.monotonic() - t0) * 1000),
+                "detail": f"rows={len(df)}" if ok else "empty/None",
+            }
+        except Exception as e:
+            report["twelve_data"] = {"status": "down", "latency_ms": int((_time.monotonic() - t0) * 1000), "detail": str(e)[:80]}
+
+    # --- fred (api + csv) -----------------------------------------------
+    import requests as _rq
+    for name, url in (
+        ("fred_api", "https://api.stlouisfed.org/fred/series/observations?series_id=CPIAUCSL&file_type=json&limit=1"
+                     + (f"&api_key={_os.environ['FRED_API_KEY']}" if _os.environ.get("FRED_API_KEY") else "")),
+        ("fred_csv", "https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL"),
+    ):
+        if name == "fred_api" and not _os.environ.get("FRED_API_KEY"):
+            report[name] = {"status": "skipped", "detail": "FRED_API_KEY not set"}
+            continue
+        t0 = _time.monotonic()
+        try:
+            r = _rq.get(url, timeout=timeout, headers={"User-Agent": "Mozilla/5.0"})
+            report[name] = {
+                "status": "ok" if r.status_code == 200 else "down",
+                "latency_ms": int((_time.monotonic() - t0) * 1000),
+                "detail": f"HTTP {r.status_code}",
+            }
+        except Exception as e:
+            report[name] = {"status": "down", "latency_ms": int((_time.monotonic() - t0) * 1000), "detail": str(e)[:80]}
+
+    # --- bls -------------------------------------------------------------
+    t0 = _time.monotonic()
+    try:
+        from src.data.fetchers.bls import fetch_cpi
+        current_year = pd.Timestamp.utcnow().year
+        df = fetch_cpi(start_year=current_year - 1, end_year=current_year)
+        ok = df is not None and not df.empty
+        report["bls"] = {
+            "status": "ok" if ok else "down",
+            "latency_ms": int((_time.monotonic() - t0) * 1000),
+            "detail": f"rows={len(df)}" if ok else "empty/None",
+        }
+    except Exception as e:
+        report["bls"] = {"status": "down", "latency_ms": int((_time.monotonic() - t0) * 1000), "detail": str(e)[:80]}
+
+    return report
 
 
 def refresh_all_data(root: Path | None = None) -> dict:

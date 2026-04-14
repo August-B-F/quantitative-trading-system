@@ -2,6 +2,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
+  /* ─── Tier palette (Skylark) ─── */
+  --tier-conf:       #28d4b0;
+  --tier-conf-bg:    #28d4b014;
+  --tier-conf-bord:  #28d4b055;
+  --tier-neut:       #e8a030;
+  --tier-neut-bg:    #e8a03014;
+  --tier-neut-bord:  #e8a03055;
+  --tier-skep:       #a878e8;
+  --tier-skep-bg:    #a878e814;
+  --tier-skep-bord:  #a878e855;
+
   --bg:           #080808;
   --bg-2:         #0e0e0e;
   --surface:      #141414;
@@ -105,21 +116,49 @@ body {
 }
 
 .sidebar-brand {
-  padding: 20px 18px 18px;
+  padding: 18px 16px 16px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  display: flex; align-items: center; gap: 11px;
+  position: relative;
+  overflow: hidden;
 }
-.brand-i {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 22px; font-weight: 700;
+.sidebar-brand::after {
+  content: '';
+  position: absolute; left: 16px; right: 16px; bottom: 8px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent);
+  opacity: .35;
+}
+.brand-mark {
+  width: 32px; height: 32px;
   color: var(--accent);
-  letter-spacing: -1px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 6px rgba(232,160,48,.35));
+  transition: transform .3s cubic-bezier(.4,0,.2,1), filter .3s;
 }
-.brand-stock {
+.sidebar-brand:hover .brand-mark {
+  transform: translateY(-1px) rotate(-2deg);
+  filter: drop-shadow(0 0 10px rgba(232,160,48,.6));
+}
+.brand-words { display: flex; flex-direction: column; line-height: 1; }
+.brand-name {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 22px; font-weight: 300;
+  font-size: 17px; font-weight: 700;
+  letter-spacing: 2.4px;
   color: var(--text);
-  letter-spacing: -1px;
+  background: linear-gradient(180deg, #f4f4f2 0%, #aaaaaa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 500;
+  letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--accent);
+  margin-top: 3px;
+  opacity: .85;
 }
 
 nav { flex: 1; padding: 16px 10px 10px; overflow-y: auto; display: flex; flex-direction: column; }
@@ -186,10 +225,10 @@ nav { flex: 1; padding: 16px 10px 10px; overflow-y: auto; display: flex; flex-di
   transition: border-color .3s, color .3s;
 }
 .regime-pill::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:currentColor; }
-.regime-pill.bull     { color:var(--teal);   border-color:var(--teal-border);  }
-.regime-pill.bear     { color:var(--red);    border-color:var(--red-border);   }
-.regime-pill.sideways { color:var(--amber);  border-color:var(--amber-border); }
-.regime-pill.crisis   { color:#c058c0;       border-color:#c058c040; }
+.regime-pill.hg-li    { color:var(--teal);   border-color:var(--teal-border);  }
+.regime-pill.hg-hi    { color:var(--amber);  border-color:var(--amber-border); }
+.regime-pill.lg-li    { color:#7aa0ff;       border-color:#7aa0ff40;           }
+.regime-pill.stag     { color:#c058c0;       border-color:#c058c040;           }
 .topbar-right { display: flex; align-items: center; gap: 14px; }
 .clock { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); letter-spacing: .5px; }
 .refresh-btn {
@@ -216,7 +255,9 @@ nav { flex: 1; padding: 16px 10px 10px; overflow-y: auto; display: flex; flex-di
 /* ─── Metric grid — fills all available width ────────────────────────────── */
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  /* auto-fit (not auto-fill) collapses empty tracks so cards stretch to
+     fill the row instead of leaving blank space on the right. */
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1px; background: var(--border); border: 1px solid var(--border);
   margin-bottom: 20px;
 }
@@ -250,7 +291,7 @@ nav { flex: 1; padding: 16px 10px 10px; overflow-y: auto; display: flex; flex-di
   gap: 1px; background: var(--border); border: 1px solid var(--border);
   margin-bottom: 20px;
 }
-.layout-main > * { background: var(--surface); }
+.layout-main > * { background: var(--surface); min-width: 0; }
 
 /* wider side panel on very wide screens */
 @media (min-width: 1600px) {
@@ -270,7 +311,9 @@ nav { flex: 1; padding: 16px 10px 10px; overflow-y: auto; display: flex; flex-di
   margin-bottom: 20px;
 }
 @media (max-width: 900px) { .layout-split { grid-template-columns: 1fr; } }
-.layout-split > * { background: var(--surface); }
+/* min-width: 0 forces grid children to actually honor 1fr instead of
+   being content-sized by their canvas/table intrinsic width */
+.layout-split > * { background: var(--surface); min-width: 0; }
 
 .layout-side {
   display: grid;
@@ -280,12 +323,12 @@ nav { flex: 1; padding: 16px 10px 10px; overflow-y: auto; display: flex; flex-di
 }
 @media (min-width: 1600px) { .layout-side { grid-template-columns: 340px 1fr; } }
 @media (max-width: 900px)  { .layout-side { grid-template-columns: 1fr; } }
-.layout-side > * { background: var(--surface); }
+.layout-side > * { background: var(--surface); min-width: 0; }
 
 /* ─── Chart ──────────────────────────────────────────────────────────────── */
-.chart-wrap { position: relative; height: 220px; }
+.chart-wrap { position: relative; height: 220px; width: 100%; min-width: 0; }
 @media (min-width: 1600px) { .chart-wrap { height: 260px; } }
-.chart-wrap canvas { width: 100% !important; }
+.chart-wrap canvas { width: 100% !important; max-width: 100% !important; }
 .chart-pad { padding: 18px 20px; background: var(--surface); }
 
 /* ─── Tables ─────────────────────────────────────────────────────────────── */
@@ -545,6 +588,259 @@ tbody tr:nth-child(n+7) { animation-delay: .14s; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border-2); }
 
+/* ═══════════════════════════════════════════════════════════ SKYLARK ═══ */
+
+/* Tier badges + nav dots */
+.nav-item.tier-confident svg { color: var(--tier-conf); opacity: .85; }
+.nav-item.tier-neutral   svg { color: var(--tier-neut); opacity: .85; }
+.nav-item.tier-skeptical svg { color: var(--tier-skep); opacity: .85; }
+
+.chip.tier-confident.active { background: var(--tier-conf); border-color: var(--tier-conf); color: var(--bg); }
+.chip.tier-neutral.active   { background: var(--tier-neut); border-color: var(--tier-neut); color: var(--bg); }
+.chip.tier-skeptical.active { background: var(--tier-skep); border-color: var(--tier-skep); color: var(--bg); }
+
+.tier-badge {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 500;
+  letter-spacing: .8px; text-transform: uppercase;
+  padding: 2px 7px; border: 1px solid var(--border-2); color: var(--muted);
+}
+.tier-badge.confident { color: var(--tier-conf); border-color: var(--tier-conf-bord); background: var(--tier-conf-bg); }
+.tier-badge.neutral   { color: var(--tier-neut); border-color: var(--tier-neut-bord); background: var(--tier-neut-bg); }
+.tier-badge.skeptical { color: var(--tier-skep); border-color: var(--tier-skep-bord); background: var(--tier-skep-bg); }
+
+/* Horse-race strategy cards — 3x3 grid */
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--border); border: 1px solid var(--border);
+}
+@media (max-width: 1100px) { .tier-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 720px)  { .tier-grid { grid-template-columns: 1fr; } }
+
+.strat-card {
+  background: var(--surface);
+  padding: 16px 18px;
+  border-left: 2px solid var(--border-2);
+  cursor: pointer;
+  transition: background .12s, border-color .12s;
+  animation: fadeUp .3s ease backwards;
+}
+.strat-card:hover { background: var(--surface-2); }
+.strat-card.confident { border-left-color: var(--tier-conf); }
+.strat-card.neutral   { border-left-color: var(--tier-neut); }
+.strat-card.skeptical { border-left-color: var(--tier-skep); }
+
+.strat-card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; gap: 8px; }
+.strat-card-slot { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: .5px; }
+.strat-card-name { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+.strat-card-return {
+  font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700;
+  letter-spacing: -1px; font-variant-numeric: tabular-nums;
+}
+.strat-card-return.pos { color: var(--teal); }
+.strat-card-return.neg { color: var(--red); }
+.strat-card-sub  { font-size: 11px; color: var(--muted); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+.strat-card-meta { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+.strat-card-meta span { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+.strat-card-meta b { color: var(--text-2); font-weight: 500; }
+
+/* Rank table — best/worst column highlights */
+td.cell-best  { color: var(--teal) !important; font-weight: 600; background: var(--teal-bg); }
+td.cell-worst { color: var(--red)  !important; font-weight: 600; background: var(--red-bg);  }
+
+/* Rank index column */
+td.rank-idx { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 13px; color: var(--muted); }
+td.rank-idx.r1 { color: var(--accent); }
+
+/* Live pill + regime */
+.status-tag.live { border-color: var(--red-border); color: var(--red); letter-spacing: 1.2px; }
+.status-tag.paper { border-color: var(--blue); color: var(--blue); }
+
+/* Sortable table headers */
+thead th[data-sort] { cursor: pointer; user-select: none; }
+thead th[data-sort]:hover { color: var(--text-2); }
+thead th[data-sort].sort-asc::after  { content: ' ↑'; color: var(--accent); }
+thead th[data-sort].sort-desc::after { content: ' ↓'; color: var(--accent); }
+
+/* Correlation heatmap */
+.corr-table { border-collapse: collapse; font-size: 10px; font-family: 'JetBrains Mono', monospace; }
+.corr-table th, .corr-table td {
+  padding: 5px 6px; text-align: center; border: 1px solid var(--border);
+  min-width: 44px; font-variant-numeric: tabular-nums;
+}
+.corr-table th { background: var(--surface-2); color: var(--muted); font-weight: 500; letter-spacing: .3px; }
+.corr-table td { color: var(--text-2); }
+.corr-cell-lo { background: rgba(40, 212, 176, 0.30); color: var(--text); }
+.corr-cell-md { background: rgba(232, 160, 48, 0.20); color: var(--text-2); }
+.corr-cell-hi { background: rgba(232, 85, 85, 0.25);  color: var(--text); }
+.corr-cell-diag { background: var(--border); color: var(--muted); }
+
+/* Strategy detail — select + yaml + rationale blocks */
+.sd-select {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  background: var(--surface-2); color: var(--text);
+  border: 1px solid var(--border-2); padding: 6px 10px;
+  letter-spacing: .3px; cursor: pointer;
+  min-width: 220px;
+}
+.sd-select:hover { border-color: var(--accent); }
+.sd-select:focus { outline: none; border-color: var(--accent); }
+
+.yaml-block {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  background: var(--bg-2); border: 1px solid var(--border);
+  padding: 14px 16px; color: var(--text-2);
+  max-height: 360px; overflow: auto;
+  white-space: pre; line-height: 1.55;
+}
+.yaml-block.collapsed { max-height: 0; padding: 0 16px; border: none; }
+
+.rationale-block {
+  font-size: 12.5px; line-height: 1.7; color: var(--text-2);
+  max-height: 520px; overflow: auto;
+  padding-right: 6px;
+}
+.rationale-block.collapsed { max-height: 0; overflow: hidden; }
+.rationale-block p { margin-bottom: 10px; }
+.rationale-block strong, .rationale-block b { color: var(--text); }
+.rationale-block code {
+  font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  background: var(--bg-2); padding: 1px 5px; color: var(--accent);
+}
+.rationale-block ul { padding-left: 20px; margin-bottom: 10px; }
+.rationale-block li { margin-bottom: 4px; }
+
+/* Account tier sub-cards — one per strategy within a tier */
+.acc-strat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 16px 20px; margin-bottom: 1px;
+}
+.acc-strat-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; gap: 12px; flex-wrap: wrap; }
+.acc-strat-name { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -.3px; }
+.acc-strat-eq   { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -.6px; }
+.acc-strat-eq.pos { color: var(--teal); }
+.acc-strat-eq.neg { color: var(--red);  }
+.acc-strat-sub { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+.acc-strat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) { .acc-strat-grid { grid-template-columns: 1fr; } }
+.acc-strat-grid .card-label { margin-top: 4px; }
+
+/* CPU per-core grid on system page */
+.core-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+  gap: 6px;
+}
+.core-cell {
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  padding: 6px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  position: relative;
+  overflow: hidden;
+}
+.core-cell .core-label { display: block; letter-spacing: .5px; }
+.core-cell .core-val   { display: block; color: var(--text); font-size: 11px; margin-top: 2px; font-weight: 600; }
+.core-cell::after {
+  content: '';
+  position: absolute; left: 0; bottom: 0;
+  height: 2px; background: var(--accent);
+  width: var(--fill, 0%);
+  transition: width .4s ease;
+}
+.core-cell.warn::after { background: var(--amber); }
+.core-cell.crit::after { background: var(--red); }
+
+/* GPU card inside system page */
+.gpu-row {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.gpu-row:last-child { border-bottom: none; }
+.gpu-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 8px; gap: 12px; flex-wrap: wrap;
+}
+.gpu-name { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); }
+.gpu-stats { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+
+/* Key statistics grid (Strategy Detail) */
+.ks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.ks-cell {
+  background: var(--surface);
+  padding: 12px 14px;
+  transition: background .15s;
+}
+.ks-cell:hover { background: var(--surface-2); }
+.ks-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 4px;
+}
+.ks-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17px; font-weight: 700; letter-spacing: -.5px;
+  color: var(--text); font-variant-numeric: tabular-nums;
+}
+.ks-val.pos { color: var(--teal); }
+.ks-val.neg { color: var(--red);  }
+.ks-val.warn { color: var(--amber); }
+
+/* SPY comparison row inside a ks-cell */
+.ks-spy {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-top: 6px; padding-top: 6px;
+  border-top: 1px dashed var(--border);
+  gap: 8px;
+}
+.ks-spy-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: .8px; color: var(--muted);
+}
+.ks-spy-val {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 12px; font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-2);
+}
+.ks-spy-val.pos { color: var(--teal); }
+.ks-spy-val.neg { color: var(--red);  }
+.ks-grid.ks-compare .ks-cell { padding-bottom: 10px; }
+
+/* Monthly heatmap — stretches to fill the card width on desktop, scrolls on mobile */
+.heatmap-wrap { overflow-x: auto; padding-bottom: 4px; }
+.heatmap {
+  border-collapse: collapse;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  width: 100%;
+  table-layout: fixed;
+}
+.heatmap th, .heatmap td {
+  padding: 4px 7px;
+  text-align: center;
+  border: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+  min-width: 42px;
+}
+.heatmap th.yr, .heatmap td.hm-year { width: 56px; }
+.heatmap th { color: var(--muted); background: var(--surface-2); font-weight: 500; letter-spacing: .3px; }
+.heatmap th.yr { text-align: right; color: var(--text-2); padding-right: 10px; }
+.heatmap td.hm-empty { background: var(--bg-2); color: var(--border-3); }
+.heatmap td.hm-year {
+  color: var(--text); font-weight: 600;
+  background: var(--surface-2);
+  border-left: 2px solid var(--border-3);
+}
+
 /* ─── Hamburger (hidden on desktop) ─────────────────────────────────────── */
 .hamburger {
   display: none; align-items: center; justify-content: center;
@@ -591,7 +887,13 @@ tbody tr:nth-child(n+7) { animation-delay: .14s; }
   .layout-side  { grid-template-columns: 1fr !important; }
 
   .tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  table { min-width: 560px; }
+  /* Compact tables drop their min-width so they fit the viewport cleanly */
+  table.tbl-compact { min-width: 0; }
+  table.tbl-compact th, table.tbl-compact td { padding: 7px 8px; font-size: 11px; }
+  /* Any element tagged .hide-mobile is hidden on narrow screens */
+  .hide-mobile { display: none !important; }
+  /* Non-compact tables still scroll horizontally */
+  table:not(.tbl-compact) { min-width: 560px; }
 
   .run-bar { gap: 8px; }
   .run-bar .btn { padding: 6px 12px; font-size: 10px; }
@@ -600,5 +902,68 @@ tbody tr:nth-child(n+7) { animation-delay: .14s; }
 
   .health-grid { grid-template-columns: repeat(2, 1fr); }
 
-  .chart-wrap { height: 200px !important; }
+  .chart-wrap { height: 220px !important; }
+
+  /* Skylark mobile refinements */
+  #topbar { padding: 0 14px; gap: 8px; }
+  .page-title { font-size: 13px; }
+  .topbar-left { gap: 8px; min-width: 0; }
+  .topbar-right { gap: 8px; }
+  .clock { font-size: 11px; }
+  .refresh-btn { padding: 5px 8px; }
+
+  .brand-name { font-size: 15px; letter-spacing: 2px; }
+  .brand-tag  { font-size: 8px; letter-spacing: 1.4px; }
+  .brand-mark { width: 28px; height: 28px; }
+
+  /* Horse race cards 1-up and full comparison table compact */
+  .tier-grid { grid-template-columns: 1fr; }
+  .strat-card { padding: 14px 16px; }
+  .strat-card-return { font-size: 20px; }
+
+  /* Dashboard filter row — hide the tier filter on mobile (default to All) */
+  #dash-tier-filter { display: none; }
+  /* Correlation heatmap is too dense for phones; hide on mobile */
+  #hr-corr { display: none; }
+
+  /* Chart card headers wrap cleanly — shrink labels so chips don't push out */
+  .card .card-label { font-size: 9px; }
+
+  /* Key stats: force 2 columns on narrow screens */
+  .ks-grid { grid-template-columns: repeat(2, 1fr); }
+  .ks-val  { font-size: 15px; }
+
+  /* CPU per-core grid denser */
+  .core-grid { grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); }
+
+  /* Strategy detail controls wrap nicely */
+  .sd-select { min-width: 170px; flex: 1; }
+
+  /* Heatmap already scrolls; shrink cell padding */
+  .heatmap th, .heatmap td { padding: 3px 5px; min-width: 36px; font-size: 9px; }
+
+  /* Correlation table */
+  .corr-table th, .corr-table td { padding: 3px 4px; min-width: 34px; }
+
+  /* Log panels fit in the viewport */
+  .log-panel { font-size: 10.5px; }
+
+  /* Tighter chip groups on mobile so filter rows don't blow up */
+  .chip { padding: 3px 8px; font-size: 9px; }
+
+  /* Rationale + yaml blocks scroll shorter */
+  .rationale-block { max-height: 360px; }
+  .yaml-block { max-height: 260px; font-size: 10px; }
+
+  /* Live pill stays visible even when regime pill is hidden */
+  .status-tag.live, .status-tag.paper { font-size: 9px; }
+}
+
+/* Very narrow phones — collapse metric grid to 1 col for readability */
+@media (max-width: 420px) {
+  .metric-grid { grid-template-columns: 1fr; }
+  .health-grid { grid-template-columns: 1fr; }
+  .ks-grid     { grid-template-columns: 1fr; }
+  .sidebar-brand { padding: 14px 14px 12px; }
+  .brand-tag { display: none; }
 }

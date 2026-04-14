@@ -16,6 +16,9 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
+from pathlib import Path
+import yaml
+
 from data.pipeline import PanelBundle
 from strategy.momentum import build_momentum_array
 from strategy.regime_switch import select_momentum
@@ -146,3 +149,66 @@ class PortfolioEngine:
             target_weights=weights,
             fwd_ret=fwd,
         )
+
+
+# =============================================================================
+# Multi-strategy dispatcher
+# =============================================================================
+
+
+class StrategyRunner:
+    """Config-driven wrapper that routes a strategy yaml to its implementation.
+
+    One runner per strategy yaml. The heavy lifting happens in
+    ``src/strategy/strategies.py``; this class is just the public surface used
+    by ``backtest.multi_engine.MultiStrategyBacktest``.
+
+    Usage::
+
+        runner = StrategyRunner("configs/strategies/strategy_1_optimized.yaml")
+        monthly, weights_hist = runner.run(bundle, pred_reg, test_dates, cfg_global)
+
+    ``compute_signal`` is provided for live use; stateful ML strategies require
+    the full historical loop, so it delegates to a cached ``run()`` result.
+    """
+
+    def __init__(self, config_path: str | Path):
+        self.config_path = Path(config_path)
+        with open(self.config_path, "r") as f:
+            self.config = yaml.safe_load(f)
+        self.name: str = self.config["name"]
+        self.slot: int = int(self.config.get("slot", 0))
+        self._cached_run = None  # (monthly, weights_history)
+
+    def run(self, bundle, pred_reg, test_dates, cfg_global):
+        """Run this strategy over the backtest window.
+
+        Returns (monthly_returns: pd.Series, weights_history: list[(Timestamp, dict)]).
+        """
+        from strategy.strategies import STRATEGY_DISPATCH
+
+        fn = STRATEGY_DISPATCH.get(self.name)
+        if fn is None:
+            raise KeyError(f"no strategy implementation registered for {self.name!r}")
+        monthly, weights_history = fn(self.config, bundle, pred_reg, test_dates, cfg_global)
+        self._cached_run = (monthly, weights_history)
+        return monthly, weights_history
+
+    def compute_signal(self, as_of_date, price_data=None, macro_data=None, classifier=None):
+        """Return target weights dict for ``as_of_date``.
+
+        For stateful strategies (S2/S7/S8/S9) this indexes into the cached
+        run() result and will raise if run() has not been called yet.
+        """
+        if self._cached_run is None:
+            raise RuntimeError(
+                f"{self.name}.compute_signal requires a prior run(); stateful "
+                "strategies depend on history of realised returns."
+            )
+        _, weights_history = self._cached_run
+        target = pd.Timestamp(as_of_date)
+        # pick the most recent rebalance on or before as_of_date
+        for rd, w in reversed(weights_history):
+            if rd <= target:
+                return w
+        raise KeyError(f"no rebalance weight available on or before {as_of_date}")

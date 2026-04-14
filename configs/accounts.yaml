@@ -1,0 +1,109 @@
+# 9-account paper trading mapping (3 Alpaca logins x 3 paper accounts each).
+# Each strategy trades in its own dedicated paper account.
+
+initial_capital: 100000
+
+strategies:
+  strategy_1_optimized:
+    name: OPTIMIZED
+    slot: 1
+    tier: confident
+    login: brunnbergaugust81
+    alpaca_key_env: ALPACA_S1_KEY
+    alpaca_secret_env: ALPACA_S1_SECRET
+    config: configs/strategies/strategy_1_optimized.yaml
+
+  strategy_2_robust_stack:
+    name: ROBUST_STACK
+    slot: 2
+    tier: confident
+    login: brunnbergaugust81
+    alpaca_key_env: ALPACA_S2_KEY
+    alpaca_secret_env: ALPACA_S2_SECRET
+    config: configs/strategies/strategy_2_robust_stack.yaml
+
+  strategy_3_dropoverlap:
+    name: DROPOVERLAP
+    slot: 3
+    tier: confident
+    login: brunnbergaugust81
+    alpaca_key_env: ALPACA_S3_KEY
+    alpaca_secret_env: ALPACA_S3_SECRET
+    config: configs/strategies/strategy_3_dropoverlap.yaml
+
+  strategy_4_t2_balanced:
+    name: T2_BALANCED
+    slot: 4
+    tier: neutral
+    login: amsterdam.tech
+    alpaca_key_env: ALPACA_S4_KEY
+    alpaca_secret_env: ALPACA_S4_SECRET
+    config: configs/strategies/strategy_4_t2_balanced.yaml
+
+  strategy_5_trend_simple:
+    name: TREND_SIMPLE
+    slot: 5
+    tier: neutral
+    login: amsterdam.tech
+    alpaca_key_env: ALPACA_S5_KEY
+    alpaca_secret_env: ALPACA_S5_SECRET
+    config: configs/strategies/strategy_5_trend_simple.yaml
+
+  strategy_6_dual_momentum:
+    name: DUAL_MOMENTUM
+    slot: 6
+    tier: neutral
+    login: amsterdam.tech
+    alpaca_key_env: ALPACA_S6_KEY
+    alpaca_secret_env: ALPACA_S6_SECRET
+    config: configs/strategies/strategy_6_dual_momentum.yaml
+
+  strategy_7_robust_var:
+    name: ROBUST_VAR
+    slot: 7
+    tier: skeptical
+    login: servintek
+    alpaca_key_env: ALPACA_S7_KEY
+    alpaca_secret_env: ALPACA_S7_SECRET
+    config: configs/strategies/strategy_7_robust_var.yaml
+
+  strategy_8_p59_full_stack:
+    name: P59_FULL_STACK
+    slot: 8
+    tier: skeptical
+    login: servintek
+    alpaca_key_env: ALPACA_S8_KEY
+    alpaca_secret_env: ALPACA_S8_SECRET
+    config: configs/strategies/strategy_8_p59_full_stack.yaml
+
+  strategy_9_p57_frontloaded:
+    name: P57_FRONTLOADED
+    slot: 9
+    tier: skeptical
+    login: servintek
+    alpaca_key_env: ALPACA_S9_KEY
+    alpaca_secret_env: ALPACA_S9_SECRET
+    config: configs/strategies/strategy_9_p57_frontloaded.yaml
+
+tiers:
+  confident: [strategy_1_optimized, strategy_2_robust_stack, strategy_3_dropoverlap]
+  neutral:   [strategy_4_t2_balanced, strategy_5_trend_simple, strategy_6_dual_momentum]
+  skeptical: [strategy_7_robust_var, strategy_8_p59_full_stack, strategy_9_p57_frontloaded]
+
+# Legacy aggregation block — preserved for run_multi_backtest.py compatibility.
+accounts:
+  confident:
+    name: "Confident Tier"
+    alpaca_env_prefix: "ALPACA_CONFIDENT"
+    strategies: [strategy_1_optimized, strategy_2_robust_stack, strategy_3_dropoverlap]
+    capital_split: [0.3333, 0.3333, 0.3334]
+  neutral:
+    name: "Neutral Tier"
+    alpaca_env_prefix: "ALPACA_NEUTRAL"
+    strategies: [strategy_4_t2_balanced, strategy_5_trend_simple, strategy_6_dual_momentum]
+    capital_split: [0.3333, 0.3333, 0.3334]
+  skeptical:
+    name: "Skeptical Tier"
+    alpaca_env_prefix: "ALPACA_SKEPTICAL"
+    strategies: [strategy_7_robust_var, strategy_8_p59_full_stack, strategy_9_p57_frontloaded]
+    capital_split: [0.3333, 0.3333, 0.3334]

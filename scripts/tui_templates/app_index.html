@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="/static/css/xterm.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Roboto%20Mono"
+    />
+    <!-- defer so the inline rewrite below runs first -->
+    <script defer src="/static/js/textual.js"></script>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #0c181f;
+        font-family: "Roboto Mono", menlo, monospace;
+        color: #cfe7f5;
+      }
+      #terminal {
+        position: absolute;
+        inset: 0;
+        opacity: 1 !important;
+      }
+      .closed-dialog {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(12, 24, 31, 0.92);
+        z-index: 20;
+      }
+      body.-closed .closed-dialog { display: flex; }
+      .closed-dialog .panel {
+        background: #12232d;
+        padding: 32px 48px;
+        border: 1px solid #1d3a4a;
+        text-align: center;
+      }
+      .closed-dialog button {
+        margin-top: 16px;
+        padding: 12px 28px;
+        background: #5e0ba7;
+        color: #fff;
+        border: none;
+        font-family: inherit;
+        cursor: pointer;
+      }
+      .closed-dialog button:hover { background: #ac5af4; }
+    </style>
+    <script>
+      function reconnect() {
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        params.delete("delay");
+        window.location.href = url.pathname + "?" + params.toString();
+      }
+    </script>
+  </head>
+  <body data-pingurl="{{ ping_url }}">
+    <div
+      id="terminal"
+      class="textual-terminal"
+      data-session-websocket-url="{{ app_websocket_url }}"
+      data-font-size="{{ font_size }}"
+    ></div>
+    <script>
+      // textual-serve hardcodes the bind host (often 0.0.0.0) into
+      // app_websocket_url, which is unreachable from a remote browser.
+      // Rewrite it to match the host the page was actually loaded from.
+      (function () {
+        var term = document.getElementById("terminal");
+        if (!term) return;
+        var orig = term.getAttribute("data-session-websocket-url") || "";
+        var proto = window.location.protocol === "https:" ? "wss:" : "ws:";
+        var path = "/ws";
+        try {
+          var u = new URL(orig);
+          path = u.pathname + u.search;
+        } catch (e) {}
+        term.setAttribute(
+          "data-session-websocket-url",
+          proto + "//" + window.location.host + path
+        );
+      })();
+    </script>
+
+    <div class="closed-dialog">
+      <div class="panel">
+        <div>Session ended.</div>
+        <button type="button" onClick="reconnect()">Reconnect</button>
+      </div>
+    </div>
+  </body>
+</html>

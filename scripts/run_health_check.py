@@ -485,6 +485,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Daily health check (§6.1)")
     parser.add_argument("--date", default=None, help="override today's date (YYYY-MM-DD)")
     parser.add_argument("--no-log", action="store_true", help="do not append to logs/health_check.log")
+    parser.add_argument("--probe-sources", action="store_true",
+                        help="probe live data sources (yahoo/twelve_data/fred/bls) and print their status")
     args = parser.parse_args(argv)
 
     today = (
@@ -510,6 +512,18 @@ def main(argv: list[str] | None = None) -> int:
     now_stamp = datetime.now().strftime("%Y-%m-%d %H:%M ET")
     report = _format_report(today, sections, rebal_info, now_stamp)
     print(report)
+
+    if args.probe_sources:
+        try:
+            from data.pipeline import source_health_report
+            health = source_health_report()
+        except Exception as exc:
+            print(f"SOURCES: probe failed — {exc}")
+        else:
+            print("SOURCES:")
+            for name, info in health.items():
+                lat = f"{info.get('latency_ms','?')}ms" if info.get("status") != "skipped" else "-"
+                print(f"  {name:12s} {info.get('status','?'):8s} {lat:>8s}  {info.get('detail','')}")
 
     if not args.no_log:
         _append_log(report)

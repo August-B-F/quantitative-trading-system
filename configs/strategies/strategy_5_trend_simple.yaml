@@ -1,0 +1,39 @@
+name: TREND_SIMPLE
+slot: 5
+tier: neutral_null
+description: >
+  Null hypothesis of the entire race. SPY closes above its 200d SMA →
+  hold SPY. Otherwise → hold SHY. Flip only on cross. One rule, two
+  assets.
+type: rules_trend
+universe: [SPY, SHY]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: on_signal_flip
+signal:
+  kind: sma_cross
+  asset: SPY
+  window: 200
+  above: hold_SPY
+  below: hold_SHY
+sizing:
+  allocation: 1.0
+gate: null
+fomc_defer:
+  enabled: false
+classifier: null
+backtest:
+  cagr_est: 0.105
+  sharpe_est: 0.85
+  max_dd_est: -0.19
+  source: approx_from_SPY_benchmark_stress_test6
+  note: >
+    Our SPY benchmark over 2008-2025 is 15.42%/1.09/-26.61%. A 200d
+    SMA switcher historically gives up ~4-5pp CAGR in bull markets
+    but halves MaxDD.
+confidence: NEUTRAL
+notes: >
+  If this beats half the field over 6 months, complexity is not
+  paying for itself. Particularly dangerous for OPTIMIZED in a
+  calm-VIX rally (Test 9: OPT trails SPY by 30pp excess in VIX<15
+  regimes).

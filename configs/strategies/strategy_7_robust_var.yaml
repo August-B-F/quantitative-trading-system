@@ -1,0 +1,64 @@
+name: ROBUST_VAR
+slot: 7
+tier: skeptical_champion
+description: >
+  Shipping champion of the autonomous suite. ROBUST_STACK + one extra
+  delta: basket weighting switched from inverse-vol (p=1) to
+  inverse-variance (p=2). CAGR 30.96% / Sharpe 1.989 / MaxDD -12.79%.
+  The highest-Sharpe candidate anywhere in the research tree.
+type: ml_layered_champion
+universe_stable: [SOXX, QQQ, IGV, XLE, GLD, SHY]
+universe_transition: [SOXX, QQQ, IGV, XLE, GLD, SHY, TLT, AGG, XLV, XLF]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: month_end
+signal:
+  kind: rank_aggregation
+  lookbacks_and_weights: [[42, 1], [63, 3], [126, 1]]
+  transition_lookback: 21
+classifier:
+  model: HistGradientBoostingClassifier
+  feature_set: core_50_plus_7
+  signal_gate_max_proba: 0.40
+  universe_tier_max_proba: 0.50
+  retrain_cadence: quarterly
+sizing:
+  top1_weight_normal: 0.50
+  top1_weight_full_boost: 0.82
+  basket_weighting: inverse_variance
+  basket_vol_exp: 2.0
+boost:
+  trailing_9m_threshold: 0.30
+  spy_63d_threshold: 0.12
+gate:
+  kind: sma_distance
+  index: SPY
+  window: 200
+  threshold: -0.04
+  action: top1_to_cash
+fomc_defer:
+  enabled: true
+  pre_days: 0
+  post_days: 2
+  defer_days: 3
+backtest:
+  cagr: 0.3096
+  sharpe: 1.989
+  max_dd: -0.1279
+  cagr_net_10bps: 0.2949
+  sharpe_net_10bps: 1.910
+  period_a_sharpe: 2.251
+  period_b_sharpe: 1.890
+  source: tests/autonomous/champions/p_robust_var_champion.py
+  bootstrap_vs_canonical: t=3.22, P=99.96, CI [+2.42, +9.77] pp/yr
+  bootstrap_vs_inv_atr: t=2.02, P=98.23, CI [+0.06, +1.80] pp/yr
+confidence: SKEPTICAL
+notes: >
+  The inv-var basket delta was discovered by batch exploration on top
+  of an already-purge-validated stack — small incremental search with
+  a t=2.02 paired bootstrap vs its parent ROBUST_STACK. Parameter
+  neighborhood (p in w=1/vol^p) is monotone smooth 0→3, which lowers
+  fragility concern. Treat the +0.06 Sharpe lift as the least reliable
+  part; the first 1.92 of the 1.989 Sharpe is inherited from
+  ROBUST_STACK and carries its OOS evidence. Included on purpose as
+  the "can backtest Sharpe 1.989 survive forward?" headline bet.

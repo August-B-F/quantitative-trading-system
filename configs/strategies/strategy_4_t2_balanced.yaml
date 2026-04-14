@@ -1,0 +1,39 @@
+name: T2_BALANCED
+slot: 4
+tier: confident_fallback
+description: >
+  Rules-only runner-up from Tier 2. 50% top-1 (with SMA200 -4% gate) +
+  50% equal-weight top-3 by 63d momentum. No ML, no regime switch, no
+  FOMC defer. Identical universe and cadence as OPTIMIZED.
+type: rules_momentum
+universe: [SOXX, QQQ, XLK, VGT, IGV, XLE, GLD, SHY]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: month_end
+signal:
+  kind: momentum
+  lookback_days: 63
+sizing:
+  top1_weight: 0.50
+  top3_weight: 0.50
+  top_k: 3
+  top3_weighting: equal
+gate:
+  kind: sma_distance
+  index: SPY
+  window: 200
+  threshold: -0.04
+  action: top1_to_cash
+fomc_defer:
+  enabled: false
+classifier: null
+backtest:
+  cagr: 0.193
+  sharpe: 1.22
+  max_dd: -0.210
+  source: results/experiments/T2_balanced.json
+confidence: CONFIDENT
+notes: >
+  The "what if ML breaks" fallback. Isolates the incremental value of
+  the entire OPTIMIZED ML + sizing + FOMC stack. If T2_BALANCED ties or
+  beats OPTIMIZED forward, the ML machinery is pure ops burden.

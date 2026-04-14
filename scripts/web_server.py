@@ -20,26 +20,13 @@ from fastapi.responses import HTMLResponse, FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 
-try:
-    from ultimate_trader.utils.config_loader import load_config
-    from ultimate_trader.utils.logging import PerformanceDB
-    _CONFIG_AVAILABLE = True
-except ImportError:
-    _CONFIG_AVAILABLE = False
-
-from scripts.tui import (
-    load_backtest_results, load_predictions, load_model_info,
-    get_gpu_info, scan_data_files, load_alpaca_positions,
-    load_equity_series, fmt_bytes,
-)
+from scripts import web_data as wd
 
 try:
     import psutil
     HAS_PSUTIL = True
 except ImportError:
     HAS_PSUTIL = False
-
-import pandas as pd
 
 _SCRIPTS = Path(__file__).parent
 _ROOT    = _SCRIPTS.parent
@@ -100,31 +87,7 @@ class ProcessManager:
         }
 
 
-_pm  = ProcessManager()
-_cfg = None
-_db  = None
-
-
-def _get_cfg():
-    global _cfg
-    if _cfg is None and _CONFIG_AVAILABLE:
-        try:
-            _cfg = load_config(str(_ROOT / "config"))
-        except Exception:
-            pass
-    return _cfg
-
-
-def _get_db():
-    global _db
-    if _db is None:
-        cfg = _get_cfg()
-        if cfg:
-            try:
-                _db = PerformanceDB(cfg.paths.db_path)
-            except Exception:
-                pass
-    return _db
+_pm = ProcessManager()
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -163,153 +126,95 @@ async def root():
 
 @app.get("/api/overview")
 async def overview():
-    bt      = load_backtest_results()
-    metrics = bt.get("metrics", {})
-    eq_vals: list = []
-    if "equity_curve" in bt:
-        eq_vals = bt["equity_curve"]["equity"].tolist()
-    elif (db := _get_db()):
-        eq_vals = load_equity_series(db)
-    regime = "unknown"
-    if (db := _get_db()):
-        try:
-            df = db.get_daily_pnl()
-            if not df.empty:
-                regime = df.iloc[-1].get("regime", "unknown")
-        except Exception:
-            pass
-    models_dir = str(_ROOT / "data" / "models")
-    cfg = _get_cfg()
-    if cfg:
-        models_dir = getattr(getattr(cfg, "paths", None), "models_dir", models_dir)
+    metrics = wd.get_metrics()
+    eq      = wd.get_equity_series(benchmark=False)
     return {
-        "metrics": metrics, "equity": eq_vals[-60:] if eq_vals else [],
-        "regime": regime, "model": load_model_info(models_dir),
-        "gpu": get_gpu_info(), "process": _pm.status(),
+        "metrics":    metrics,
+        "equity":     eq["values"][-60:],
+        "regime":     wd.get_current_regime(),
+        "model":      wd.load_model_info(),
+        "gpu":        wd.get_gpu_info(),
+        "process":    _pm.status(),
+        "holdings":   wd.load_holdings(),
         "updated_at": datetime.now().isoformat(),
     }
 
 
 @app.get("/api/equity")
 async def equity():
-    bt = load_backtest_results()
-    if "equity_curve" in bt:
-        ec    = bt["equity_curve"]
-        dates = list(ec.index.astype(str))
-        vals  = ec["equity"].tolist()
-    elif (db := _get_db()):
-        try:
-            df    = db.get_daily_pnl()
-            dates = df["date"].astype(str).tolist() if not df.empty else []
-            vals  = df["equity"].tolist() if not df.empty else []
-        except Exception:
-            dates, vals = [], []
-    else:
-        dates, vals = [], []
-    return {"dates": dates, "values": vals}
+    """Monthly equity curve + SPY benchmark (canonical ETF Momentum Rotation)."""
+    return wd.get_equity_series(benchmark=True)
 
 
 @app.get("/api/trades")
 async def trades():
-    bt  = load_backtest_results()
-    df  = bt.get("trades", None)
-    if df is None or (isinstance(df, pd.DataFrame) and df.empty):
-        if (db := _get_db()):
-            try:
-                df = db.get_all_trades()
-            except Exception:
-                df = pd.DataFrame()
-    if df is None or (isinstance(df, pd.DataFrame) and df.empty):
-        return {"trades": []}
+    """Rotation trade log — each entry is a monthly rebalance, not a flat buy/sell."""
+    log = wd.get_trade_log(limit=200)
     rows = []
-    for _, r in df.tail(200).iterrows():
+    for t in log:
+        to_map = t.get("to", {}) or {}
         rows.append({
-            "symbol": str(r.get("symbol", "")),
-            "entry_date": str(r.get("entry_date", ""))[:10],
-            "exit_date":  str(r.get("exit_date",  ""))[:10],
-            "pnl_pct":    float(r.get("pnl_pct",    0)),
-            "pnl_dollar": float(r.get("pnl_dollar",  0)),
-            "exit_reason": str(r.get("exit_reason", "")),
-            "regime": str(r.get("regime", "")),
+            "date":      t.get("date", ""),
+            "regime":    t.get("regime", ""),
+            "lookback":  t.get("lookback"),
+            "deferred":  bool(t.get("deferred")),
+            "ret":       t.get("ret"),
+            "holdings":  to_map,
+            "top":       ", ".join(f"{k} {v:.0%}" for k, v in to_map.items()),
         })
     return {"trades": rows}
 
 
 @app.get("/api/performance")
 async def performance():
-    bt      = load_backtest_results()
-    metrics = bt.get("metrics", {})
-    pnl_dates: list = []
-    pnl_vals:  list = []
-    if (db := _get_db()):
-        try:
-            df = db.get_daily_pnl()
-            if not df.empty:
-                pnl_dates = df["date"].astype(str).tolist()
-                pnl_vals  = df["pnl"].tolist()
-        except Exception:
-            pass
-    elif "equity_curve" in bt:
-        ec        = bt["equity_curve"]["equity"]
-        pnl_vals  = ec.diff().fillna(0).tolist()
-        pnl_dates = list(bt["equity_curve"].index.astype(str))
-    return {"metrics": metrics, "pnl_dates": pnl_dates[-60:], "pnl_values": pnl_vals[-60:]}
+    pres    = wd.load_presentation()
+    metrics = wd.get_metrics()
+    eq      = wd.get_equity_series(benchmark=False)
+    dates   = eq["dates"]
+    vals    = eq["values"]
+    pnl_vals: list[float] = []
+    for i, v in enumerate(vals):
+        pnl_vals.append(0.0 if i == 0 else (v - vals[i - 1]))
+    return {
+        "metrics":        metrics,
+        "pnl_dates":      dates[-60:],
+        "pnl_values":     pnl_vals[-60:],
+        "rolling_sharpe": wd.get_rolling_sharpe(),
+        "drawdowns":      wd.get_drawdowns(),
+        "annual_returns": wd.get_annual_returns(),
+        "regime_breakdown": wd.get_regime_breakdown(),
+    }
 
 
 @app.get("/api/positions")
 async def positions():
-    cfg = _get_cfg()
-    if not cfg:
-        return {"positions": [], "account": None, "error": "Config not loaded"}
-    pos_list, account = load_alpaca_positions(cfg)
-    account_data = None
-    if account:
-        account_data = {
-            "equity":          float(account.equity),
-            "cash":            float(account.cash),
-            "buying_power":    float(account.buying_power),
-            "portfolio_value": float(account.portfolio_value),
-        }
-    positions_data = []
-    for p in pos_list:
-        avg = float(p.avg_entry_price)
-        cur = float(p.current_price)
-        positions_data.append({
-            "symbol": p.symbol, "qty": float(p.qty),
-            "avg_entry": avg, "current": cur,
-            "market_value": float(p.market_value),
-            "unrealized_pl": float(p.unrealized_pl),
-            "pnl_pct": (cur - avg) / avg if avg else 0,
-        })
-    return {"positions": positions_data, "account": account_data}
+    """Placeholder until paper trading is wired. Returns target weights from holdings.json."""
+    holdings = wd.load_holdings()
+    return {
+        "positions": [],
+        "account":   None,
+        "target_weights": holdings,
+        "broker_connected": False,
+        "note": "Paper trading not yet wired. Showing target weights from configs/holdings.json.",
+    }
 
 
 @app.get("/api/signals")
 async def signals():
-    df = load_predictions()
-    if df.empty:
-        return {"signals": [], "summary": {}, "date": None}
-    latest    = df["date"].max()
-    latest_df = df[df["date"] == latest]
-    rows = []
-    for _, r in latest_df.sort_values("confidence", ascending=False).iterrows():
-        pc        = int(r["pred_class"])
-        prob_cols = [f"prob_{i}" for i in range(5)]
-        probs     = [float(r[c]) for c in prob_cols if c in r]
-        rows.append({
-            "symbol":      str(r["symbol"]),
-            "pred_class":  pc,
-            "confidence":  float(r["confidence"]),
-            "uncertainty": float(r.get("uncertainty", 0)),
-            "probs":       probs,
-        })
-    summary = {
-        "buys":     int(latest_df["pred_class"].isin([3, 4]).sum()),
-        "sells":    int(latest_df["pred_class"].isin([0, 1]).sum()),
-        "holds":    int((latest_df["pred_class"] == 2).sum()),
-        "avg_conf": float(latest_df["confidence"].mean()) if not latest_df.empty else 0,
+    """Phase A stub. The old 5-class classifier signals are dead.
+    Phase B will rebuild this as ETF rotation rankings.
+    """
+    holdings = wd.load_holdings()
+    strat    = wd.load_strategy_config()
+    universe = strat.get("universe") or []
+    regime   = wd.get_current_regime()
+    return {
+        "signals":  [],
+        "summary":  {"universe_size": len(universe), "regime": regime},
+        "universe": universe,
+        "holdings": holdings,
+        "date":     None,
     }
-    return {"signals": rows, "summary": summary, "date": str(latest)}
 
 
 @app.get("/api/status")
@@ -323,76 +228,36 @@ async def status():
 
 @app.get("/api/data/summary")
 async def data_summary():
-    files = scan_data_files()
-    total_size = sum(f["size"] for f in files)
-    total_rows = sum(f["rows"] for f in files if isinstance(f["rows"], int))
-    latest_mt  = max((f["mtime"] for f in files), default=0)
-    for f in files:
-        f["size_fmt"] = fmt_bytes(f["size"])
-        f["updated"]  = datetime.fromtimestamp(f["mtime"]).strftime("%Y-%m-%d %H:%M")
-    return {
-        "files":        files,
-        "total_files":  len(files),
-        "total_rows":   total_rows,
-        "total_size":   fmt_bytes(total_size),
-        "last_updated": datetime.fromtimestamp(latest_mt).strftime("%Y-%m-%d %H:%M") if latest_mt else "—",
-    }
+    return wd.scan_data_summary()
 
 
 @app.get("/api/data/symbols")
 async def data_symbols():
-    """Per-symbol coverage from bars directory."""
-    bars_dir = _ROOT / "data" / "raw" / "bars"
-    results  = []
-    if not bars_dir.exists():
-        # fallback: scan generic raw dir
-        bars_dir = _ROOT / "data" / "raw"
-    if bars_dir.exists():
-        for fp in sorted(bars_dir.glob("*.parquet")) + sorted(bars_dir.glob("*.csv")):
-            symbol = fp.stem.upper()
-            stat   = fp.stat()
-            row = {
-                "symbol":    symbol,
-                "file":      fp.name,
-                "size":      fmt_bytes(stat.st_size),
-                "updated":   datetime.fromtimestamp(stat.st_mtime).strftime("%Y-%m-%d %H:%M"),
-                "rows":      "?",
-                "date_from": "?",
-                "date_to":   "?",
-                "days":      "?",
-            }
-            try:
-                df = pd.read_parquet(fp) if fp.suffix == ".parquet" else pd.read_csv(fp)
-                row["rows"] = len(df)
-                dcol = next((c for c in ("date","Date","datetime","timestamp") if c in df.columns), None)
-                if dcol:
-                    dates = pd.to_datetime(df[dcol], errors="coerce").dropna()
-                    if not dates.empty:
-                        row["date_from"] = dates.min().strftime("%Y-%m-%d")
-                        row["date_to"]   = dates.max().strftime("%Y-%m-%d")
-                        row["days"]      = (dates.max() - dates.min()).days
-            except Exception:
-                pass
-            results.append(row)
+    results = wd.scan_symbols()
     return {"symbols": results, "count": len(results)}
 
 
 @app.get("/api/model")
 async def model_info_route():
-    cfg        = _get_cfg()
-    models_dir = str(_ROOT / "data" / "models")
-    if cfg:
-        models_dir = getattr(getattr(cfg, "paths", None), "models_dir", models_dir)
-    info = load_model_info(models_dir)
-    if info.get("mtime"):
-        age_s       = time.time() - info["mtime"]
-        info["age_str"] = f"{int(age_s / 3600)}h ago"
-    return info
+    return wd.load_model_info()
+
+
+@app.get("/api/model/checkpoints")
+async def model_checkpoints():
+    return {"checkpoints": wd.load_model_checkpoints()}
 
 
 @app.get("/api/gpu")
 async def gpu():
-    return get_gpu_info()
+    return wd.get_gpu_info()
+
+
+@app.get("/api/strategy")
+async def strategy_cfg():
+    return {
+        "config":   wd.load_strategy_config(),
+        "holdings": wd.load_holdings(),
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -404,38 +269,32 @@ async def system_health():
     health: dict = {}
 
     if HAS_PSUTIL:
-        health["cpu_pct"]  = psutil.cpu_percent(interval=0.2)
+        health["cpu_pct"]   = psutil.cpu_percent(interval=0.2)
         vm = psutil.virtual_memory()
-        health["mem_pct"]  = vm.percent
-        health["mem_used"] = fmt_bytes(vm.used)
-        health["mem_total"]= fmt_bytes(vm.total)
+        health["mem_pct"]   = vm.percent
+        health["mem_used"]  = wd.fmt_bytes(vm.used)
+        health["mem_total"] = wd.fmt_bytes(vm.total)
         du = psutil.disk_usage(str(_ROOT))
-        health["disk_pct"] = du.percent
-        health["disk_used"]= fmt_bytes(du.used)
-        health["disk_total"]= fmt_bytes(du.total)
+        health["disk_pct"]   = du.percent
+        health["disk_used"]  = wd.fmt_bytes(du.used)
+        health["disk_total"] = wd.fmt_bytes(du.total)
     else:
-        # basic fallback via /proc on Linux
-        try:
-            import shutil
-            total, used, free = shutil.disk_usage(str(_ROOT))
-            health["disk_pct"]  = round(used / total * 100, 1)
-            health["disk_used"] = fmt_bytes(used)
-            health["disk_total"]= fmt_bytes(total)
-        except Exception:
-            pass
+        disk = wd.get_disk_usage()
+        if disk:
+            health["disk_pct"]   = disk["pct"]
+            health["disk_used"]  = disk["used_fmt"]
+            health["disk_total"] = disk["total_fmt"]
 
-    # GPU
-    gpu_info = get_gpu_info()
+    gpu_info = wd.get_gpu_info()
     if gpu_info:
-        health["gpu_pct"]  = round(gpu_info.get("pct", 0) * 100, 1)
-        health["gpu_used"] = f"{gpu_info.get('used_gb', 0):.1f} GB"
-        health["gpu_total"]= f"{gpu_info.get('total_gb', 0):.0f} GB"
-        health["gpu_name"] = gpu_info.get("name", "")
+        health["gpu_pct"]   = round(gpu_info.get("pct", 0) * 100, 1)
+        health["gpu_used"]  = f"{gpu_info.get('used_gb', 0):.1f} GB"
+        health["gpu_total"] = f"{gpu_info.get('total_gb', 0):.0f} GB"
+        health["gpu_name"]  = gpu_info.get("name", "")
 
-    # DB size
-    db_path = _ROOT / "data" / "performance.db"
-    if db_path.exists():
-        health["db_size"] = fmt_bytes(db_path.stat().st_size)
+    pres_path = _ROOT / "results" / "backtest_presentation.json"
+    if pres_path.exists():
+        health["presentation_size"] = wd.fmt_bytes(pres_path.stat().st_size)
 
     health["uptime_str"] = _get_uptime()
     return health
@@ -502,16 +361,35 @@ def _run(name: str, script: str, extra: list[str] = None):
 
 
 @app.post("/api/run/download")
-async def run_download(): return _run("Data Download", "download_data.py")
+async def run_download(): return _run("Data Download", "phase1_download.py")
+
+@app.post("/api/run/download/fred")
+async def run_download_fred(): return _run("FRED Download", "phase1_fred.py")
+
+@app.post("/api/run/download/alt")
+async def run_download_alt(): return _run("Alt Data", "phase2_alternative.py")
+
+@app.post("/api/run/health")
+async def run_health(): return _run("Data Health Check", "phase3_integrate_and_health.py")
 
 @app.post("/api/run/train")
-async def run_train(): return _run("Training", "train.py")
+async def run_train(): return _run("Training (retrain)", "run_retrain.py")
 
 @app.post("/api/run/backtest")
-async def run_backtest(): return _run("Backtest", "backtest.py")
+async def run_backtest(): return _run("Backtest", "run_backtest.py")
+
+@app.post("/api/run/rebalance")
+async def run_rebalance(): return _run("Rebalance (dry)", "run_rebalance.py")
+
+@app.post("/api/run/signal_test")
+async def run_signal_test(): return _run("Signal Test", "run_signal_test.py")
 
 @app.post("/api/run/bot")
-async def run_bot(): return _run("Live Bot", "run_live_bot.py", ["--now"])
+async def run_bot():
+    raise HTTPException(
+        501,
+        "Live/paper trading is not wired yet. Use /api/run/rebalance for a dry-run rebalance.",
+    )
 
 @app.post("/api/stop")
 async def stop_process():
@@ -557,35 +435,65 @@ async def logs_history():
 # Entry
 # ═══════════════════════════════════════════════════════════════════════════
 
-def _tailscale_ip() -> str:
-    """Bind to the Tailscale interface (100.x.x.x) so only VPN peers can reach us."""
-    import subprocess
+def _zerotier_ip() -> str:
+    """Bind to the ZeroTier interface so only VPN peers can reach us.
+
+    Tries ipconfig (Windows) first since the CLI needs admin for the authtoken,
+    then falls back to `zerotier-cli listnetworks`, then socket interface scan.
+    """
+    import subprocess, re
+
+    # 1. Windows ipconfig — parse the "ZeroTier" adapter's IPv4 line.
     try:
-        r = subprocess.run(["tailscale", "ip", "-4"], capture_output=True, text=True, timeout=3)
-        ip = r.stdout.strip()
-        if ip.startswith("100."):
-            return ip
+        r = subprocess.run(["ipconfig"], capture_output=True, text=True, timeout=3)
+        if r.returncode == 0:
+            blocks = re.split(r"\r?\n\r?\n", r.stdout)
+            for blk in blocks:
+                if "ZeroTier" in blk:
+                    m = re.search(r"IPv4 Address[^\n:]*:\s*([0-9.]+)", blk)
+                    if m:
+                        return m.group(1)
     except Exception:
         pass
-    # Fallback: scan local interfaces for a 100.x address
+
+    # 2. zerotier-cli (needs admin on Windows, works on Linux/Mac as user).
+    for exe in ("zerotier-cli",
+                r"C:\Program Files (x86)\ZeroTier\One\zerotier-cli.bat"):
+        try:
+            r = subprocess.run([exe, "-j", "listnetworks"],
+                               capture_output=True, text=True, timeout=3)
+            if r.returncode == 0 and r.stdout.strip():
+                import json as _json
+                data = _json.loads(r.stdout)
+                for net in data:
+                    for ip in net.get("assignedAddresses", []) or []:
+                        ip = ip.split("/")[0]
+                        if ":" not in ip:
+                            return ip
+        except Exception:
+            continue
+
+    # 3. Socket fallback — first non-loopback, non-private-LAN-looking IP.
     try:
         import socket
         for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
-            if ip.startswith("100."):
-                return ip
+            if ip.startswith(("127.", "169.254.")):
+                continue
+            return ip
     except Exception:
         pass
-    print("  WARNING: Tailscale IP not found — binding to 127.0.0.1 (local only)")
+
+    print("  WARNING: ZeroTier IP not found — binding to 127.0.0.1 (local only)")
     return "127.0.0.1"
 
 
 def serve(host: str = None, port: int = 8000, open_browser: bool = False):
     if host is None:
-        host = _tailscale_ip()
+        host = _zerotier_ip()
     if open_browser:
         import threading, webbrowser
         threading.Timer(1.2, lambda: webbrowser.open(f"http://{host}:{port}")).start()
-    print(f"\n  iStock  ·  http://{host}:{port}  (Tailscale only)\n")
+    print(f"\n  iStock  ·  http://{host}:{port}  (ZeroTier only)\n")
     uvicorn.run(app, host=host, port=port, log_level="warning")
 
 

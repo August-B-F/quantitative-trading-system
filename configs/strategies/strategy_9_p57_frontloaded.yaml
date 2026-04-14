@@ -1,0 +1,68 @@
+name: P57_FRONTLOADED
+slot: 9
+tier: skeptical_overfit_control
+description: >
+  A known-overfit branch of the autonomous suite. P55 + high-confidence
+  transition defence (max_proba ≥ 0.82 → top1=0.45) + own-vol regime
+  sizing. Full-sample numbers look spectacular (30.48% CAGR / 1.90
+  Sharpe / 2010-15 sub-Sharpe 2.08) but BEST.md explicitly flags that
+  P54-P57's marginal improvements are concentrated 2010-2015 and
+  collectively HURT 2018-2026 by ~0.6pp/yr annualized.
+type: ml_layered_overfit_control
+universe_stable: [SOXX, QQQ, IGV, XLE, GLD, SHY]
+universe_transition: [SOXX, QQQ, IGV, XLE, GLD, SHY, TLT, AGG, XLV, XLF]
+cash_proxy: SHY
+reference_index: SPY
+rebalance: month_end
+signal:
+  kind: rank_aggregation
+  lookbacks_and_weights: [[42, 1], [63, 3], [126, 1]]
+  transition_lookback: 21
+classifier:
+  model: HistGradientBoostingClassifier
+  feature_set: core_50_plus_7
+  signal_gate_max_proba: 0.40
+  universe_tier_max_proba: 0.50
+  retrain_cadence: quarterly
+sizing:
+  top1_weight_normal: 0.62
+  top1_weight_full_boost: 0.78
+  top1_weight_dd: 0.45
+  basket_weighting: inverse_vol
+overrides:
+  stagflation_defend:
+    when: current_regime == lg_hi_stagflation
+    top1_weight: 0.45
+  high_conf_trans_defend:
+    when: max_proba > 0.82 and predicted != current
+    top1_weight: 0.45
+  own_vol_regime:
+    realized_12m_vol_below: [0.12, 0.75]
+    realized_12m_vol_above: [0.25, 0.45]
+gate:
+  kind: sma_distance
+  index: SPY
+  window: 200
+  threshold: -0.04
+  action: top1_to_cash
+fomc_defer:
+  enabled: true
+  pre_days: 0
+  post_days: 1
+  defer_days: 4
+backtest:
+  cagr: 0.3048
+  sharpe: 1.90
+  max_dd: -0.1266
+  first_half_sharpe: 2.08
+  second_half_drag_pp_yr: -0.6
+  bootstrap_t: 3.444
+  ci_lower_pp_yr: 2.51
+  source: tests/autonomous/BEST.md::P57 section
+confidence: VERY_SKEPTICAL
+notes: >
+  The cleanest "first-half-overfit" shape in the suite. Included as a
+  control: if P57 survives forward (2026-04..2026-10), then the
+  "helped 2010-15 but hurt 2018-26" diagnostic is not as reliable as
+  the research process assumed and rejected layers should be
+  reconsidered.
