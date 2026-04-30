@@ -1132,7 +1132,7 @@ def _run_serve(host: str, port: int) -> int:
     print(f"   host      : {host}")
     print(f"   port      : {port}")
     print(f"   url       : http://{host}:{port}/")
-    print("   NOTE: firewall rule must restrict 8765 to the ZeroTier iface.")
+    print("   NOTE: firewall rule must restrict 8765 to the WireGuard iface.")
     print("=" * 64, flush=True)
 
     with ReusableTCPServer((host, port), Handler) as httpd:

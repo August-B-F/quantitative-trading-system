@@ -49,7 +49,7 @@ Register-ScheduledTask `
     -Trigger   $Trigger `
     -Settings  $Settings `
     -Principal $Principal `
-    -Description "QTS FastAPI web server (iStock UI, port 8000, ZeroTier-bound)" | Out-Null
+    -Description "QTS FastAPI web server (iStock UI, port 8000, WireGuard-bound)" | Out-Null
 
 Write-Host "Starting task immediately ..."
 Start-ScheduledTask -TaskName $TaskName
@@ -61,7 +61,7 @@ Write-Host "  Start   :  Start-ScheduledTask -TaskName $TaskName"
 Write-Host "  Status  :  Get-ScheduledTask  -TaskName $TaskName | Get-ScheduledTaskInfo"
 Write-Host "  Logs    :  Get-WinEvent -LogName 'Microsoft-Windows-TaskScheduler/Operational' | Where-Object {`$_.Message -like '*$TaskName*'} | Select-Object -First 20"
 Write-Host ""
-Write-Host "The server binds to the ZeroTier interface (auto-detected via ipconfig)."
+Write-Host "The server binds to the WireGuard interface (auto-detected via ipconfig)."
 Write-Host "If a firewall rule is needed:"
-Write-Host '  netsh advfirewall firewall add rule name="QTS-Web 8000 (ZT)" `'
+Write-Host '  netsh advfirewall firewall add rule name="QTS-Web 8000 (WG)" `'
 Write-Host '         dir=in action=allow protocol=TCP localport=8000 profile=private'

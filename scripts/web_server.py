@@ -435,65 +435,51 @@ async def logs_history():
 # Entry
 # ═══════════════════════════════════════════════════════════════════════════
 
-def _zerotier_ip() -> str:
-    """Bind to the ZeroTier interface so only VPN peers can reach us.
-
-    Tries ipconfig (Windows) first since the CLI needs admin for the authtoken,
-    then falls back to `zerotier-cli listnetworks`, then socket interface scan.
-    """
+def _wireguard_ip() -> str:
+    """Bind to the VPN tunnel interface so only VPN peers can reach us."""
     import subprocess, re
 
-    # 1. Windows ipconfig — parse the "ZeroTier" adapter's IPv4 line.
     try:
         r = subprocess.run(["ipconfig"], capture_output=True, text=True, timeout=3)
         if r.returncode == 0:
-            blocks = re.split(r"\r?\n\r?\n", r.stdout)
-            for blk in blocks:
-                if "ZeroTier" in blk:
-                    m = re.search(r"IPv4 Address[^\n:]*:\s*([0-9.]+)", blk)
+            for blk in re.split(r"\r?\n\r?\n", r.stdout):
+                m = re.search(r"IPv4 Address[^\n:]*:\s*(10\.200\.200\.\d+)", blk)
+                if m:
+                    return m.group(1)
+                if re.search(r"ZeroTier", blk, re.IGNORECASE):
+                    m = re.search(r"IPv4 Address[^\n:]*:\s*(\d+\.\d+\.\d+\.\d+)", blk)
                     if m:
                         return m.group(1)
     except Exception:
         pass
 
-    # 2. zerotier-cli (needs admin on Windows, works on Linux/Mac as user).
-    for exe in ("zerotier-cli",
-                r"C:\Program Files (x86)\ZeroTier\One\zerotier-cli.bat"):
-        try:
-            r = subprocess.run([exe, "-j", "listnetworks"],
-                               capture_output=True, text=True, timeout=3)
-            if r.returncode == 0 and r.stdout.strip():
-                import json as _json
-                data = _json.loads(r.stdout)
-                for net in data:
-                    for ip in net.get("assignedAddresses", []) or []:
-                        ip = ip.split("/")[0]
-                        if ":" not in ip:
-                            return ip
-        except Exception:
-            continue
-
-    # 3. Socket fallback — first non-loopback, non-private-LAN-looking IP.
     try:
         import socket
         for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
-            if ip.startswith(("127.", "169.254.")):
-                continue
-            return ip
+            if ip.startswith("10.200.200."):
+                return ip
     except Exception:
         pass
 
-    print("  WARNING: ZeroTier IP not found — binding to 127.0.0.1 (local only)")
+    try:
+        import socket
+        for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
+            if not ip.startswith(("127.", "169.254.", "172.")):
+                return ip
+    except Exception:
+        pass
+
+    print("  WARNING: VPN IP not found — binding to 127.0.0.1 (local only)")
     return "127.0.0.1"
 
 
 def serve(host: str = None, port: int = 8000, open_browser: bool = False):
     if host is None:
-        host = _zerotier_ip()
+        host = _wireguard_ip()
     if open_browser:
         import threading, webbrowser
         threading.Timer(1.2, lambda: webbrowser.open(f"http://{host}:{port}")).start()
-    print(f"\n  iStock  ·  http://{host}:{port}  (ZeroTier only)\n")
+    print(f"\n  iStock  ·  http://{host}:{port}  (WireGuard only)\n")
     uvicorn.run(app, host=host, port=port, log_level="warning")
 
 

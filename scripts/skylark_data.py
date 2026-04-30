@@ -448,6 +448,7 @@ def dashboard_summary() -> dict:
             "bt_sortino":  bt.get("sortino"),
             "bt_win_pct":  bt.get("win_pct"),
             "bt_worst_yr": bt.get("worst_year"),
+            "tracking":    expectations_quick(s["slot"]),
         })
     ranked = sorted(rows, key=lambda r: (r["return_pct"] if r["return_pct"] is not None else -9), reverse=True)
     best  = ranked[0] if ranked else None
@@ -1240,3 +1241,287 @@ def current_regime() -> dict:
         "date":      last.get("date"),
         "source":    "rebalance_log",
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Expectations tracking — monthly checkpoint after each rebalance
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _live_monthly_returns(strategy: dict) -> list[dict]:
+    """Compute month-over-month returns from Alpaca portfolio history.
+
+    Returns [{date: 'YYYY-MM', return: float}] for each completed month.
+    """
+    hist = alpaca_portfolio_history(strategy, period="12M")
+    points = hist.get("points") or []
+    if len(points) < 2:
+        return []
+
+    # Group daily equity by YYYY-MM, take last available equity per month
+    months: dict[str, float] = {}
+    for p in points:
+        d = p.get("date", "")
+        eq = p.get("equity")
+        if not d or eq is None or eq <= 0:
+            continue
+        ym = d[:7]  # "YYYY-MM"
+        months[ym] = eq
+
+    sorted_months = sorted(months.keys())
+    if len(sorted_months) < 2:
+        return []
+
+    # Don't include the current (incomplete) month
+    today_ym = datetime.now().strftime("%Y-%m")
+    if sorted_months[-1] == today_ym:
+        sorted_months = sorted_months[:-1]
+
+    out = []
+    for i in range(1, len(sorted_months)):
+        prev_eq = months[sorted_months[i - 1]]
+        curr_eq = months[sorted_months[i]]
+        if prev_eq > 0:
+            ret = (curr_eq / prev_eq) - 1.0
+            out.append({"date": sorted_months[i], "return": ret})
+    return out
+
+
+def expectations_check(slot: int) -> dict:
+    """Compare live monthly returns against the backtest distribution.
+
+    For each completed month after the first rebalance, checks whether
+    the realised return falls within the backtest's historical range.
+
+    Returns:
+      status:       'on_track' | 'drifting' | 'diverged' | 'pending'
+      months:       [{date, live_return, bt_mean, bt_std, z_score, status}]
+      summary:      {tracking_error, avg_z, cumulative_drift, n_months,
+                     bt_mean, bt_std, bt_sharpe, live_sharpe}
+      band:         {dates, upper_2s, upper_1s, expected, lower_1s, lower_2s, live}
+    """
+    s = strategy_by_slot(slot)
+    if s is None:
+        return {"status": "pending", "months": [], "summary": {}, "band": {}}
+
+    # Backtest monthly return distribution
+    bt_monthly = s["monthly_returns"] or {}
+    if not bt_monthly:
+        return {"status": "pending", "months": [], "summary": {}, "band": {}}
+
+    bt_rets = [float(v) for v in bt_monthly.values() if v is not None]
+    if len(bt_rets) < 12:
+        return {"status": "pending", "months": [], "summary": {}, "band": {}}
+
+    bt_mean = sum(bt_rets) / len(bt_rets)
+    bt_var = sum((r - bt_mean) ** 2 for r in bt_rets) / max(len(bt_rets) - 1, 1)
+    bt_std = math.sqrt(bt_var)
+    bt_vol_ann = bt_std * math.sqrt(12)
+    bt_sharpe = (bt_mean * 12) / bt_vol_ann if bt_vol_ann > 0 else None
+
+    # Live monthly returns from Alpaca
+    live_months = _live_monthly_returns(s)
+
+    if not live_months:
+        # No completed months yet — build the band from backtest projection only
+        band = _build_expectation_band(bt_mean, bt_std, [], 100_000)
+        return {
+            "status": "pending",
+            "months": [],
+            "summary": {
+                "bt_mean": bt_mean, "bt_std": bt_std, "bt_sharpe": bt_sharpe,
+                "n_months": 0, "tracking_error": None, "avg_z": None,
+                "cumulative_drift": None, "live_sharpe": None,
+            },
+            "band": band,
+        }
+
+    # Score each live month against backtest distribution
+    scored = []
+    z_scores = []
+    for m in live_months:
+        z = (m["return"] - bt_mean) / bt_std if bt_std > 0 else 0.0
+        abs_z = abs(z)
+        if abs_z < 1.0:
+            m_status = "on_track"
+        elif abs_z < 2.0:
+            m_status = "drifting"
+        else:
+            m_status = "diverged"
+        scored.append({
+            "date": m["date"],
+            "live_return": m["return"],
+            "bt_mean": bt_mean,
+            "bt_std": bt_std,
+            "z_score": z,
+            "status": m_status,
+        })
+        z_scores.append(z)
+
+    # Tracking error = std of (live - expected)
+    diffs = [m["return"] - bt_mean for m in live_months]
+    te_mean = sum(diffs) / len(diffs)
+    te_var = sum((d - te_mean) ** 2 for d in diffs) / max(len(diffs) - 1, 1) if len(diffs) > 1 else 0.0
+    tracking_error = math.sqrt(te_var) * math.sqrt(12)  # annualized
+
+    avg_z = sum(z_scores) / len(z_scores) if z_scores else 0.0
+
+    # Cumulative drift: compound live vs compound expected
+    cum_live = 1.0
+    cum_exp = 1.0
+    for m in live_months:
+        cum_live *= (1.0 + m["return"])
+        cum_exp *= (1.0 + bt_mean)
+    cumulative_drift = (cum_live / cum_exp) - 1.0
+
+    # Live Sharpe (annualized from available months)
+    live_rets = [m["return"] for m in live_months]
+    if len(live_rets) >= 2:
+        lm = sum(live_rets) / len(live_rets)
+        lv = sum((r - lm) ** 2 for r in live_rets) / (len(live_rets) - 1)
+        ls = math.sqrt(lv)
+        live_sharpe = (lm * 12) / (ls * math.sqrt(12)) if ls > 0 else None
+    else:
+        live_sharpe = None
+
+    # Overall status — based on recent trend (last 3 months or all if fewer)
+    recent = scored[-3:] if len(scored) >= 3 else scored
+    diverged_count = sum(1 for m in recent if m["status"] == "diverged")
+    drifting_count = sum(1 for m in recent if m["status"] == "drifting")
+    if diverged_count >= 2:
+        overall = "diverged"
+    elif diverged_count >= 1 or drifting_count >= 2:
+        overall = "drifting"
+    else:
+        overall = "on_track"
+
+    cfg = load_accounts_cfg()
+    initial = float(cfg.get("initial_capital", 100_000))
+    band = _build_expectation_band(bt_mean, bt_std, live_months, initial)
+
+    return {
+        "status": overall,
+        "months": scored,
+        "summary": {
+            "bt_mean": bt_mean,
+            "bt_std": bt_std,
+            "bt_sharpe": bt_sharpe,
+            "tracking_error": tracking_error,
+            "avg_z": avg_z,
+            "cumulative_drift": cumulative_drift,
+            "n_months": len(live_months),
+            "live_sharpe": live_sharpe,
+        },
+        "band": band,
+    }
+
+
+def _build_expectation_band(
+    bt_mean: float, bt_std: float,
+    live_months: list[dict], initial: float,
+) -> dict:
+    """Build projected confidence band from go-live forward.
+
+    Projects 12 months ahead of the last live month (or 12 from now if no
+    live data yet). Returns date labels + 5 series (upper_2s, upper_1s,
+    expected, lower_1s, lower_2s) + live equity.
+    """
+    n_project = 12
+    today_ym = datetime.now().strftime("%Y-%m")
+
+    if live_months:
+        start_ym = live_months[0]["date"]
+        # Count months from start to today + projection
+        all_dates = []
+        y, m = int(start_ym[:4]), int(start_ym[5:7])
+        # Go one month before start (the "initial" point)
+        pm = m - 1
+        py = y
+        if pm < 1:
+            pm = 12
+            py -= 1
+        all_dates.append(f"{py:04d}-{pm:02d}")
+        # Add live months + projection
+        for _ in range(len(live_months) + n_project):
+            all_dates.append(f"{y:04d}-{m:02d}")
+            m += 1
+            if m > 12:
+                m = 1
+                y += 1
+    else:
+        all_dates = []
+        y, m = int(today_ym[:4]), int(today_ym[5:7])
+        for _ in range(n_project + 1):
+            all_dates.append(f"{y:04d}-{m:02d}")
+            m += 1
+            if m > 12:
+                m = 1
+                y += 1
+
+    # Build expected equity paths
+    exp = [initial]
+    u1 = [initial]
+    u2 = [initial]
+    l1 = [initial]
+    l2 = [initial]
+    for i in range(1, len(all_dates)):
+        exp.append(exp[-1] * (1.0 + bt_mean))
+        u1.append(u1[-1] * (1.0 + bt_mean + 1.0 * bt_std))
+        u2.append(u2[-1] * (1.0 + bt_mean + 2.0 * bt_std))
+        l1.append(l1[-1] * (1.0 + max(bt_mean - 1.0 * bt_std, -0.99)))
+        l2.append(l2[-1] * (1.0 + max(bt_mean - 2.0 * bt_std, -0.99)))
+
+    # Build live equity series aligned to the same dates
+    live_eq = [initial]
+    live_by_date = {lm["date"]: lm["return"] for lm in live_months}
+    eq = initial
+    for d in all_dates[1:]:
+        if d in live_by_date:
+            eq *= (1.0 + live_by_date[d])
+            live_eq.append(eq)
+        else:
+            live_eq.append(None)
+
+    return {
+        "dates": all_dates,
+        "upper_2s": [round(v, 2) for v in u2],
+        "upper_1s": [round(v, 2) for v in u1],
+        "expected": [round(v, 2) for v in exp],
+        "lower_1s": [round(v, 2) for v in l1],
+        "lower_2s": [round(v, 2) for v in l2],
+        "live": [round(v, 2) if v is not None else None for v in live_eq],
+    }
+
+
+def expectations_quick(slot: int) -> str:
+    """Return just the tracking status string for dashboard chips."""
+    s = strategy_by_slot(slot)
+    if s is None:
+        return "pending"
+    bt_monthly = s["monthly_returns"] or {}
+    bt_rets = [float(v) for v in bt_monthly.values() if v is not None]
+    if len(bt_rets) < 12:
+        return "pending"
+    bt_mean = sum(bt_rets) / len(bt_rets)
+    bt_var = sum((r - bt_mean) ** 2 for r in bt_rets) / max(len(bt_rets) - 1, 1)
+    bt_std = math.sqrt(bt_var)
+    if bt_std == 0:
+        return "pending"
+
+    live_months = _live_monthly_returns(s)
+    if not live_months:
+        return "pending"
+
+    recent = live_months[-3:] if len(live_months) >= 3 else live_months
+    diverged = 0
+    drifting = 0
+    for m in recent:
+        z = abs((m["return"] - bt_mean) / bt_std)
+        if z >= 2.0:
+            diverged += 1
+        elif z >= 1.0:
+            drifting += 1
+    if diverged >= 2:
+        return "diverged"
+    if diverged >= 1 or drifting >= 2:
+        return "drifting"
+    return "on_track"

@@ -61,8 +61,8 @@ Write-Host ""
 Write-Host "Done. Verify with:"
 Write-Host "  schtasks /Query /TN $TaskName /V /FO LIST"
 Write-Host ""
-Write-Host "Firewall rule (run elevated, restricts to ZeroTier interface):"
-Write-Host '  netsh advfirewall firewall add rule name="QTS-TUI 8765 (ZT)" `'
+Write-Host "Firewall rule (run elevated, restricts to WireGuard interface):"
+Write-Host '  netsh advfirewall firewall add rule name="QTS-TUI 8765 (WG)" `'
 Write-Host '         dir=in action=allow protocol=TCP localport=8765 `'
 Write-Host '         interfacetype=lan profile=private'
 Write-Host ""

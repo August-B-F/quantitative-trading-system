@@ -9,11 +9,15 @@ $ErrorActionPreference = "Stop"
 
 $TaskName    = "Skylark"
 $ProjectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
-$Python      = "py"
+# VBS launcher hides the Python console window. The task runs wscript.exe
+# against scripts/skylark_hidden.vbs, which calls WScript.Shell.Run with
+# windowStyle=0 to launch py.exe detached and invisible.
+$Launcher    = "wscript.exe"
+$VbsPath     = "scripts\skylark_hidden.vbs"
 
 Write-Host "Installing scheduled task '$TaskName'"
 Write-Host "  project root : $ProjectRoot"
-Write-Host "  command      : $Python scripts\skylark_server.py"
+Write-Host "  command      : $Launcher $VbsPath (windowless)"
 
 # Also remove the legacy QTS-Web task if present (superseded by Skylark).
 foreach ($stale in @("QTS-Web", $TaskName)) {
@@ -25,8 +29,8 @@ foreach ($stale in @("QTS-Web", $TaskName)) {
 }
 
 $Action    = New-ScheduledTaskAction `
-                -Execute $Python `
-                -Argument "scripts\skylark_server.py" `
+                -Execute $Launcher `
+                -Argument $VbsPath `
                 -WorkingDirectory $ProjectRoot
 
 $Trigger   = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
@@ -51,7 +55,7 @@ Register-ScheduledTask `
     -Trigger     $Trigger `
     -Settings    $Settings `
     -Principal   $Principal `
-    -Description "Skylark - 9-strategy horse race UI (port 8765, ZeroTier-bound)" | Out-Null
+    -Description "Skylark - 9-strategy horse race UI (port 8765, WireGuard-bound)" | Out-Null
 
 Write-Host "Starting task immediately ..."
 Start-ScheduledTask -TaskName $TaskName

@@ -166,6 +166,7 @@ async def strategies():
             "return_pct":  eq["return_pct"],
             "connected":   eq["connected"],
             "backtest":    bt,
+            "tracking":    sd.expectations_quick(s["slot"]),
         })
     return {"strategies": out, "live_mode": sd.is_live()}
 
@@ -183,6 +184,7 @@ async def strategy_detail(slot: int):
     rationale = sd.strategy_rationale().get(slot, "")
     stats    = sd.strategy_stats(slot)
     vs_spy   = sd.vs_spy_stats(slot)
+    expect   = sd.expectations_check(slot)
     # Build a comparable backtest equity curve (base=1.0) from monthly returns
     monthly = s["monthly_returns"] or {}
     bt_curve = []
@@ -217,6 +219,7 @@ async def strategy_detail(slot: int):
         "portfolio_history": hist,
         "orders":      orders,
         "rebalance_log": reb_log,
+        "expectations":  expect,
     }
 
 
@@ -427,48 +430,51 @@ async def system_health():
 # Entry
 # ───────────────────────────────────────────────────────────────────────────
 
-def _zerotier_ip() -> str:
-    """Bind to the ZeroTier interface so only VPN peers can reach the UI."""
+def _wireguard_ip() -> str:
+    """Bind to the VPN tunnel interface so only VPN peers can reach the UI."""
     import re, subprocess, socket
+
     try:
         r = subprocess.run(["ipconfig"], capture_output=True, text=True, timeout=3)
         if r.returncode == 0:
             for blk in re.split(r"\r?\n\r?\n", r.stdout):
-                if "ZeroTier" in blk:
-                    m = re.search(r"IPv4 Address[^\n:]*:\s*([0-9.]+)", blk)
+                # WireGuard (10.200.200.x) or ZeroTier (named adapter)
+                m = re.search(r"IPv4 Address[^\n:]*:\s*(10\.200\.200\.\d+)", blk)
+                if m:
+                    return m.group(1)
+                if re.search(r"ZeroTier", blk, re.IGNORECASE):
+                    m = re.search(r"IPv4 Address[^\n:]*:\s*(\d+\.\d+\.\d+\.\d+)", blk)
                     if m:
                         return m.group(1)
     except Exception:
         pass
-    for exe in ("zerotier-cli", r"C:\Program Files (x86)\ZeroTier\One\zerotier-cli.bat"):
-        try:
-            r = subprocess.run([exe, "-j", "listnetworks"], capture_output=True, text=True, timeout=3)
-            if r.returncode == 0 and r.stdout.strip():
-                import json as _json
-                for net in _json.loads(r.stdout):
-                    for ip in net.get("assignedAddresses", []) or []:
-                        ip = ip.split("/")[0]
-                        if ":" not in ip:
-                            return ip
-        except Exception:
-            continue
+
     try:
         for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
-            if not ip.startswith(("127.", "169.254.")):
+            if ip.startswith("10.200.200."):
                 return ip
     except Exception:
         pass
-    print("  WARNING: ZeroTier IP not found — binding to 127.0.0.1 (local only)")
+
+    # Fallback — exclude loopback, link-local, and Hyper-V virtual switches.
+    try:
+        for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
+            if not ip.startswith(("127.", "169.254.", "172.")):
+                return ip
+    except Exception:
+        pass
+
+    print("  WARNING: VPN IP not found — binding to 127.0.0.1 (local only)")
     return "127.0.0.1"
 
 
 def serve(host: str | None = None, port: int = 8765, open_browser: bool = False):
     if host is None:
-        host = _zerotier_ip()
+        host = _wireguard_ip()
     if open_browser:
         threading.Timer(1.2, lambda: __import__("webbrowser").open(f"http://{host}:{port}")).start()
     mode = "LIVE" if sd.is_live() else "paper"
-    print(f"\n  Skylark · http://{host}:{port} · {mode} · ZeroTier only\n")
+    print(f"\n  Skylark · http://{host}:{port} · {mode} · WireGuard only\n")
     uvicorn.run(app, host=host, port=port, log_level="warning")
 
 

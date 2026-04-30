@@ -53,6 +53,11 @@ async function fetchJSON(url) {
   }
 }
 
+function trackingLabel(status) {
+  const map = { on_track: 'On Track', drifting: 'Drifting', diverged: 'Diverged', pending: 'Pending' };
+  return map[status] || 'Pending';
+}
+
 function tierColor(tier, idx) {
   const palette = TIER_COLORS[tier] || ['#888'];
   return palette[idx % palette.length];
@@ -176,7 +181,8 @@ async function renderDashboard() {
       <td class="hide-mobile">${fmt.pct(r.bt_cagr)}</td>
       <td>${fmt.num(r.bt_sharpe)}</td>
       <td class="hide-mobile t-neg">${fmt.pct(r.bt_max_dd)}</td>
-      <td class="hide-mobile"><span class="status-tag ${r.connected ? 'active' : ''}">${r.connected ? 'connected' : 'offline'}</span></td>`;
+      <td class="hide-mobile"><span class="status-tag ${r.connected ? 'active' : ''}">${r.connected ? 'connected' : 'offline'}</span></td>
+      <td><span class="tracking-chip ${r.tracking || 'pending'}">${trackingLabel(r.tracking)}</span></td>`;
     tbody.appendChild(tr);
   });
 
@@ -365,6 +371,7 @@ async function renderHorseRace() {
           <div class="strat-card-slot">SLOT ${s.slot} · <span class="tier-badge ${s.tier}">${s.tier}</span></div>
           <div class="strat-card-name">${s.name}</div>
         </div>
+        <span class="tracking-chip ${live.tracking || 'pending'}">${trackingLabel(live.tracking)}</span>
       </div>
       <div class="strat-card-return ${retCls}">${fmt.pctS(ret)}</div>
       <div class="strat-card-sub">live since inception</div>
@@ -547,6 +554,9 @@ async function renderStrategy() {
   drawKeyStats(state.sdKsData, state.sdKsCompare || 'strat');
   drawVsSpy(data.vs_spy || {});
 
+  // Expectations tracking (monthly checkpoints vs backtest)
+  drawExpectations(data.expectations || {});
+
   // Rolling sharpe + drawdowns + heatmap + attribution
   drawRollingSharpe(data.rolling_sharpe || []);
   drawDrawdowns(data.drawdowns || [], data.spy_drawdowns || []);
@@ -699,6 +709,165 @@ function drawVsSpy(v) {
     }
     return `<div class="ks-cell"><div class="ks-label">${it.label}</div><div class="ks-val ${cls}">${it.fmt(it.v)}</div></div>`;
   }).join('');
+}
+
+function drawExpectations(expect) {
+  const statusEl = document.getElementById('sd-expect-status');
+  const summaryHost = document.getElementById('sd-expect-summary');
+  const tbody = document.getElementById('sd-expect-body');
+  const tblWrap = document.getElementById('sd-expect-tbl-wrap');
+
+  if (!expect || !statusEl) return;
+
+  // Status chip
+  const st = expect.status || 'pending';
+  statusEl.textContent = trackingLabel(st);
+  statusEl.className = 'tracking-chip ' + st;
+
+  // Summary metrics
+  const s = expect.summary || {};
+  const summaryItems = [
+    { label: 'BT Mean (mo)', v: s.bt_mean, fmt: v => fmt.pctS(v, 2) },
+    { label: 'BT Std (mo)',  v: s.bt_std,  fmt: v => fmt.pct(v, 2) },
+    { label: 'BT Sharpe',   v: s.bt_sharpe, fmt: v => fmt.num(v) },
+    { label: 'Live Sharpe',  v: s.live_sharpe, fmt: v => fmt.num(v) },
+    { label: 'Tracking Error', v: s.tracking_error, fmt: v => v == null ? '—' : (v * 100).toFixed(1) + '%' },
+    { label: 'Cum. Drift',  v: s.cumulative_drift, fmt: v => v == null ? '—' : `${v >= 0 ? '+' : ''}${(v * 100).toFixed(1)}%` },
+    { label: 'Avg Z-Score', v: s.avg_z, fmt: v => v == null ? '—' : v.toFixed(2) },
+    { label: 'Live Months',  v: s.n_months, fmt: v => v == null ? '—' : v },
+  ];
+  summaryHost.innerHTML = summaryItems.map(it => {
+    let cls = '';
+    if (it.label === 'Avg Z-Score' && typeof it.v === 'number') {
+      cls = Math.abs(it.v) < 1 ? 'pos' : Math.abs(it.v) < 2 ? 'warn' : 'neg';
+    }
+    if (it.label === 'Cum. Drift' && typeof it.v === 'number') {
+      cls = it.v >= 0 ? 'pos' : 'neg';
+    }
+    return `<div class="ks-cell"><div class="ks-label">${it.label}</div><div class="ks-val ${cls}">${it.fmt(it.v)}</div></div>`;
+  }).join('');
+
+  // Monthly checkpoints table
+  const months = expect.months || [];
+  if (!months.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Waiting for first completed month after rebalance.</td></tr>';
+  } else {
+    tbody.innerHTML = '';
+    months.slice().reverse().forEach(m => {
+      const tr = document.createElement('tr');
+      const retCls = (m.live_return || 0) >= 0 ? 't-pos' : 't-neg';
+      const zCls = Math.abs(m.z_score) < 1 ? 't-pos' : Math.abs(m.z_score) < 2 ? 't-warn' : 't-neg';
+      tr.innerHTML = `
+        <td>${m.date}</td>
+        <td class="${retCls}">${fmt.pctS(m.live_return, 2)}</td>
+        <td>${fmt.pctS(m.bt_mean, 2)}</td>
+        <td class="${zCls}">${m.z_score != null ? m.z_score.toFixed(2) : '—'}</td>
+        <td><span class="tracking-chip ${m.status}">${trackingLabel(m.status)}</span></td>`;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Confidence band chart
+  drawExpectationBand(expect.band || {});
+}
+
+function drawExpectationBand(band) {
+  destroyChart('sd-expect-chart');
+  const canvas = document.getElementById('sd-expect-chart');
+  if (!canvas || !band.dates || !band.dates.length) return;
+
+  const datasets = [];
+
+  // 2-sigma band (filled between upper and lower)
+  if (band.upper_2s) {
+    datasets.push({
+      label: '+2σ',
+      data: band.upper_2s,
+      borderColor: 'rgba(232,85,85,0.25)',
+      backgroundColor: 'rgba(232,85,85,0.04)',
+      borderWidth: 1, borderDash: [3, 3], pointRadius: 0, tension: 0.2,
+      fill: '+1',
+    });
+  }
+  if (band.lower_2s) {
+    datasets.push({
+      label: '-2σ',
+      data: band.lower_2s,
+      borderColor: 'rgba(232,85,85,0.25)',
+      backgroundColor: 'rgba(232,85,85,0.04)',
+      borderWidth: 1, borderDash: [3, 3], pointRadius: 0, tension: 0.2,
+      fill: false,
+    });
+  }
+
+  // 1-sigma band (filled between upper and lower)
+  if (band.upper_1s) {
+    datasets.push({
+      label: '+1σ',
+      data: band.upper_1s,
+      borderColor: 'rgba(232,160,48,0.35)',
+      backgroundColor: 'rgba(232,160,48,0.06)',
+      borderWidth: 1, borderDash: [4, 3], pointRadius: 0, tension: 0.2,
+      fill: '+1',
+    });
+  }
+  if (band.lower_1s) {
+    datasets.push({
+      label: '-1σ',
+      data: band.lower_1s,
+      borderColor: 'rgba(232,160,48,0.35)',
+      backgroundColor: 'rgba(232,160,48,0.06)',
+      borderWidth: 1, borderDash: [4, 3], pointRadius: 0, tension: 0.2,
+      fill: false,
+    });
+  }
+
+  // Expected (center line)
+  if (band.expected) {
+    datasets.push({
+      label: 'Expected',
+      data: band.expected,
+      borderColor: '#6c6c6c',
+      borderWidth: 1.5, borderDash: [6, 4], pointRadius: 0, tension: 0.2,
+      fill: false,
+    });
+  }
+
+  // Live equity
+  if (band.live) {
+    datasets.push({
+      label: 'Live',
+      data: band.live,
+      borderColor: '#28d4b0',
+      borderWidth: 2.5, pointRadius: 3, pointBackgroundColor: '#28d4b0',
+      tension: 0.1, spanGaps: false,
+      fill: false,
+    });
+  }
+
+  state.charts['sd-expect-chart'] = new Chart(canvas, {
+    type: 'line',
+    data: { labels: band.dates, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: mobileLegend(),
+        tooltip: {
+          callbacks: {
+            label: c => {
+              const v = c.parsed.y;
+              return v != null ? `${c.dataset.label}: $${Math.round(v).toLocaleString()}` : '';
+            },
+          },
+        },
+      },
+      scales: {
+        x: { ticks: mobileXTicks(8), grid: { color: '#1c1c1c' } },
+        y: { ticks: { font: { size: 9 }, callback: v => '$' + (v / 1000).toFixed(0) + 'k' }, grid: { color: '#1c1c1c' } },
+      },
+    },
+  });
 }
 
 function drawRollingSharpe(data) {

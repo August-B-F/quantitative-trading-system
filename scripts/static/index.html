@@ -162,8 +162,9 @@
           <th>Sharpe</th>
           <th class="hide-mobile">MaxDD (BT)</th>
           <th class="hide-mobile">Status</th>
+          <th>Tracking</th>
         </tr></thead>
-        <tbody id="dash-rank-body"><tr><td colspan="8" class="empty-state">Loading…</td></tr></tbody>
+        <tbody id="dash-rank-body"><tr><td colspan="9" class="empty-state">Loading…</td></tr></tbody>
       </table>
     </div>
 
@@ -259,6 +260,23 @@
       <div class="card-label mb-12">Performance vs SPY</div>
       <div class="ks-grid" id="sd-vs-spy"></div>
       <p class="mono text-xs text-muted mt-8">Correlation, beta and capture ratios are computed on the aligned monthly-return window. Alpha is annualized from the monthly intercept in the strategy-vs-SPY regression.</p>
+    </div>
+
+    <!-- Expectations tracking — monthly checkpoints vs backtest -->
+    <div class="card mb-20" id="sd-expect-card">
+      <div class="flex items-center justify-between mb-12 wrap gap-12">
+        <span class="card-label" style="margin-bottom:0">Performance vs Expectations</span>
+        <span class="tracking-chip" id="sd-expect-status">PENDING</span>
+      </div>
+      <div class="chart-wrap mb-16" style="height:240px"><canvas id="sd-expect-chart"></canvas></div>
+      <div class="ks-grid mb-16" id="sd-expect-summary"></div>
+      <div class="tbl-wrap" style="border:none" id="sd-expect-tbl-wrap">
+        <div class="tbl-header"><span class="tbl-title">Monthly Checkpoints</span></div>
+        <table class="tbl-compact">
+          <thead><tr><th>Month</th><th>Live Return</th><th>Expected</th><th>Z-Score</th><th>Status</th></tr></thead>
+          <tbody id="sd-expect-body"><tr><td colspan="5" class="empty-state">Waiting for first completed month after rebalance.</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="layout-split mb-20">

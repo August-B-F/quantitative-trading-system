@@ -1814,7 +1814,7 @@ py scripts/tui.py
 
 Keys: `1..5` switch tabs, `r` reload snapshot, `q` quit.
 
-**Run as a web server (browser, phone, ZeroTier).**
+**Run as a web server (browser, phone, WireGuard).**
 
 ```
 py scripts/tui.py --serve              # binds 0.0.0.0:8765
@@ -1835,29 +1835,25 @@ Registers the `QTS-TUI` task: `At log on` trigger, restart every 1 min on
 failure, no execution time limit, runs hidden, working dir = project root.
 Survives reboot once the user logs in.
 
-**ZeroTier access from another device.**
+**WireGuard access from another device.**
+
+From the phone/laptop browser (once the WireGuard tunnel is active):
 
 ```
-zerotier-cli listnetworks      # find this host's ZT-assigned IP
+http://10.200.200.2:8765
 ```
 
-Then from the phone/laptop browser:
+**Firewall — restrict 8765 to the WireGuard interface only.** Run elevated:
 
 ```
-http://<zt-ip>:8765
-```
-
-**Firewall — restrict 8765 to the ZeroTier interface only.** Run elevated:
-
-```
-netsh advfirewall firewall add rule name="QTS-TUI 8765 (ZT)" ^
+netsh advfirewall firewall add rule name="QTS-TUI 8765 (WG)" ^
        dir=in action=allow protocol=TCP localport=8765 ^
        interfacetype=lan profile=private
 ```
 
-Do *not* add the rule for the `public` profile. The ZeroTier interface
+Do *not* add the rule for the `public` profile. The WireGuard interface
 shows up under the `private`/`lan` profile by default — confirm via
-`Get-NetConnectionProfile` and re-categorize the ZT adapter to `Private`
+`Get-NetConnectionProfile` and re-categorize the WG adapter to `Private`
 if Windows tagged it as Public.
 
 **Auth token.** Set `TUI_TOKEN` to require a query-string token:

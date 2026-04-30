@@ -1,45 +1,40 @@
-"""QTS dashboard connectivity diagnostic — CLIENT SIDE (Italian laptop).
+"""QTS dashboard connectivity diagnostic — CLIENT SIDE.
 
 ========================================================================
   INSTRUCTIONS FOR CLAUDE CODE RUNNING THIS SCRIPT
 ========================================================================
 
 You have been handed this script to help the user debug why they cannot
-reach the QTS dashboard on the Swedish host at:
+reach the QTS dashboard on the Swedish host via WireGuard at:
 
-    http://10.88.220.209:8765
+    http://10.200.200.2:8765
 
 The host-side is known-good. This script is READ-ONLY.
 
 HARD RULES:
-  1. Do NOT modify the user's ZeroTier, Tailscale, firewall, routing,
-     browser, or any system setting without explicit consent from the user.
-  2. Do NOT run `zerotier-cli join/leave`, `sudo` anything, edit files,
-     or install packages. This script only *reads* and *probes*.
+  1. Do NOT modify the user's WireGuard, firewall, routing, browser, or
+     any system setting without explicit consent from the user.
+  2. Do NOT edit files, or install packages. This script only *reads*
+     and *probes*.
   3. If a check surfaces a problem that needs a change, print the
      suggested fix as text and STOP. Ask the user before acting.
-  4. Sudo is only needed to read ZeroTier's auth token on Linux/macOS;
-     if the user doesn't want to sudo, skip that section gracefully.
-  5. Report back only what was observed. Don't embellish.
+  4. Report back only what was observed. Don't embellish.
 
 HOW TO RUN:
     python3 scripts/debug_zt_client.py
 
 Optional environment variables:
-    HOST_IP=10.88.220.209   # override target ZT IP
+    HOST_IP=10.200.200.2    # override target WireGuard IP
     HOST_PORT=8765          # override target port
     VERBOSE=1               # print full subprocess output
 
 WHAT IT CHECKS (all read-only):
     - OS / platform / kernel
-    - Whether ZeroTier is installed + service running
-    - Which ZT networks are joined and their status + assigned IP
-    - Whether the 10.88.220.0/24 route is installed in the OS routing table
-    - ARP / neighbour table for the ZT subnet
-    - ICMP ping to the host (10.88.220.209)
+    - Whether the WireGuard tunnel interface is up (ipconfig / ip addr)
+    - Whether the 10.200.200.0/24 route is installed in the OS routing table
+    - ICMP ping to the host (10.200.200.2)
     - TCP connect to port 8765
     - HTTP GET of / and /backtest_presentation.json
-    - Tailscale interference (is it up, does it hold 10/8 routes)
     - Environment proxy variables (HTTP_PROXY etc)
 
 ========================================================================
@@ -49,6 +44,7 @@ from __future__ import annotations
 import json
 import os
 import platform
+import re
 import shutil
 import socket
 import subprocess
@@ -63,9 +59,9 @@ try:
 except Exception:
     pass
 
-HOST_IP = os.environ.get("HOST_IP", "10.88.220.209")
+HOST_IP = os.environ.get("HOST_IP", "10.200.200.2")
 HOST_PORT = int(os.environ.get("HOST_PORT", "8765"))
-NETWORK_ID = "b103a835d29357ad"
+WG_SUBNET = "10.200.200."
 VERBOSE = bool(os.environ.get("VERBOSE"))
 
 
@@ -144,115 +140,59 @@ def check_env_proxies() -> dict:
     else:
         for k, v in set_vars.items():
             warn(f"{k}={v}")
-        warn("A proxy env var can reroute 10.88.220.209 through an upstream "
-             "proxy that can't reach the ZT network.")
+        warn("A proxy env var can reroute traffic through an upstream "
+             "proxy that can't reach the WireGuard network.")
     return set_vars
 
 
-def check_zerotier() -> dict:
-    header("ZeroTier")
-    out: dict = {"installed": False, "service": None, "networks": [],
-                 "node_id": None, "online": None}
+def check_wireguard() -> dict:
+    header("WireGuard tunnel interface")
+    out: dict = {"found": False, "ip": None}
 
-    exe = which("zerotier-cli")
-    if not exe:
-        # Windows default install path
-        win_exe = r"C:\ProgramData\ZeroTier\One\zerotier-one_x64.exe"
-        if os.path.exists(win_exe):
-            exe = win_exe
-            info(f"zerotier-cli not on PATH; found {win_exe}")
-    if not exe:
-        bad("ZeroTier not installed (no zerotier-cli on PATH and no Windows install)")
-        info("FIX (ask user): install from https://www.zerotier.com/download/")
-        return out
-    out["installed"] = True
-    ok(f"ZeroTier binary: {exe}")
-
-    # info
-    if exe.endswith(".exe"):
-        rc, so, se = run([exe, "-q", "info"])
+    if platform.system() == "Windows":
+        rc, so, _ = run(["ipconfig"])
+        if rc == 0:
+            for blk in re.split(r"\r?\n\r?\n", so):
+                m = re.search(r"IPv4 Address[^\n:]*:\s*(10\.200\.200\.\d+)", blk)
+                if m:
+                    out["found"] = True
+                    out["ip"] = m.group(1)
+                    adapter = ""
+                    am = re.search(r"adapter\s+(.+?):", blk)
+                    if am:
+                        adapter = am.group(1)
+                    ok(f"WireGuard adapter '{adapter}' has IP {out['ip']}")
+                    break
     else:
-        rc, so, se = run([exe, "info"])
-    if rc == 0 and so.strip():
-        out["status_line"] = so.strip()
-        info(f"info: {so.strip()}")
-        parts = so.split()
-        if len(parts) >= 4:
-            out["node_id"] = parts[1] if parts[0] == "200" else parts[0]
-            out["online"] = "ONLINE" in so.upper()
-    else:
-        # Non-Windows may need sudo to talk to the service
-        if "root" in (se or "").lower() or "permission" in (se or "").lower():
-            warn("zerotier-cli info requires root/admin on this platform")
-            info("Try: sudo zerotier-cli info")
+        if which("ip"):
+            rc, so, _ = run(["ip", "-4", "addr"])
         else:
-            bad(f"zerotier-cli info failed: {se.strip() or so.strip()}")
-        return out
+            rc, so, _ = run(["ifconfig"])
+        for line in so.splitlines():
+            m = re.search(r"(10\.200\.200\.\d+)", line)
+            if m:
+                out["found"] = True
+                out["ip"] = m.group(1)
+                ok(f"WireGuard interface has IP {out['ip']}")
+                break
 
-    # listnetworks
-    if exe.endswith(".exe"):
-        rc, so, se = run([exe, "-q", "listnetworks"])
-    else:
-        rc, so, se = run([exe, "listnetworks"])
-    if rc != 0:
-        warn(f"listnetworks failed: {se.strip() or so.strip()}")
-        info("Try: sudo zerotier-cli listnetworks")
-        return out
-
-    # Parse: `200 listnetworks <nwid> <name> <mac> <status> <type> <dev> <ips>`
-    for line in so.splitlines():
-        line = line.strip()
-        if not line or "listnetworks" not in line.split()[:2]:
-            continue
-        toks = line.split()
-        # toks[0]=200 toks[1]=listnetworks toks[2]=nwid ...
-        if len(toks) < 8:
-            continue
-        rec = {
-            "nwid": toks[2],
-            "name": toks[3],
-            "mac": toks[4],
-            "status": toks[5],
-            "type": toks[6],
-            "dev": toks[7],
-            "ips": toks[8] if len(toks) > 8 else "-",
-        }
-        out["networks"].append(rec)
-        line_ok = (rec["status"] == "OK")
-        line_target = (rec["nwid"] == NETWORK_ID)
-        fn = ok if (line_ok and line_target) else (warn if line_target else info)
-        fn(f"{rec['nwid']}  name={rec['name']}  "
-           f"status={rec['status']}  ips={rec['ips']}  dev={rec['dev']}")
-
-    target = [n for n in out["networks"] if n["nwid"] == NETWORK_ID]
-    if not target:
-        bad(f"This device is NOT joined to network {NETWORK_ID}")
-        info(f"FIX (ask user): `zerotier-cli join {NETWORK_ID}`, then "
-             "authorize at https://my.zerotier.com")
-    else:
-        t = target[0]
-        if t["status"] != "OK":
-            bad(f"network {NETWORK_ID} status is {t['status']} (expected OK)")
-            if t["status"] == "REQUESTING_CONFIGURATION":
-                info("The controller has not authorized this member yet. "
-                     "Fix at https://my.zerotier.com → Networks → "
-                     f"{NETWORK_ID} → Members → tick Auth?")
-            elif t["status"] == "ACCESS_DENIED":
-                info("The member is explicitly denied by the controller.")
-        elif t["ips"] in ("-", ""):
-            bad("network OK but no managed IP assigned")
+    if not out["found"]:
+        bad("No interface with a 10.200.200.x address found")
+        info("FIX: ensure the WireGuard tunnel is active.")
+        if platform.system() == "Windows":
+            info("Open WireGuard app → activate the 'tower' tunnel")
         else:
-            ok(f"This device has ZT IP {t['ips']} on {NETWORK_ID}")
+            info("Try: sudo wg-quick up tower")
     return out
 
 
-def check_route(target_cidr: str = "10.88.220.0/24") -> dict:
-    header(f"Routing table for {target_cidr}")
+def check_route() -> dict:
+    header(f"Routing table for {WG_SUBNET}0/24")
     out: dict = {"found": False, "lines": []}
     if platform.system() == "Windows":
         rc, so, _ = run(["route", "print", "-4"])
         for line in so.splitlines():
-            if "10.88.220" in line:
+            if WG_SUBNET.rstrip(".") in line:
                 out["lines"].append(line.strip())
     else:
         if which("ip"):
@@ -260,18 +200,16 @@ def check_route(target_cidr: str = "10.88.220.0/24") -> dict:
         else:
             rc, so, _ = run(["netstat", "-rn"])
         for line in so.splitlines():
-            if "10.88.220" in line:
+            if WG_SUBNET.rstrip(".") in line:
                 out["lines"].append(line.strip())
     if out["lines"]:
         out["found"] = True
         for l in out["lines"]:
             ok(l)
     else:
-        bad(f"No route for {target_cidr} in the OS routing table")
-        info("This is the most common root cause on mobile: the ZT app is "
-             "installed but the OS never installed the managed route. On "
-             "iOS/Android, check 'Allow Managed' / 'Allow Default Route' "
-             "for this network in the ZeroTier app.")
+        bad(f"No route for {WG_SUBNET}0/24 in the OS routing table")
+        info("The WireGuard tunnel may not be active, or AllowedIPs "
+             "does not include this subnet.")
     return out
 
 
@@ -292,8 +230,8 @@ def check_ping() -> dict:
         ok(f"host {HOST_IP} reachable via ICMP")
     else:
         bad(f"host {HOST_IP} NOT reachable via ICMP")
-        info("If the routing-table check above also failed, the ZT route is "
-             "missing → fix in the ZeroTier app, not here.")
+        info("If the routing-table check above also failed, the WireGuard "
+             "tunnel is likely not active.")
     return {"alive": alive, "output": so}
 
 
@@ -336,49 +274,7 @@ def check_http() -> dict:
     return out
 
 
-def check_tailscale() -> dict:
-    header("Tailscale (interference check)")
-    out: dict = {"installed": False, "backend": None, "up": False,
-                 "grabs_private": None}
-    exe = which("tailscale")
-    if not exe:
-        info("tailscale not installed — cannot interfere")
-        return out
-    out["installed"] = True
-    rc, so, se = run([exe, "status", "--json"])
-    if rc != 0:
-        warn(f"tailscale status failed: {se.strip() or so.strip()}")
-        return out
-    try:
-        st = json.loads(so)
-    except json.JSONDecodeError:
-        warn("could not parse tailscale status")
-        return out
-    backend = st.get("BackendState")
-    out["backend"] = backend
-    out["up"] = backend == "Running"
-    if backend == "Running":
-        warn(f"Tailscale backend is Running (self={st.get('Self',{}).get('TailscaleIPs')})")
-        # Check if any peer advertises 10.88.220.0/24 or 10.0.0.0/8
-        covers = []
-        for peer in (st.get("Peer") or {}).values():
-            for r in (peer.get("PrimaryRoutes") or []):
-                if r.startswith("10.") or r == "0.0.0.0/0":
-                    covers.append((peer.get("HostName"), r))
-        if covers:
-            warn(f"Tailscale peers advertise private routes: {covers}")
-        else:
-            ok("No Tailscale peer advertises 10.x — Tailscale should not "
-               "intercept 10.88.220.209")
-        # ExitNodeID
-        if st.get("ExitNodeStatus") and st["ExitNodeStatus"].get("ID"):
-            warn(f"Tailscale exit node is set: {st['ExitNodeStatus']}")
-    else:
-        info(f"Tailscale backend: {backend}")
-    return out
-
-
-def check_ips_on_host() -> dict:
+def check_local_interfaces() -> dict:
     header("Local interfaces")
     out: dict = {"interfaces": []}
     if platform.system() == "Windows":
@@ -389,8 +285,8 @@ def check_ips_on_host() -> dict:
         else:
             rc, so, _ = run(["ifconfig"])
     lines = [l for l in so.splitlines()
-             if "zerotier" in l.lower() or "10.88.220" in l
-             or "tailscale" in l.lower() or "utun" in l.lower()]
+             if "wireguard" in l.lower() or "tower" in l.lower()
+             or "10.200.200" in l or "wg" in l.lower()]
     for l in lines:
         info(l.strip())
     out["matches"] = lines
@@ -402,47 +298,29 @@ def check_ips_on_host() -> dict:
 def main() -> int:
     print(f"{BOLD}QTS dashboard — client-side connectivity diagnostic{RESET}")
     print(f"{DIM}target: http://{HOST_IP}:{HOST_PORT}/   "
-          f"network: {NETWORK_ID}{RESET}")
+          f"subnet: {WG_SUBNET}0/24{RESET}")
 
     report: dict = {}
     report["platform"] = check_platform()
     report["proxy_env"] = check_env_proxies()
-    report["zerotier"] = check_zerotier()
-    report["local_if"] = check_ips_on_host()
+    report["wireguard"] = check_wireguard()
+    report["local_if"] = check_local_interfaces()
     report["route"] = check_route()
     report["ping"] = check_ping()
     report["tcp"] = check_tcp()
     report["http"] = check_http()
-    report["tailscale"] = check_tailscale()
 
     # Summary
     header("Summary")
     problems: list[str] = []
-    zt = report["zerotier"]
-    if not zt.get("installed"):
-        problems.append("ZeroTier is not installed on this device.")
-    elif not zt.get("networks"):
-        problems.append("No ZeroTier networks joined (or cli needs sudo).")
-    else:
-        target = [n for n in zt["networks"] if n["nwid"] == NETWORK_ID]
-        if not target:
-            problems.append(
-                f"Not joined to target network {NETWORK_ID}."
-            )
-        else:
-            t = target[0]
-            if t["status"] != "OK":
-                problems.append(
-                    f"Network {NETWORK_ID} status={t['status']} — "
-                    "authorize at https://my.zerotier.com."
-                )
-            elif t["ips"] in ("-", ""):
-                problems.append(f"Network {NETWORK_ID} joined but no IP assigned.")
+    wg = report["wireguard"]
+    if not wg.get("found"):
+        problems.append("No WireGuard tunnel interface found (no 10.200.200.x IP). "
+                        "Activate the tunnel first.")
     if not report["route"]["found"]:
         problems.append(
-            f"No OS route for 10.88.220.0/24 — the ZT app is not installing "
-            "the managed route. Check 'Allow Managed' / 'Allow Default Route' "
-            "in the ZT app for this network."
+            f"No OS route for {WG_SUBNET}0/24 — the WireGuard tunnel "
+            "may not be active or AllowedIPs is misconfigured."
         )
     if not report["ping"]["alive"]:
         problems.append(f"ICMP ping to {HOST_IP} fails.")
@@ -450,12 +328,7 @@ def main() -> int:
         problems.append(f"TCP connect to {HOST_IP}:{HOST_PORT} fails.")
     if report["proxy_env"]:
         problems.append("Proxy environment variables are set; unset them "
-                        "or add 10.88.220.0/24 to NO_PROXY.")
-    if report["tailscale"].get("up"):
-        problems.append(
-            "Tailscale is running. Confirm it is NOT your source of "
-            "interference by disabling it and re-running this script."
-        )
+                        f"or add {WG_SUBNET}0/24 to NO_PROXY.")
 
     if not problems:
         ok("All checks passed — the client can reach the dashboard. "

@@ -110,7 +110,7 @@ Production target: Windows 10 Pro, RTX 4060 Ti, i5-13600K, Europe/Stockholm.
      Change advanced power settings → Sleep → **Allow wake timers = Enable**.
    - Set "Put the computer to sleep" to **Never** on AC power, or at
      minimum ensure the registered tasks' `WakeToRun` flag is honored.
-   - If accessed via Parsec + ZeroTier, Parsec keeps the box awake while
+   - If accessed via Parsec + WireGuard, Parsec keeps the box awake while
      connected; the wake timer covers the unattended windows.
 9. Install tasks from an **elevated** PowerShell:
    `powershell -ExecutionPolicy Bypass -File scripts\scheduler\install_tasks.ps1`
