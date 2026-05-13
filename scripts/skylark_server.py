@@ -431,21 +431,16 @@ async def system_health():
 # ───────────────────────────────────────────────────────────────────────────
 
 def _wireguard_ip() -> str:
-    """Bind to the VPN tunnel interface so only VPN peers can reach the UI."""
+    """Bind to the WireGuard tunnel interface so only VPN peers can reach the UI."""
     import re, subprocess, socket
 
     try:
         r = subprocess.run(["ipconfig"], capture_output=True, text=True, timeout=3)
         if r.returncode == 0:
             for blk in re.split(r"\r?\n\r?\n", r.stdout):
-                # WireGuard (10.200.200.x) or ZeroTier (named adapter)
                 m = re.search(r"IPv4 Address[^\n:]*:\s*(10\.200\.200\.\d+)", blk)
                 if m:
                     return m.group(1)
-                if re.search(r"ZeroTier", blk, re.IGNORECASE):
-                    m = re.search(r"IPv4 Address[^\n:]*:\s*(\d+\.\d+\.\d+\.\d+)", blk)
-                    if m:
-                        return m.group(1)
     except Exception:
         pass
 
@@ -464,7 +459,7 @@ def _wireguard_ip() -> str:
     except Exception:
         pass
 
-    print("  WARNING: VPN IP not found — binding to 127.0.0.1 (local only)")
+    print("  WARNING: WireGuard IP not found — binding to 127.0.0.1 (local only)")
     return "127.0.0.1"
 
 

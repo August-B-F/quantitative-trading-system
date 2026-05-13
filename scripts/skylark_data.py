@@ -38,7 +38,7 @@ _MONTHLY_CSV   = _ROOT / "logs" / "monthly_comparison.csv"
 
 TIER_ORDER = ("confident", "neutral", "skeptical")
 
-_YAHOO_DIR = _ROOT / "data" / "raw" / "yahoo"
+_YAHOO_DIR = _ROOT / "data" / "clean" / "prices"
 _PRESENTATION = _ROOT / "results" / "backtest_presentation.json"
 
 
@@ -404,8 +404,23 @@ def live_equity_curves(period: str = "1M") -> dict:
         if name not in out_strats:
             out_strats[name] = [initial if d != today_iso else eq for d in dates]
 
-    # SPY benchmark in dollars — start at `initial`, scale by cumulative SPY return
+    # SPY benchmark in dollars — start at `initial`, scale by cumulative SPY return.
+    # Append today's live SPY price via Alpaca so the benchmark moves intraday.
     spy = _load_adj_close("SPY")
+    if spy is not None and today_iso in dates:
+        try:
+            import os as _os
+            _ak = _os.environ.get("ALPACA_S1_KEY", "")
+            _as = _os.environ.get("ALPACA_S1_SECRET", "")
+            if _ak and _as:
+                from alpaca_trade_api import REST as _REST
+                _api = _REST(_ak, _as, base_url="https://paper-api.alpaca.markets")
+                _snap = _api.get_snapshot("SPY")
+                if _snap and _snap.latest_trade:
+                    import pandas as pd
+                    spy[pd.Timestamp(today_iso)] = float(_snap.latest_trade.price)
+        except Exception:
+            pass
     spy_col: list[float | None] = []
     if spy is not None:
         spy_px = _resample_series_to_dates(spy, dates)
@@ -417,6 +432,23 @@ def live_equity_curves(period: str = "1M") -> dict:
             spy_col = [None] * len(dates)
     else:
         spy_col = [None] * len(dates)
+
+    # Clip to the most recent rebalance date so the chart starts from when
+    # live trading began, not from old test trades or account creation.
+    log = load_rebalance_log()
+    last_rebal = None
+    for entry in reversed(log):
+        if entry.get("executed"):
+            last_rebal = entry.get("date")
+            break
+    if last_rebal and last_rebal in dates:
+        idx = max(0, dates.index(last_rebal) - 1)
+        dates    = dates[idx:]
+        spy_col  = spy_col[idx:]
+        out_strats = {n: v[idx:] for n, v in out_strats.items()}
+        if spy_col and spy_col[0]:
+            base = spy_col[0]
+            spy_col = [initial * (p / base) if p else None for p in spy_col]
 
     return {
         "labels":     dates,
@@ -807,10 +839,8 @@ def _corr_matrix(series: dict[str, dict[str, float]], dates: list[str]) -> dict:
 # ═══════════════════════════════════════════════════════════════════════════
 
 _DATA_SOURCES = [
-    ("Yahoo ETFs",    "prices",   _ROOT / "data" / "raw" / "yahoo"),
-    ("Stock bars",    "prices",   _ROOT / "data" / "raw" / "bars"),
-    ("FRED macro",    "macro",    _ROOT / "data" / "raw" / "fred"),
-    ("News",          "alt",      _ROOT / "data" / "raw" / "news"),
+    ("Clean prices",  "prices",   _ROOT / "data" / "clean" / "prices"),
+    ("Clean macro",   "macro",    _ROOT / "data" / "clean" / "macro"),
     ("Features",      "features", _ROOT / "data" / "features"),
     ("Models",        "models",   _ROOT / "data" / "models"),
     ("Rebalance log", "logs",     _REBAL_LOG),

@@ -1,12 +1,12 @@
 # FEATURE_REPORT.md
 
-Generated: 2026-04-12T15:24:31.353296+00:00
+Generated: 2026-05-13T08:32:02.864471+00:00
 
 ## Inventory
 - Total raw feature columns: 1051
-- Surviving (after dedup): 886
-- Dropped by |corr|>=0.95: 165
-- Non-stationary (p>0.05): 184
+- Surviving (after dedup): 1013
+- Dropped by |corr|>=0.95: 38
+- Non-stationary (p>0.05): 483
 
 ### Per-category counts
 
@@ -21,57 +21,48 @@ Generated: 2026-04-12T15:24:31.353296+00:00
 | sentiment | 97 |
 
 ## Panel
-- Shape: (5351, 902)
+- Shape: (5351, 1029)
 - Date range: 2005-01-03 .. 2026-04-10
-- Features: 886, Targets: 16
+- Features: 1013, Targets: 16
 
 ### NaN% by year
 
 | year | nan% |
 |---|---|
-| 2005 | 35.3 |
-| 2006 | 19.8 |
-| 2007 | 18.7 |
-| 2008 | 18.5 |
-| 2009 | 18.6 |
-| 2010 | 10.7 |
-| 2011 | 9.2 |
-| 2012 | 9.1 |
-| 2013 | 9.2 |
-| 2014 | 9.3 |
-| 2015 | 6.8 |
-| 2016 | 3.9 |
-| 2017 | 3.9 |
-| 2018 | 2.9 |
-| 2019 | 3.2 |
-| 2020 | 4.6 |
-| 2021 | 4.6 |
-| 2022 | 4.2 |
-| 2023 | 4.0 |
-| 2024 | 6.5 |
-| 2025 | 6.0 |
-| 2026 | 5.4 |
+| 2005 | 73.4 |
+| 2006 | 71.5 |
+| 2007 | 71.1 |
+| 2008 | 71.0 |
+| 2009 | 71.1 |
+| 2010 | 64.2 |
+| 2011 | 62.8 |
+| 2012 | 62.8 |
+| 2013 | 62.8 |
+| 2014 | 62.9 |
+| 2015 | 60.7 |
+| 2016 | 58.2 |
+| 2017 | 58.2 |
+| 2018 | 57.3 |
+| 2019 | 57.5 |
+| 2020 | 58.8 |
+| 2021 | 58.8 |
+| 2022 | 58.4 |
+| 2023 | 58.3 |
+| 2024 | 60.4 |
+| 2025 | 57.8 |
+| 2026 | 22.0 |
 
 ## Feature sets
 - CORE: 50
 - EXTENDED: 120
 - MINIMAL: 13
 
-Recommended training start: **2006-01-03 00:00:00** (first day with core NaN < 10%)
+Recommended training start: **2006-07-12 00:00:00** (first day with core NaN < 10%)
 
 ## Correlation-dropped features (top 30)
 
 | dropped | kept | corr |
 |---|---|---|
-| quality_drawdown_252d__QQQ | quality_52w_high_ratio__QQQ | 1.0 |
-| quality_drawdown_252d__VGT | quality_52w_high_ratio__VGT | 1.0 |
-| quality_drawdown_252d__XLE | quality_52w_high_ratio__XLE | 1.0 |
-| quality_drawdown_252d__GLD | quality_52w_high_ratio__GLD | 1.0 |
-| quality_drawdown_252d__SHY | quality_52w_high_ratio__SHY | 1.0 |
-| quality_drawdown_252d__SPY | quality_52w_high_ratio__SPY | 1.0 |
-| quality_drawdown_252d__XLI | quality_52w_high_ratio__XLI | 1.0 |
-| quality_drawdown_252d__IWM | quality_52w_high_ratio__IWM | 1.0 |
-| momentum_spreads_63d__spy_minus_gld_63d | relative_strength_63d__GLD | 1.0 |
 | vol_features__vix_regime_low | regime_vix__vix_regime_low | 1.0 |
 | vol_features__vix_regime_medium | regime_vix__vix_regime_medium | 1.0 |
 | vol_features__vix_regime_high | regime_vix__vix_regime_high | 1.0 |
@@ -81,45 +72,54 @@ Recommended training start: **2006-01-03 00:00:00** (first day with core NaN < 1
 | gtrends_gold_buy__gtrends_gold_buy_ma4w | gtrends_buy_gold__gtrends_buy_gold_ma4w | 1.0 |
 | gtrends_gold_buy__gtrends_gold_buy_accel | gtrends_buy_gold__gtrends_buy_gold_accel | 1.0 |
 | timing__is_sp_rebalance_week | timing__is_quad_witching_week | 1.0 |
-| quality_drawdown_252d__EEM | quality_52w_high_ratio__EEM | 1.0 |
-| quality_drawdown_252d__XLK | quality_52w_high_ratio__XLK | 1.0 |
-| quality_drawdown_252d__IGV | quality_52w_high_ratio__IGV | 1.0 |
-| quality_drawdown_252d__XLV | quality_52w_high_ratio__XLV | 1.0 |
-| quality_drawdown_252d__DBC | quality_52w_high_ratio__DBC | 1.0 |
-| quality_drawdown_252d__XLF | quality_52w_high_ratio__XLF | 1.0 |
-| quality_drawdown_252d__SOXX | quality_52w_high_ratio__SOXX | 1.0 |
-| quality_drawdown_252d__TLT | quality_52w_high_ratio__TLT | 1.0 |
-| quality_drawdown_252d__AGG | quality_52w_high_ratio__AGG | 1.0 |
-| atr_21d__SHY | atr_14d__SHY | 1.0 |
-| atr_21d__AGG | atr_14d__AGG | 1.0 |
-| atr_21d__TLT | atr_14d__TLT | 0.9997 |
-| _+135 more_ | | |
+| mom63_when_yc_inverted__VGT | mom63_when_yc_inverted__XLK | 0.9965 |
+| mom63_when_cpi_hot__VGT | mom63_when_cpi_hot__XLK | 0.9944 |
+| mom63_x_aaii_spread__VGT | mom63_x_aaii_spread__XLK | 0.9924 |
+| mom63_x_pcr_total_z__VGT | mom63_x_pcr_total_z__XLK | 0.9918 |
+| mom63_when_yc_normal__VGT | mom63_when_yc_normal__XLK | 0.9914 |
+| positioning_cot_ust10y_mm_net__cot_ust10y_mm_net | positioning_cot_ust10y_comm_vs_spec__cot_ust10y_comm_vs_spec | 0.9907 |
+| mom63_when_cpi_cool__VGT | mom63_when_cpi_cool__XLK | 0.9901 |
+| mom63_x_vix_regime__VGT | mom63_x_vix_regime__XLK | 0.9892 |
+| gtrends_bankruptcy__gtrends_bankruptcy_raw | gtrends_bankruptcy__gtrends_bankruptcy_ma4w | 0.9887 |
+| mom63_when_yc_inverted__XLK | mom63_when_yc_inverted__QQQ | 0.9862 |
+| mom63_when_cpi_hot__XLK | mom63_when_cpi_hot__QQQ | 0.9846 |
+| gtrends_inflation__gtrends_inflation_raw | gtrends_inflation__gtrends_inflation_ma4w | 0.9834 |
+| consumer_features__cb_consumer_conf | consumer_features__umich_sentiment | 0.9826 |
+| mom63_x_aaii_spread__XLK | mom63_x_aaii_spread__QQQ | 0.9813 |
+| mom63_x_pcr_total_z__XLK | mom63_x_pcr_total_z__QQQ | 0.9809 |
+| mom63_when_yc_normal__XLK | mom63_when_yc_normal__QQQ | 0.9775 |
+| gtrends_semiconductor_shortage__gtrends_semiconductor_shortage_raw | gtrends_semiconductor_shortage__gtrends_semiconductor_shortage_ma4w | 0.977 |
+| gtrends_ai_stocks__gtrends_ai_stocks_raw | gtrends_ai_stocks__gtrends_ai_stocks_ma4w | 0.9762 |
+| gtrends_housing_crash__gtrends_housing_crash_raw | gtrends_housing_crash__gtrends_housing_crash_ma4w | 0.9758 |
+| gtrends_unemployment__gtrends_unemployment_raw | gtrends_unemployment__gtrends_unemployment_ma4w | 0.9731 |
+| mom63_when_cpi_cool__XLK | mom63_when_cpi_cool__QQQ | 0.9726 |
+| _+8 more_ | | |
 
 ## Top 20 features by mutual information vs T1 8-class target
 _(diagnostic only — full-sample MI, DO NOT use for training selection)_
 
 | MI | feature |
 |---|---|
-| 0.7202 | consumer_features__consumer_credit_yoy |
-| 0.6347 | activity_features__capacity_utilization |
-| 0.6064 | activity_features__ism_pmi |
-| 0.5934 | inflation_features__cpi_yoy |
-| 0.5854 | activity_features__oecd_cli |
-| 0.3539 | inflation_features__cpi_mom |
-| 0.3386 | activity_features__initial_claims_4wma |
-| 0.3086 | atr_14d__XLE |
-| 0.2910 | activity_rail_traffic__rail_traffic_ma4w |
-| 0.2908 | atr_14d__DBC |
-| 0.2397 | cross_asset_oil_gold__oil_gold_ratio |
-| 0.2377 | positioning_margin_debt_per_spy_px__margin_debt_per_spy_px |
-| 0.2105 | atr_14d__SPY |
-| 0.1897 | vol_63d__SOXX |
-| 0.1849 | vol_63d__QQQ |
-| 0.1844 | vol_63d__XLV |
-| 0.1727 | vol_63d__TLT |
-| 0.1719 | vol_42d__XLI |
-| 0.1625 | vol_42d__QQQ |
-| 0.1525 | vol_42d__XLE |
+| 0.8588 | activity_features__capacity_utilization |
+| 0.8204 | sp500_pe |
+| 0.8071 | consumer_features__consumer_credit_yoy |
+| 0.7936 | inflation_features__pce_core_yoy_3m_trend |
+| 0.7491 | activity_features__oecd_cli |
+| 0.7225 | inflation_features__cpi_yoy_3m_trend |
+| 0.6370 | activity_features__ism_pmi |
+| 0.6106 | inflation_features__cpi_yoy |
+| 0.5222 | liquidity_features__fed_balance_sheet_yoy |
+| 0.4570 | positioning_cot_nasdaq_comm_vs_spec__cot_nasdaq_comm_vs_spec |
+| 0.4359 | survey_naaim_exposure__naaim_exposure |
+| 0.4341 | positioning_margin_debt_3m_chg__margin_debt_3m_chg |
+| 0.4060 | positioning_cot_nasdaq_mm_net__cot_nasdaq_mm_net |
+| 0.3881 | inflation_features__cpi_mom |
+| 0.3774 | positioning_cot_sp500_mm_net_z52w__cot_sp500_mm_net_z52w |
+| 0.3634 | activity_features__lei_6m_change |
+| 0.3575 | consumer_features__personal_savings_rate |
+| 0.3451 | activity_features__initial_claims_4wma |
+| 0.3151 | activity_rail_traffic__rail_traffic_ma4w |
+| 0.2477 | yield_curve_features__real_rate_10y |
 
 ## Validation
 - Shape check: PASS

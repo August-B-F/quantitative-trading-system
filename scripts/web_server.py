@@ -436,7 +436,7 @@ async def logs_history():
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _wireguard_ip() -> str:
-    """Bind to the VPN tunnel interface so only VPN peers can reach us."""
+    """Bind to the WireGuard tunnel interface so only VPN peers can reach us."""
     import subprocess, re
 
     try:
@@ -446,10 +446,6 @@ def _wireguard_ip() -> str:
                 m = re.search(r"IPv4 Address[^\n:]*:\s*(10\.200\.200\.\d+)", blk)
                 if m:
                     return m.group(1)
-                if re.search(r"ZeroTier", blk, re.IGNORECASE):
-                    m = re.search(r"IPv4 Address[^\n:]*:\s*(\d+\.\d+\.\d+\.\d+)", blk)
-                    if m:
-                        return m.group(1)
     except Exception:
         pass
 
@@ -461,6 +457,7 @@ def _wireguard_ip() -> str:
     except Exception:
         pass
 
+    # Fallback — exclude loopback, link-local, and Hyper-V virtual switches.
     try:
         import socket
         for ip in socket.gethostbyname_ex(socket.gethostname())[2]:
@@ -469,7 +466,7 @@ def _wireguard_ip() -> str:
     except Exception:
         pass
 
-    print("  WARNING: VPN IP not found — binding to 127.0.0.1 (local only)")
+    print("  WARNING: WireGuard IP not found — binding to 127.0.0.1 (local only)")
     return "127.0.0.1"
 
 

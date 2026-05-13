@@ -283,3 +283,179 @@ Artifacts:
 | price | relative_strength_63d | 8 | 5353 | 2005-01-03..2026-04-14 | data/features/price/relative_strength_63d.parquet | 2026-04-14 |
 | price | relative_strength_126d | 8 | 5353 | 2005-01-03..2026-04-14 | data/features/price/relative_strength_126d.parquet | 2026-04-14 |
 | price | relative_strength_trend_accel | 8 | 5353 | 2005-01-03..2026-04-14 | data/features/price/relative_strength_trend_accel.parquet | 2026-04-14 |
+| price | returns_5d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_5d.parquet | 2026-04-30 |
+| price | returns_10d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_10d.parquet | 2026-04-30 |
+| price | returns_21d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_21d.parquet | 2026-04-30 |
+| price | returns_42d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_42d.parquet | 2026-04-30 |
+| price | returns_63d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_63d.parquet | 2026-04-30 |
+| price | returns_126d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_126d.parquet | 2026-04-30 |
+| price | returns_252d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_252d.parquet | 2026-04-30 |
+| price | returns_12_1_mom | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/returns_12_1_mom.parquet | 2026-04-30 |
+| price | vol_21d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/vol_21d.parquet | 2026-04-30 |
+| price | vol_42d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/vol_42d.parquet | 2026-04-30 |
+| price | vol_63d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/vol_63d.parquet | 2026-04-30 |
+| price | atr_14d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/atr_14d.parquet | 2026-04-30 |
+| price | atr_21d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/atr_21d.parquet | 2026-04-30 |
+| price | intraday_range_21d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/intraday_range_21d.parquet | 2026-04-30 |
+| price | quality_voladj_mom_21d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_voladj_mom_21d.parquet | 2026-04-30 |
+| price | quality_voladj_mom_42d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_voladj_mom_42d.parquet | 2026-04-30 |
+| price | quality_voladj_mom_63d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_voladj_mom_63d.parquet | 2026-04-30 |
+| price | quality_voladj_mom_126d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_voladj_mom_126d.parquet | 2026-04-30 |
+| price | quality_mom_accel | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_mom_accel.parquet | 2026-04-30 |
+| price | quality_52w_high_ratio | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_52w_high_ratio.parquet | 2026-04-30 |
+| price | quality_dist_sma200 | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_dist_sma200.parquet | 2026-04-30 |
+| price | quality_dist_sma50 | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_dist_sma50.parquet | 2026-04-30 |
+| price | quality_golden_cross | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_golden_cross.parquet | 2026-04-30 |
+| price | quality_drawdown_252d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_drawdown_252d.parquet | 2026-04-30 |
+| price | quality_rsi_14d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_rsi_14d.parquet | 2026-04-30 |
+| price | quality_rsi_28d | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_rsi_28d.parquet | 2026-04-30 |
+| price | quality_bb_position | 17 | 122 | 2025-11-03..2026-04-29 | data/features/price/quality_bb_position.parquet | 2026-04-30 |
+| price | cross_sectional_mom_rank_21d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_mom_rank_21d.parquet | 2026-04-30 |
+| price | cross_sectional_mom_rank_42d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_mom_rank_42d.parquet | 2026-04-30 |
+| price | cross_sectional_mom_rank_63d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_mom_rank_63d.parquet | 2026-04-30 |
+| price | cross_sectional_mom_rank_126d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_mom_rank_126d.parquet | 2026-04-30 |
+| price | cross_sectional_relative_mom_63d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_relative_mom_63d.parquet | 2026-04-30 |
+| price | cross_sectional_mom_zscore_63d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_mom_zscore_63d.parquet | 2026-04-30 |
+| price | cross_sectional_rank_stability_21d | 1 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_rank_stability_21d.parquet | 2026-04-30 |
+| price | cross_sectional_top_margin_63d | 1 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_top_margin_63d.parquet | 2026-04-30 |
+| price | cross_sectional_dispersion_63d | 1 | 122 | 2025-11-03..2026-04-29 | data/features/price/cross_sectional_dispersion_63d.parquet | 2026-04-30 |
+| price | volume_trend_21_63 | 9 | 122 | 2025-11-03..2026-04-29 | data/features/price/volume_trend_21_63.parquet | 2026-04-30 |
+| price | volume_relative_21d | 9 | 122 | 2025-11-03..2026-04-29 | data/features/price/volume_relative_21d.parquet | 2026-04-30 |
+| price | volume_obv_slope_21d | 9 | 122 | 2025-11-03..2026-04-29 | data/features/price/volume_obv_slope_21d.parquet | 2026-04-30 |
+| price | relative_strength_63d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/relative_strength_63d.parquet | 2026-04-30 |
+| price | relative_strength_126d | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/relative_strength_126d.parquet | 2026-04-30 |
+| price | relative_strength_trend_accel | 8 | 122 | 2025-11-03..2026-04-29 | data/features/price/relative_strength_trend_accel.parquet | 2026-04-30 |
+
+## Session 5.0 - Master panel assembly (build 2026-04-12, src/features/assemble_master_panel.py)
+
+Loaded 1051 raw feature columns across 7 categories, plus 16 target columns. Dropped 38 features via |corr|>=0.95 pairwise dedup (keeping the longer-history member of each pair). Ran ADF stationarity (flagged 489 non-stationary — these must be differenced at training time per-fold, not here). Computed lag-21 autocorrelation per feature. Built CORE (50 feats, 2010+ with <5% NaN, non-experimental, |target_corr|>=0.05), EXTENDED (120 feats, all survivors), and MINIMAL (13 feats, hand-picked for low-param models). Master panel saved to data/features/master_panel.parquet (shape (5351, 1029)). Recommended training start: 2006-07-12 00:00:00 (first day where CORE NaN<10%).
+
+NaN by year (master panel):
+- 2005: 73.4%
+- 2006: 71.5%
+- 2007: 71.1%
+- 2008: 71.0%
+- 2009: 71.1%
+- 2010: 64.2%
+- 2011: 62.8%
+- 2012: 62.8%
+- 2013: 62.8%
+- 2014: 62.9%
+- 2015: 60.7%
+- 2016: 58.2%
+- 2017: 58.2%
+- 2018: 57.3%
+- 2019: 57.5%
+- 2020: 58.8%
+- 2021: 58.8%
+- 2022: 58.4%
+- 2023: 58.3%
+- 2024: 60.4%
+- 2025: 57.8%
+- 2026: 22.0%
+
+Correlation drops: 38 pairs. First 10:
+- DROP `vol_features__vix_regime_low` (kept `regime_vix__vix_regime_low`, |r|=1.0)
+- DROP `vol_features__vix_regime_medium` (kept `regime_vix__vix_regime_medium`, |r|=1.0)
+- DROP `vol_features__vix_regime_high` (kept `regime_vix__vix_regime_high`, |r|=1.0)
+- DROP `vol_features__vix_regime_extreme` (kept `regime_vix__vix_regime_extreme`, |r|=1.0)
+- DROP `momentum_spreads_63d__spy_minus_eem_63d` (kept `cross_asset_eem_spy__eem_minus_spy_63d`, |r|=1.0)
+- DROP `gtrends_gold_buy__gtrends_gold_buy_raw` (kept `gtrends_buy_gold__gtrends_buy_gold_raw`, |r|=1.0)
+- DROP `gtrends_gold_buy__gtrends_gold_buy_ma4w` (kept `gtrends_buy_gold__gtrends_buy_gold_ma4w`, |r|=1.0)
+- DROP `gtrends_gold_buy__gtrends_gold_buy_accel` (kept `gtrends_buy_gold__gtrends_buy_gold_accel`, |r|=1.0)
+- DROP `timing__is_sp_rebalance_week` (kept `timing__is_quad_witching_week`, |r|=1.0)
+- DROP `mom63_when_yc_inverted__VGT` (kept `mom63_when_yc_inverted__XLK`, |r|=0.9965)
+
+Artifacts:
+- data/features/master_panel.parquet
+- data/features/master_panel_metadata.json
+- configs/feature_sets.yaml
+- data/FEATURE_REPORT.md
+| price | returns_5d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_5d.parquet | 2026-05-13 |
+| price | returns_10d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_10d.parquet | 2026-05-13 |
+| price | returns_21d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_21d.parquet | 2026-05-13 |
+| price | returns_42d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_42d.parquet | 2026-05-13 |
+| price | returns_63d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_63d.parquet | 2026-05-13 |
+| price | returns_126d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_126d.parquet | 2026-05-13 |
+| price | returns_252d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_252d.parquet | 2026-05-13 |
+| price | returns_12_1_mom | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/returns_12_1_mom.parquet | 2026-05-13 |
+| price | vol_21d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/vol_21d.parquet | 2026-05-13 |
+| price | vol_42d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/vol_42d.parquet | 2026-05-13 |
+| price | vol_63d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/vol_63d.parquet | 2026-05-13 |
+| price | atr_14d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/atr_14d.parquet | 2026-05-13 |
+| price | atr_21d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/atr_21d.parquet | 2026-05-13 |
+| price | intraday_range_21d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/intraday_range_21d.parquet | 2026-05-13 |
+| price | quality_voladj_mom_21d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_voladj_mom_21d.parquet | 2026-05-13 |
+| price | quality_voladj_mom_42d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_voladj_mom_42d.parquet | 2026-05-13 |
+| price | quality_voladj_mom_63d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_voladj_mom_63d.parquet | 2026-05-13 |
+| price | quality_voladj_mom_126d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_voladj_mom_126d.parquet | 2026-05-13 |
+| price | quality_mom_accel | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_mom_accel.parquet | 2026-05-13 |
+| price | quality_52w_high_ratio | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_52w_high_ratio.parquet | 2026-05-13 |
+| price | quality_dist_sma200 | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_dist_sma200.parquet | 2026-05-13 |
+| price | quality_dist_sma50 | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_dist_sma50.parquet | 2026-05-13 |
+| price | quality_golden_cross | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_golden_cross.parquet | 2026-05-13 |
+| price | quality_drawdown_252d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_drawdown_252d.parquet | 2026-05-13 |
+| price | quality_rsi_14d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_rsi_14d.parquet | 2026-05-13 |
+| price | quality_rsi_28d | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_rsi_28d.parquet | 2026-05-13 |
+| price | quality_bb_position | 17 | 131 | 2025-11-03..2026-05-12 | data/features/price/quality_bb_position.parquet | 2026-05-13 |
+| price | cross_sectional_mom_rank_21d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_mom_rank_21d.parquet | 2026-05-13 |
+| price | cross_sectional_mom_rank_42d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_mom_rank_42d.parquet | 2026-05-13 |
+| price | cross_sectional_mom_rank_63d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_mom_rank_63d.parquet | 2026-05-13 |
+| price | cross_sectional_mom_rank_126d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_mom_rank_126d.parquet | 2026-05-13 |
+| price | cross_sectional_relative_mom_63d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_relative_mom_63d.parquet | 2026-05-13 |
+| price | cross_sectional_mom_zscore_63d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_mom_zscore_63d.parquet | 2026-05-13 |
+| price | cross_sectional_rank_stability_21d | 1 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_rank_stability_21d.parquet | 2026-05-13 |
+| price | cross_sectional_top_margin_63d | 1 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_top_margin_63d.parquet | 2026-05-13 |
+| price | cross_sectional_dispersion_63d | 1 | 131 | 2025-11-03..2026-05-12 | data/features/price/cross_sectional_dispersion_63d.parquet | 2026-05-13 |
+| price | volume_trend_21_63 | 9 | 131 | 2025-11-03..2026-05-12 | data/features/price/volume_trend_21_63.parquet | 2026-05-13 |
+| price | volume_relative_21d | 9 | 131 | 2025-11-03..2026-05-12 | data/features/price/volume_relative_21d.parquet | 2026-05-13 |
+| price | volume_obv_slope_21d | 9 | 131 | 2025-11-03..2026-05-12 | data/features/price/volume_obv_slope_21d.parquet | 2026-05-13 |
+| price | relative_strength_63d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/relative_strength_63d.parquet | 2026-05-13 |
+| price | relative_strength_126d | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/relative_strength_126d.parquet | 2026-05-13 |
+| price | relative_strength_trend_accel | 8 | 131 | 2025-11-03..2026-05-12 | data/features/price/relative_strength_trend_accel.parquet | 2026-05-13 |
+
+## Session 5.0 - Master panel assembly (build 2026-04-12, src/features/assemble_master_panel.py)
+
+Loaded 1051 raw feature columns across 7 categories, plus 16 target columns. Dropped 38 features via |corr|>=0.95 pairwise dedup (keeping the longer-history member of each pair). Ran ADF stationarity (flagged 483 non-stationary — these must be differenced at training time per-fold, not here). Computed lag-21 autocorrelation per feature. Built CORE (50 feats, 2010+ with <5% NaN, non-experimental, |target_corr|>=0.05), EXTENDED (120 feats, all survivors), and MINIMAL (13 feats, hand-picked for low-param models). Master panel saved to data/features/master_panel.parquet (shape (5351, 1029)). Recommended training start: 2006-07-12 00:00:00 (first day where CORE NaN<10%).
+
+NaN by year (master panel):
+- 2005: 73.4%
+- 2006: 71.5%
+- 2007: 71.1%
+- 2008: 71.0%
+- 2009: 71.1%
+- 2010: 64.2%
+- 2011: 62.8%
+- 2012: 62.8%
+- 2013: 62.8%
+- 2014: 62.9%
+- 2015: 60.7%
+- 2016: 58.2%
+- 2017: 58.2%
+- 2018: 57.3%
+- 2019: 57.5%
+- 2020: 58.8%
+- 2021: 58.8%
+- 2022: 58.4%
+- 2023: 58.3%
+- 2024: 60.4%
+- 2025: 57.8%
+- 2026: 22.0%
+
+Correlation drops: 38 pairs. First 10:
+- DROP `vol_features__vix_regime_low` (kept `regime_vix__vix_regime_low`, |r|=1.0)
+- DROP `vol_features__vix_regime_medium` (kept `regime_vix__vix_regime_medium`, |r|=1.0)
+- DROP `vol_features__vix_regime_high` (kept `regime_vix__vix_regime_high`, |r|=1.0)
+- DROP `vol_features__vix_regime_extreme` (kept `regime_vix__vix_regime_extreme`, |r|=1.0)
+- DROP `momentum_spreads_63d__spy_minus_eem_63d` (kept `cross_asset_eem_spy__eem_minus_spy_63d`, |r|=1.0)
+- DROP `gtrends_gold_buy__gtrends_gold_buy_raw` (kept `gtrends_buy_gold__gtrends_buy_gold_raw`, |r|=1.0)
+- DROP `gtrends_gold_buy__gtrends_gold_buy_ma4w` (kept `gtrends_buy_gold__gtrends_buy_gold_ma4w`, |r|=1.0)
+- DROP `gtrends_gold_buy__gtrends_gold_buy_accel` (kept `gtrends_buy_gold__gtrends_buy_gold_accel`, |r|=1.0)
+- DROP `timing__is_sp_rebalance_week` (kept `timing__is_quad_witching_week`, |r|=1.0)
+- DROP `mom63_when_yc_inverted__VGT` (kept `mom63_when_yc_inverted__XLK`, |r|=0.9965)
+
+Artifacts:
+- data/features/master_panel.parquet
+- data/features/master_panel_metadata.json
+- configs/feature_sets.yaml
+- data/FEATURE_REPORT.md
