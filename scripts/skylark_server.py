@@ -466,11 +466,21 @@ def _wireguard_ip() -> str:
 def serve(host: str | None = None, port: int = 8765, open_browser: bool = False):
     if host is None:
         host = _wireguard_ip()
-    if open_browser:
-        threading.Timer(1.2, lambda: __import__("webbrowser").open(f"http://{host}:{port}")).start()
     mode = "LIVE" if sd.is_live() else "paper"
-    print(f"\n  Skylark · http://{host}:{port} · {mode} · WireGuard only\n")
-    uvicorn.run(app, host=host, port=port, log_level="warning")
+    for p in range(port, port + 5):
+        import socket
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex((host, p)) == 0:
+                print(f"  port {p} in use — trying next")
+                continue
+        if p != port:
+            print(f"  NOTE: using fallback port {p} (primary {port} was taken)")
+        if open_browser:
+            threading.Timer(1.2, lambda: __import__("webbrowser").open(f"http://{host}:{p}")).start()
+        print(f"\n  Skylark · http://{host}:{p} · {mode} · WireGuard only\n")
+        uvicorn.run(app, host=host, port=p, log_level="warning")
+        return
+    print(f"  ERROR: ports {port}-{port+4} all in use — cannot start")
 
 
 if __name__ == "__main__":

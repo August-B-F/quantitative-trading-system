@@ -40,7 +40,9 @@ LAG_DAYS = {
 }
 
 START = "2003-01-01"
-END = "2026-04-12"
+# The builder must never clamp time — always build through today. Upstream
+# raw sources may still be stale; that is monitored elsewhere.
+END = pd.Timestamp.today().normalize()
 
 
 def _load_clean(rel: Path, lag_key: str, freq: str = "daily") -> pd.DataFrame:

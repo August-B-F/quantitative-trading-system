@@ -15,6 +15,10 @@ Checks:
     5. classifier age      (warn at 120d, alert at 365d)
     6. SMA200 proximity    (info when SPY within -2% to -6% of SMA200)
     7. rebalance countdown + FOMC conflict
+    8. signal freshness    (parquets the live signal path actually consumes)
+    9. core staleness      (per-feature last-valid dates for the CORE set)
+   10. last rebalance      (success flags in logs/rebalance_log.json)
+   11. broker drift        (Alpaca positions vs logged targets; network-optional)
 """
 from __future__ import annotations
 
@@ -34,6 +38,11 @@ sys.path.insert(0, str(ROOT))
 
 PRICES_DIR = ROOT / "data/clean/prices"
 MACRO_DIR = ROOT / "data/clean/macro"
+FEATURES_PRICE_DIR = ROOT / "data/features/price"
+MASTER_PANEL_PATH = ROOT / "data/features/master_panel.parquet"
+RETURNS_63D_PATH = FEATURES_PRICE_DIR / "returns_63d.parquet"
+QUALITY_SMA200_PATH = FEATURES_PRICE_DIR / "quality_dist_sma200.parquet"
+ACCOUNTS_PATH = ROOT / "configs/accounts.yaml"
 MODELS_DIR = ROOT / "data/models"
 CALENDAR_PATH = ROOT / "data/clean/calendar/events.parquet"
 HOLDINGS_PATH = ROOT / "configs/holdings.json"
@@ -236,11 +245,28 @@ def check_macro(today: pd.Timestamp, alerts_cfg: dict) -> Section:
 
 
 def _last_rebalance_entry(records: list[dict]) -> dict | None:
-    """Walk the log backwards to find the last entry with target_weights
-    (skips fomc_defer event markers)."""
+    """Walk the log backwards to find the last executed rebalance.
+
+    Supports both legacy single-strategy format (top-level target_weights)
+    and the 9-strategy format (weights nested under strategies.{name}).
+    For the multi-strategy format, returns a synthetic entry with the
+    equal-weighted average of all strategies' target_weights.
+    """
     for r in reversed(records):
         if "target_weights" in r:
             return r
+        if r.get("executed") and "strategies" in r:
+            merged: dict[str, float] = {}
+            count = 0
+            for _sname, sdata in r["strategies"].items():
+                tw = sdata.get("target_weights") or sdata.get("post_rebalance_weights") or {}
+                if tw:
+                    count += 1
+                    for ticker, w in tw.items():
+                        merged[ticker] = merged.get(ticker, 0.0) + float(w)
+            if count > 0:
+                merged = {k: v / count for k, v in merged.items()}
+                return {"date": r["date"], "target_weights": merged}
     return None
 
 
@@ -386,6 +412,299 @@ def check_sma200(today: pd.Timestamp, cfg: dict) -> Section:
     return Section("SMA200", "OK", detail)
 
 
+def _raw_index_max(path: Path) -> pd.Timestamp | None:
+    """Raw index max of a parquet, regardless of trailing-NaN rows."""
+    if not path.exists():
+        return None
+    df = pd.read_parquet(path)
+    if df.empty:
+        return None
+    return pd.Timestamp(df.index.max()).normalize()
+
+
+def _column_last_valid(path: Path, column: str) -> tuple[pd.Timestamp | None, float | None]:
+    """(last date with a non-NaN value in `column`, value at the file's raw max index).
+
+    The second element is None when the column is NaN at the file's last
+    row — exactly the state where gate_fired(NaN) silently forces risk-off.
+    """
+    if not path.exists():
+        return None, None
+    df = pd.read_parquet(path)
+    if df.empty or column not in df.columns:
+        return None, None
+    ser = pd.to_numeric(df[column], errors="coerce").sort_index()
+    valid = ser.dropna()
+    last_valid = pd.Timestamp(valid.index.max()).normalize() if not valid.empty else None
+    value_at_max = float(ser.iloc[-1]) if pd.notna(ser.iloc[-1]) else None
+    return last_valid, value_at_max
+
+
+def check_signal_freshness(
+    today: pd.Timestamp,
+    panel_path: Path = MASTER_PANEL_PATH,
+    returns_path: Path = RETURNS_63D_PATH,
+    quality_path: Path = QUALITY_SMA200_PATH,
+    max_tdays: int = 3,
+) -> Section:
+    """Freshness of the parquets that live signals actually consume.
+
+    This is the section that would have caught the 2026 Q2 freeze:
+    master_panel.parquet stalled at 2026-04-10 while the per-feature
+    parquets stayed current, and load_panel reindexed fresh features back
+    onto the stale panel index — so every rebalance re-traded April
+    signals with zero warnings. We therefore ALERT on the per-feature
+    parquets and only WARN on the raw panel age (the live_extend path
+    covers a stale panel).
+    """
+    alerts: list[str] = []
+    warns: list[str] = []
+    info: list[str] = []
+
+    ret_max = _raw_index_max(returns_path)
+    if ret_max is None:
+        alerts.append("returns_63d missing/empty")
+    else:
+        gap = trading_days_between(ret_max, today)
+        if gap > max_tdays:
+            alerts.append(f"returns_63d stale {gap}td (last {ret_max.date()})")
+        else:
+            info.append(f"returns_63d {ret_max.date()} ({gap}td)")
+
+    q_last_valid, q_value_at_max = _column_last_valid(quality_path, "SPY")
+    if q_last_valid is None:
+        alerts.append("quality_dist_sma200 SPY missing/empty")
+    else:
+        gap = trading_days_between(q_last_valid, today)
+        if gap > max_tdays:
+            alerts.append(
+                f"quality_dist_sma200 SPY stale {gap}td (last valid {q_last_valid.date()})"
+            )
+        else:
+            info.append(f"quality SPY {q_last_valid.date()} ({gap}td)")
+        if q_value_at_max is None:
+            alerts.append(
+                "quality_dist_sma200 SPY is NaN at max date"
+                " (gate_fired(NaN)=True -> silent risk-off)"
+            )
+
+    panel_max = _raw_index_max(panel_path)
+    if panel_max is None:
+        warns.append("master_panel missing")
+    else:
+        gap = trading_days_between(panel_max, today)
+        if gap > max_tdays:
+            warns.append(
+                f"master_panel raw index ends {panel_max.date()}"
+                f" ({gap}td behind; live_extend covers it)"
+            )
+        else:
+            info.append(f"master_panel {panel_max.date()}")
+
+    if alerts:
+        return Section("SIGNALS", "ALERT", "; ".join(alerts), extra=warns + info)
+    if warns:
+        return Section("SIGNALS", "WARNING", "; ".join(warns), extra=info)
+    return Section("SIGNALS", "OK", "; ".join(info))
+
+
+def core_feature_staleness(
+    root: Path,
+    today: pd.Timestamp,
+) -> list[tuple[str, pd.Timestamp | None, int | None]]:
+    """(feature, last-valid date, calendar age in days) per CORE feature.
+
+    Resolves each name in configs/feature_sets.yaml 'core' through the
+    same per-feature parquet lookup the live classifier path uses
+    (features.live_features._resolve_feature). Sorted stalest first;
+    unresolved features sort as stalest with (None, None).
+    """
+    from features.live_features import _resolve_feature, load_core_set
+
+    root = Path(root)
+    rows: list[tuple[str, pd.Timestamp | None, int | None]] = []
+    for name in load_core_set(root):
+        ser = _resolve_feature(name, root)
+        if ser is None or ser.dropna().empty:
+            rows.append((name, None, None))
+            continue
+        last = pd.Timestamp(ser.dropna().index.max()).normalize()
+        rows.append((name, last, int((today.normalize() - last).days)))
+    rows.sort(key=lambda r: r[2] if r[2] is not None else 10**9, reverse=True)
+    return rows
+
+
+def check_core_staleness(
+    today: pd.Timestamp,
+    root: Path = ROOT,
+    max_age_days: int = 45,
+) -> Section:
+    """CORE feature staleness — per-feature last-valid dates.
+
+    ALERTs on any CORE feature staler than `max_age_days` calendar days
+    (or unresolvable). Interaction/cross-asset features are NOT rebuilt
+    by the nightly price-feature refresh, so they can silently freeze
+    while returns_* stay current.
+    """
+    try:
+        rows = core_feature_staleness(root, today)
+    except Exception as exc:
+        return Section("CORE_FEATS", "ALERT", f"core staleness check failed: {exc}")
+
+    stale = [r for r in rows if r[2] is None or r[2] > max_age_days]
+    extra = [
+        f"{name}: " + ("unresolved" if last is None else f"{last.date()} ({age}d)")
+        for name, last, age in rows[:10]
+    ]
+    if stale:
+        return Section(
+            "CORE_FEATS",
+            "ALERT",
+            f"{len(stale)}/{len(rows)} CORE features staler than {max_age_days}d",
+            extra=extra,
+        )
+    return Section(
+        "CORE_FEATS", "OK",
+        f"all {len(rows)} CORE features within {max_age_days}d",
+        extra=extra,
+    )
+
+
+def check_last_rebalance(
+    today: pd.Timestamp,
+    log_path: Path = REBAL_LOG_PATH,
+    max_age_days: int = 7,
+) -> Section:
+    """Success flags of the most recent executed rebalance."""
+    if not log_path.exists():
+        return Section("REBALANCE", "WARNING", "no rebalance log found")
+    try:
+        records = json.loads(log_path.read_text())
+    except Exception as exc:
+        return Section("REBALANCE", "ALERT", f"rebalance log unreadable: {exc}")
+
+    entry = next((r for r in reversed(records or []) if r.get("executed")), None)
+    if entry is None:
+        return Section("REBALANCE", "WARNING", "no executed rebalance on record")
+
+    entry_date = pd.Timestamp(entry["date"]).normalize()
+    age = (today.normalize() - entry_date).days
+    strategies = entry.get("strategies") or {}
+    # Healthy only when success is EXPLICITLY true — credential failures are
+    # logged WITHOUT a 'success' key, so `is False` alone reported a dead
+    # slot as "all strategies succeeded".
+    failed = sorted(
+        name for name, sdata in strategies.items()
+        if sdata.get("success") is not True
+    )
+    # Strategies that raised before logging are absent from the entry
+    # entirely — compare against the configured lineup.
+    try:
+        expected = set((load_yaml(ACCOUNTS_PATH).get("strategies") or {}).keys())
+    except Exception:
+        expected = set()
+    # Skip the missing-strategy check for deliberate single-slot runs
+    # (run_rebalance --strategy N) — those legitimately log one entry.
+    if expected and len(strategies) > 1:
+        failed = sorted(
+            set(failed) | {f"{m} (no log entry)" for m in expected - set(strategies)}
+        )
+    if failed and age < max_age_days:
+        return Section(
+            "REBALANCE", "ALERT",
+            f"{entry_date.date()} ({age}d ago): success=false for {', '.join(failed)}",
+        )
+    if failed:
+        return Section(
+            "REBALANCE", "WARNING",
+            f"{entry_date.date()} ({age}d ago, >{max_age_days}d): "
+            f"success=false for {', '.join(failed)}",
+        )
+    return Section(
+        "REBALANCE", "OK",
+        f"{entry_date.date()} ({age}d ago): all strategies succeeded",
+    )
+
+
+def _latest_target_weights(records: list[dict], strategy: str) -> dict[str, float] | None:
+    """Most recent target_weights logged for `strategy`, newest first."""
+    for r in reversed(records):
+        sdata = (r.get("strategies") or {}).get(strategy)
+        if sdata and sdata.get("target_weights"):
+            return {k: float(v) for k, v in sdata["target_weights"].items()}
+    return None
+
+
+def check_broker_drift(
+    today: pd.Timestamp,
+    accounts_path: Path = ACCOUNTS_PATH,
+    log_path: Path = REBAL_LOG_PATH,
+    threshold: float = 0.02,
+) -> Section:
+    """Alpaca positions vs the last logged target weights (network-optional).
+
+    Any failure — missing credentials, offline broker, unreadable log —
+    degrades to a skipped/n-a section rather than crashing the check.
+    """
+    import os
+
+    try:
+        accounts = load_yaml(accounts_path)
+        records = json.loads(log_path.read_text()) if log_path.exists() else []
+    except Exception as exc:
+        return Section("BROKER", "n/a", f"skipped ({exc})")
+
+    checked = 0
+    skipped = 0
+    drifts: list[str] = []
+    try:
+        from execution.alpaca_client import AlpacaPaperClient
+
+        for sname, entry in (accounts.get("strategies") or {}).items():
+            key = os.environ.get(entry.get("alpaca_key_env", ""), "").strip()
+            sec = os.environ.get(entry.get("alpaca_secret_env", ""), "").strip()
+            if not key or not sec:
+                skipped += 1
+                continue
+            targets = _latest_target_weights(records if isinstance(records, list) else [], sname)
+            if targets is None:
+                skipped += 1
+                continue
+            client = AlpacaPaperClient(key, sec)
+            account = client.get_account()
+            positions = client.get_positions()
+            if "error" in account:
+                return Section("BROKER", "n/a", f"skipped (offline: {account['error']})")
+            if "error" in positions:
+                return Section("BROKER", "n/a", f"skipped (offline: {positions['error']})")
+            equity = float(account["equity"])
+            if equity <= 0:
+                skipped += 1
+                continue
+            actual = {t: p["market_value"] / equity for t, p in positions.items()}
+            for ticker in sorted(set(targets) | set(actual)):
+                dev = abs(actual.get(ticker, 0.0) - targets.get(ticker, 0.0))
+                if dev > threshold:
+                    drifts.append(f"{sname}:{ticker} {dev * 100:.1f}%")
+            checked += 1
+    except Exception as exc:
+        return Section("BROKER", "n/a", f"skipped (offline: {exc})")
+
+    if checked == 0:
+        return Section("BROKER", "n/a", f"skipped (no credentials/targets, {skipped} strategies)")
+    if drifts:
+        return Section(
+            "BROKER", "WARNING",
+            f"drift >{threshold * 100:.0f}% on {len(drifts)} position(s): "
+            + ", ".join(drifts[:6]) + ("..." if len(drifts) > 6 else ""),
+        )
+    return Section(
+        "BROKER", "OK",
+        f"{checked} account(s) within {threshold * 100:.0f}% of targets"
+        + (f" ({skipped} skipped)" if skipped else ""),
+    )
+
+
 def next_fomc_after(today: pd.Timestamp) -> pd.Timestamp | None:
     if not CALENDAR_PATH.exists():
         return None
@@ -434,10 +753,16 @@ def _format_report(
         "PERFORMANCE": "PERFORMANCE:",
         "CLASSIFIER":  "CLASSIFIER: ",
         "SMA200":      "SMA200:     ",
+        "SIGNALS":     "SIGNALS:    ",
+        "CORE_FEATS":  "CORE_FEATS: ",
+        "REBALANCE":   "REBALANCE:  ",
+        "BROKER":      "BROKER:     ",
     }
     for s in sections:
         prefix = labels.get(s.name, f"{s.name}: ")
         lines.append(f"{prefix} {s.status} ({s.detail})")
+        for x in s.extra:
+            lines.append(f"    - {x}")
 
     lines.append("")
     fomc_str = fomc.date().isoformat() if fomc is not None else "none scheduled"
@@ -506,6 +831,10 @@ def main(argv: list[str] | None = None) -> int:
     sections.append(check_performance(today, last_rebal, alerts_cfg))
     sections.append(check_classifier(today))
     sections.append(check_sma200(today, cfg))
+    sections.append(check_signal_freshness(today))
+    sections.append(check_core_staleness(today))
+    sections.append(check_last_rebalance(today))
+    sections.append(check_broker_drift(today))
 
     rebal_info = rebalance_countdown(today)
 
@@ -528,8 +857,18 @@ def main(argv: list[str] | None = None) -> int:
     if not args.no_log:
         _append_log(report)
 
-    # Exit 1 if any ALERT-level finding
-    if any(s.status == "ALERT" for s in sections):
+    # Exit 1 if any ALERT-level finding; page a human first.
+    alerts = [s for s in sections if s.status == "ALERT"]
+    if alerts:
+        try:
+            from risk.notify import send_alert
+            send_alert(
+                f"Health check: {len(alerts)} alert(s) — "
+                + "; ".join(s.name for s in alerts),
+                "ALERT",
+            )
+        except Exception as exc:
+            print(f"[notify] send_alert failed: {exc}", file=sys.stderr)
         return 1
     return 0
 

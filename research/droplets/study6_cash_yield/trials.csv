@@ -1,0 +1,11 @@
+trial_id,date,name,engine,window,sharpe,cagr,max_dd,n_trials_represented,source,notes
+s6_01,2026-07-02,sma200_park_SHY_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7833,0.093563,-0.2814,1,study6_cash_yield,engineering; SMA200 gate parks in SHY; cost 10bps/side; cash sleeve SHV
+s6_02,2026-07-02,sma200_park_SHY_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7588,0.090291,-0.2900,1,study6_cash_yield,engineering; SMA200 gate parks in SHY; cost 20bps/side
+s6_03,2026-07-02,sma200_park_SHV_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7702,0.091543,-0.2578,1,study6_cash_yield,engineering; SMA200 gate parks in SHV; cost 10bps/side
+s6_04,2026-07-02,sma200_park_SHV_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7457,0.088277,-0.2666,1,study6_cash_yield,engineering; SMA200 gate parks in SHV; cost 20bps/side
+s6_05,2026-07-02,sma200_park_pure_cash_10bps,daily_ledger_v1,2007-01-31..2026-06-30,0.7541,0.089349,-0.2608,1,study6_cash_yield,engineering; SMA200 gate parks in 0%-cash (free legs; flattered); cost 10bps/side
+s6_06,2026-07-02,sma200_park_pure_cash_20bps,daily_ledger_v1,2007-01-31..2026-06-30,0.7419,0.087721,-0.2652,1,study6_cash_yield,engineering; SMA200 gate parks in 0%-cash; cost 20bps/side
+s6_07,2026-07-02,tsmom_off_SHV_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.5058,0.044539,-0.2783,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve SHV (spec); cost 10bps/side
+s6_08,2026-07-02,tsmom_off_SHV_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.4602,0.040035,-0.2993,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve SHV; cost 20bps/side
+s6_09,2026-07-02,tsmom_off_SHY_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.5052,0.044506,-0.2790,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve swapped to SHY; cost 10bps/side
+s6_10,2026-07-02,tsmom_off_SHY_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.4597,0.040003,-0.3002,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve swapped to SHY; cost 20bps/side

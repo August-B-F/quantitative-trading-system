@@ -1,0 +1,15 @@
+trial_id,date,name,engine,window,sharpe,cagr,max_dd,n_trials_represented,source,notes
+ETM01,2026-07-02,ewtop3_63d_U0_base_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.69,0.0946,-0.3992,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM02,2026-07-02,ewtop3_63d_U0_base_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.639,0.0865,-0.4024,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM03,2026-07-02,ewtop3_63d_U1_smh_for_soxx_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.674,0.0908,-0.3977,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM04,2026-07-02,ewtop3_63d_U1_smh_for_soxx_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.62,0.0824,-0.401,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM05,2026-07-02,ewtop3_63d_U2_xlk_for_vgt_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.69,0.094,-0.4018,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM06,2026-07-02,ewtop3_63d_U2_xlk_for_vgt_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.643,0.0864,-0.4047,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM07,2026-07-02,ewtop3_63d_U3_both_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.663,0.089,-0.3977,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM08,2026-07-02,ewtop3_63d_U3_both_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.615,0.0814,-0.401,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM09,2026-07-02,R1_gem_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.594,0.0835,,1,exec_timing_micro,"engineering measurement (fill-convention study), gross"
+ETM10,2026-07-02,R2_ewtop3_63d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.949,0.1574,,1,exec_timing_micro,"engineering measurement (fill-convention study), gross"
+ETM11,2026-07-02,R3_top1_63d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.882,0.1854,,1,exec_timing_micro,"engineering measurement (fill-convention study), gross"
+ETM12,2026-07-02,R1_gem_delay1d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.586,0.0825,,1,exec_timing_micro,1-day-delay bracket; cagr = base + measured delta (-10.5 bps/yr)
+ETM13,2026-07-02,R2_ewtop3_63d_delay1d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.906,0.1502,,1,exec_timing_micro,1-day-delay bracket; cagr = base + measured delta (-72.1 bps/yr)
+ETM14,2026-07-02,R3_top1_63d_delay1d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.818,0.1709,,1,exec_timing_micro,1-day-delay bracket; cagr = base + measured delta (-144.8 bps/yr)

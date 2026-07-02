@@ -1,0 +1,96 @@
+# Relaunch candidate — blend_126_252 rotation (tranched)
+# Adopted by pre-registered Study 4 (research/droplets/study4_blended_momentum),
+# tranching per Study 2 (research/droplets/study2_timing_luck).
+# Status: CANDIDATE — enters the paper race per EVALUATION.md; not wired to an
+# account until the operator assigns one in configs/accounts.yaml.
+
+name: candidate_blend_rotation
+implementation: src/strategy/rotation.py     # blend_rotation_weights / build_tranched_schedules
+engine_validated: daily_ledger_v1
+status: candidate-not-live
+
+universe: [SOXX, QQQ, XLK, VGT, IGV, XLE, GLD, SHY]   # ex-ante, unchanged from live
+ranking:
+  # mean of cross-sectional ranks (ascending, average ties) of trailing returns
+  legs:
+    - {lookback_days: 126, weight: 0.5}
+    - {lookback_days: 252, weight: 0.5}
+  vol_adjust: false        # measured HARMFUL (-580 bps/yr dev) — do not enable
+  tie_break: [252d_return_desc, ticker_asc]   # DETERMINISTIC (study8 found ±0.085
+                             # dev Sharpe of pure tie-break ambiguity in the old
+                             # unstable sort); ties go to the slower leg's return
+selection:
+  top_n: 3
+  weighting: inverse_vol
+  vol_lookback_days: 63
+gate:
+  type: sma
+  ticker: SPY
+  window: 200
+  risk_off_asset: SHY      # SHY confirmed over SHV (+20 bps/yr full-window, study 6)
+rebalance:
+  cadence: monthly
+  tranches: [0, 5, 10, 15]   # month-end + k trading days; each tranche = 1/4 equity,
+                             # signal computed at its OWN decision date (study 2:
+                             # removes ~2/3 of timing-luck dispersion at ~zero cost)
+  fill: next_open            # confirmed optimal vs next_close (+64..136 bps/yr, study 1)
+overlays:
+  vol_target: none           # measured -159 bps/yr on a gated rotation (study 5)
+  no_trade_bands: none       # reversed on validation, -129 bps/yr (study 3)
+
+# Evidence (daily-ledger engine, cash SHV) — ALL numbers below re-quoted
+# 2026-07-02 from the PRODUCTION module with the deterministic tie-break
+# (study8 exposed that the originally quoted dev 1.005 depended on the
+# research harness's tie order; the production unstable sort gave 0.920):
+#   Dev 2006-02..2017-12: Sharpe 0.993 / CAGR 13.33% / MaxDD -17.4% @10bps, 0.943 @20bps
+#     (incumbent pin_63: 0.931/0.855 — adoption margins +0.062/+0.088, bar +0.05: HOLDS)
+#   Validation (ONE look window) 2018-01..2026-07: Sharpe 0.803 / CAGR 13.66% / MaxDD -16.7% @10bps
+#   Full window: 0.898 @10bps vs the spy_sma200 promotion bar 0.83: CLEARS
+#   4-tranche book, validation window: 0.830 / 14.59% / -24.4% @10bps — the HONEST
+#     forward expectation; single-date month-end backtests carry ~+0.15-0.18
+#     Sharpe of date luck (study 2). SPA vs SPY/SMA200 p=0.008; vs GEM p=0.059.
+#
+# WHAT THIS STRATEGY IS (study8, universe robustness): a GATED TECH-
+# CONCENTRATION book, not a transferable momentum edge — applied verbatim to
+# ex-ante universes the chassis adds ~0 Sharpe over its own SMA200 gate; the
+# risk-on book averages ~78% in the 5-fund tech block. The gate supplies the
+# drawdown control; the universe supplies the return. Price the dominant risk
+# accordingly: a multi-year tech-theme bust, not signal decay.
+# Forward expectation for EVALUATION.md: net Sharpe ~0.6-0.8 at 10-20 bps, MaxDD budget -30%.
+costs_assumed_bps_per_side: [10, 20]
+
+# ---------------------------------------------------------------------------
+# LIVE WIRING (2026-07-02) — operator action; this file itself is never edited
+# to go live. scripts/run_rebalance.py routes any configs/accounts.yaml
+# strategy entry carrying `engine: rotation` through the tranched rotation
+# compute path:
+#   - signals: strategy.rotation.blend_rotation_weights on data/clean/prices
+#     parquets (universe above + SPY), guarded by the same 3-trading-day
+#     freshness gate as the panel path (stale prices -> exit 2, no trade);
+#   - rebalance days: month-end + rebalance.tranches offsets above
+#     (+0/+5/+10/+15 NYSE trading days); the day determines WHICH tranche
+#     updates, each tranche = 1/4 of account equity;
+#   - tranche state: logs/tranche_state.json, keyed by the accounts.yaml slug,
+#     written atomically; missing tranches default to 100% SHY;
+#   - the account-level target (equal-weight average of the 4 tranches) feeds
+#     the existing StrategyExecutor unchanged.
+#
+# Exact accounts.yaml entry shape (add under `strategies:`):
+#
+#   candidate_blend_rotation:            # slug — also the tranche-state key
+#     name: BLEND_ROTATION
+#     slot: 10                           # slots 1-9 are taken by the classic book
+#     tier: candidate                    # report grouping ("CANDIDATE TIER")
+#     login: <alpaca login owning the paper account>
+#     alpaca_key_env: ALPACA_S10_KEY     # API key env var, set in .env
+#     alpaca_secret_env: ALPACA_S10_SECRET
+#     config: configs/strategies/candidate_blend_rotation.yaml
+#     engine: rotation                   # REQUIRED — routes to the rotation path;
+#                                        # omitted = classic StrategyRunner path
+#
+# Notes: logs/monthly_comparison.csv records slots 1-9 only (slot 10 equity is
+# in logs/rebalance_log.json); the daily scheduler must invoke run_rebalance on
+# every trading day (it already exits 0 on non-decision days) so the +5/+10/+15
+# tranche days actually fire. Until the operator adds the entry above, this
+# candidate is DORMANT in the live path.
+# ---------------------------------------------------------------------------

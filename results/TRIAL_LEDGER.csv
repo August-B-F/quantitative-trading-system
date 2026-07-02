@@ -1,0 +1,625 @@
+trial_id,date,name,engine,window,sharpe,cagr,max_dd,n_trials_represented,source,notes
+MS_001,2026-04-11,FN_abs_mom_optimized,daily_ledger_v0,2018-2025,0.962,22.99,-28.39,1,MASTER_SUMMARY,
+MS_002,2026-04-11,FN_absmom_lb63_n5,daily_ledger_v0,2018-2025,0.962,22.99,-28.39,1,MASTER_SUMMARY,
+MS_003,2026-04-11,FN_abs_mom_growth_energy,daily_ledger_v0,2018-2025,0.935,22.67,-27.67,1,MASTER_SUMMARY,
+MS_004,2026-04-11,EL_breakout_QQQ_lb63,daily_ledger_v0,2018-2025,0.894,14.3,-19.37,1,MASTER_SUMMARY,
+MS_005,2026-04-11,FN_fastdd_dd8_w21,daily_ledger_v0,2018-2025,0.846,20.81,-36.25,1,MASTER_SUMMARY,
+MS_006,2026-04-11,EL_ultimate_strategy,daily_ledger_v0,2018-2025,0.834,18.38,-37.06,1,MASTER_SUMMARY,
+MS_007,2026-04-11,EL_breakout_XLK_lb63,daily_ledger_v0,2018-2025,0.833,14.33,-25.03,1,MASTER_SUMMARY,
+MS_008,2026-04-11,FN_absmom_lb84_n2,daily_ledger_v0,2018-2025,0.82,19.04,-27.67,1,MASTER_SUMMARY,
+MS_009,2026-04-11,EL_breakout_QQQ_lb126,daily_ledger_v0,2018-2025,0.819,12.8,-19.37,1,MASTER_SUMMARY,
+MS_010,2026-04-11,EL_absrel_lb63_n5,daily_ledger_v0,2018-2025,0.815,17.7,-39.15,1,MASTER_SUMMARY,
+MS_011,2026-04-11,adaptive_top5_lb189,daily_ledger_v0,2018-2025,0.808,8.13,-18.96,1,MASTER_SUMMARY,
+MS_012,2026-04-11,bold_QQQ_SPY_VNQ_GLD,daily_ledger_v0,2018-2025,0.802,13.98,-27.87,1,MASTER_SUMMARY,
+MS_013,2026-04-11,FN_fastdd_dd10_w21,daily_ledger_v0,2018-2025,0.8,19.74,-45.8,1,MASTER_SUMMARY,
+MS_014,2026-04-11,FN_fastdd_dd12_w21,daily_ledger_v0,2018-2025,0.8,19.74,-45.8,1,MASTER_SUMMARY,
+MS_015,2026-04-11,FN_fastdd_dd12_w42,daily_ledger_v0,2018-2025,0.8,19.74,-45.8,1,MASTER_SUMMARY,
+MS_016,2026-04-11,FN_multireg_sma100,daily_ledger_v0,2018-2025,0.789,17.81,-36.9,1,MASTER_SUMMARY,
+MS_017,2026-04-11,FN_ultimate_sma150_dd10_n2,daily_ledger_v0,2018-2025,0.785,17.18,-26.44,1,MASTER_SUMMARY,
+MS_018,2026-04-11,FN_fastdd_dd10_w63,daily_ledger_v0,2018-2025,0.783,18.99,-43.44,1,MASTER_SUMMARY,
+MS_019,2026-04-11,FN_fastdd_dd10_w42,daily_ledger_v0,2018-2025,0.78,18.85,-43.96,1,MASTER_SUMMARY,
+MS_020,2026-04-11,FN_multi_regime_rot,daily_ledger_v0,2018-2025,0.779,17.54,-30.93,1,MASTER_SUMMARY,
+MS_021,2026-04-11,FN_multireg_sma150,daily_ledger_v0,2018-2025,0.779,17.54,-30.93,1,MASTER_SUMMARY,
+MS_022,2026-04-11,FN_multireg_sma200,daily_ledger_v0,2018-2025,0.779,17.54,-30.93,1,MASTER_SUMMARY,
+MS_023,2026-04-11,EL_breakout_XLK_lb126,daily_ledger_v0,2018-2025,0.778,13.06,-20.18,1,MASTER_SUMMARY,
+MS_024,2026-04-11,FN_absmom_lb63_n3,daily_ledger_v0,2018-2025,0.776,17.59,-29.82,1,MASTER_SUMMARY,
+MS_025,2026-04-11,EL_maxgrowth_sma150_dd10_n1,daily_ledger_v0,2018-2025,0.769,17.26,-38.93,1,MASTER_SUMMARY,
+MS_026,2026-04-11,EL_maxgrowth_sma150_dd12_n1,daily_ledger_v0,2018-2025,0.769,17.26,-38.93,1,MASTER_SUMMARY,
+MS_027,2026-04-11,EL_maxgrowth_sma200_dd10_n1,daily_ledger_v0,2018-2025,0.769,17.26,-38.93,1,MASTER_SUMMARY,
+MS_028,2026-04-11,EL_maxgrowth_sma200_dd12_n1,daily_ledger_v0,2018-2025,0.769,17.26,-38.93,1,MASTER_SUMMARY,
+MS_029,2026-04-11,protective_aa,daily_ledger_v0,2018-2025,0.766,6.35,-15.47,1,MASTER_SUMMARY,
+MS_030,2026-04-11,adaptive_top6_lb189,daily_ledger_v0,2018-2025,0.759,6.91,-19.39,1,MASTER_SUMMARY,
+MS_031,2026-04-11,FN_absmom_lb84_n3,daily_ledger_v0,2018-2025,0.759,18.35,-31.85,1,MASTER_SUMMARY,
+MS_032,2026-04-11,EL_breakout_XLK_lb42,daily_ledger_v0,2018-2025,0.757,12.97,-31.88,1,MASTER_SUMMARY,
+MS_033,2026-04-11,FN_absmom_lb63_n2,daily_ledger_v0,2018-2025,0.756,17.15,-30.45,1,MASTER_SUMMARY,
+MS_034,2026-04-11,EL_absrel_lb63_n3,daily_ledger_v0,2018-2025,0.75,16.22,-38.02,1,MASTER_SUMMARY,
+MS_035,2026-04-11,FN_fastdd_dd5_w21,daily_ledger_v0,2018-2025,0.745,17.16,-28.25,1,MASTER_SUMMARY,
+MS_036,2026-04-11,FN_ultimate_sma150_dd10_n3,daily_ledger_v0,2018-2025,0.744,15.85,-26.75,1,MASTER_SUMMARY,
+MS_037,2026-04-11,E_soxx_qqq_sma100_mom42,daily_ledger_v0,2018-2025,0.741,16.68,-46.31,1,MASTER_SUMMARY,
+MS_038,2026-04-11,vigilant_SPY_QQQ_EEM_TLT,daily_ledger_v0,2018-2025,0.74,9.29,-25.67,1,MASTER_SUMMARY,
+MS_039,2026-04-11,EL_canary_growth_gold,daily_ledger_v0,2018-2025,0.737,13.59,-27.89,1,MASTER_SUMMARY,
+MS_040,2026-04-11,EL_hybrid_ensemble,daily_ledger_v0,2018-2025,0.732,14.87,-32.64,1,MASTER_SUMMARY,
+MS_041,2026-04-11,EL_absrel_lb63_n2,daily_ledger_v0,2018-2025,0.729,15.97,-37.71,1,MASTER_SUMMARY,
+MS_042,2026-04-11,FN_fast_dd_growth,daily_ledger_v0,2018-2025,0.721,16.85,-31.93,1,MASTER_SUMMARY,
+MS_043,2026-04-11,FN_fastdd_dd8_w42,daily_ledger_v0,2018-2025,0.721,16.85,-31.93,1,MASTER_SUMMARY,
+MS_044,2026-04-11,FN_ultimate_sma200_dd10_n2,daily_ledger_v0,2018-2025,0.72,15.5,-26.44,1,MASTER_SUMMARY,
+MS_045,2026-04-11,EL_maxgrowth_sma100_dd8_n1,daily_ledger_v0,2018-2025,0.719,15.61,-35.45,1,MASTER_SUMMARY,
+MS_046,2026-04-11,EL_maxgrowth_sma100_dd10_n1,daily_ledger_v0,2018-2025,0.719,15.61,-35.45,1,MASTER_SUMMARY,
+MS_047,2026-04-11,EL_maxgrowth_sma100_dd12_n1,daily_ledger_v0,2018-2025,0.719,15.61,-35.45,1,MASTER_SUMMARY,
+MS_048,2026-04-11,EL_soxx_gold_hedge,daily_ledger_v0,2018-2025,0.718,15.2,-41.72,1,MASTER_SUMMARY,
+MS_049,2026-04-11,EL_soxx_gold_sma150_mom42,daily_ledger_v0,2018-2025,0.718,15.2,-41.72,1,MASTER_SUMMARY,
+MS_050,2026-04-11,bold_QQQ_XLK_SPY_TLT,daily_ledger_v0,2018-2025,0.716,12.75,-23.09,1,MASTER_SUMMARY,
+MS_051,2026-04-11,adaptive_top3_lb189,daily_ledger_v0,2018-2025,0.715,8.54,-25.68,1,MASTER_SUMMARY,
+MS_052,2026-04-11,FN_fastdd_dd5_w42,daily_ledger_v0,2018-2025,0.712,15.95,-29.08,1,MASTER_SUMMARY,
+MS_053,2026-04-11,vigilant_SPY_QQQ_EFA_AGG,daily_ledger_v0,2018-2025,0.71,9.34,-25.95,1,MASTER_SUMMARY,
+MS_054,2026-04-11,EL_soxx_trend_ddstop,daily_ledger_v0,2018-2025,0.709,15.28,-43.32,1,MASTER_SUMMARY,
+MS_055,2026-04-11,EL_soxx_dd_sma150_dd10,daily_ledger_v0,2018-2025,0.709,15.28,-43.32,1,MASTER_SUMMARY,
+MS_056,2026-04-11,EL_soxx_dd_sma150_dd12,daily_ledger_v0,2018-2025,0.709,15.28,-43.32,1,MASTER_SUMMARY,
+MS_057,2026-04-11,EL_soxx_dd_sma150_dd15,daily_ledger_v0,2018-2025,0.709,15.28,-43.32,1,MASTER_SUMMARY,
+MS_058,2026-04-11,FN_fastdd_dd12_w63,daily_ledger_v0,2018-2025,0.708,16.56,-52.03,1,MASTER_SUMMARY,
+MS_059,2026-04-11,E_soxx_qqq_sma200_mom42,daily_ledger_v0,2018-2025,0.707,16.39,-40.68,1,MASTER_SUMMARY,
+MS_060,2026-04-11,lev_growth_QQQ_VGT_IGV,daily_ledger_v0,2018-2025,0.704,12.66,-23.01,1,MASTER_SUMMARY,
+MS_061,2026-04-11,E_soxx_qqq_sma100_mom126,daily_ledger_v0,2018-2025,0.7,15.91,-45.29,1,MASTER_SUMMARY,
+MS_062,2026-04-11,EL_breakout_QQQ_lb42,daily_ledger_v0,2018-2025,0.692,10.8,-34.98,1,MASTER_SUMMARY,
+MS_063,2026-04-11,EL_maxgrowth_sma150_dd10_n2,daily_ledger_v0,2018-2025,0.69,14.47,-27.72,1,MASTER_SUMMARY,
+MS_064,2026-04-11,EL_maxgrowth_sma150_dd12_n2,daily_ledger_v0,2018-2025,0.69,14.47,-27.72,1,MASTER_SUMMARY,
+MS_065,2026-04-11,EL_maxgrowth_sma200_dd10_n2,daily_ledger_v0,2018-2025,0.69,14.47,-27.72,1,MASTER_SUMMARY,
+MS_066,2026-04-11,EL_maxgrowth_sma200_dd12_n2,daily_ledger_v0,2018-2025,0.69,14.47,-27.72,1,MASTER_SUMMARY,
+MS_067,2026-04-11,adaptive_top4_lb189,daily_ledger_v0,2018-2025,0.689,7.3,-22.12,1,MASTER_SUMMARY,
+MS_068,2026-04-11,EL_maxgrowth_sma150_dd8_n1,daily_ledger_v0,2018-2025,0.687,14.81,-38.93,1,MASTER_SUMMARY,
+MS_069,2026-04-11,EL_maxgrowth_sma200_dd8_n1,daily_ledger_v0,2018-2025,0.687,14.81,-38.93,1,MASTER_SUMMARY,
+MS_070,2026-04-11,leveraged_growth,daily_ledger_v0,2018-2025,0.686,14.5,-23.63,1,MASTER_SUMMARY,
+MS_071,2026-04-11,lev_growth_QQQ_XLK_VGT,daily_ledger_v0,2018-2025,0.686,14.5,-23.63,1,MASTER_SUMMARY,
+MS_072,2026-04-11,E_tech_vol_regime,daily_ledger_v0,2018-2025,0.685,16.16,-41.19,1,MASTER_SUMMARY,
+MS_073,2026-04-11,FN_ultimate_sma100_dd8_n2,daily_ledger_v0,2018-2025,0.683,14.21,-29.08,1,MASTER_SUMMARY,
+MS_074,2026-04-11,FN_ultimate_sma100_dd10_n2,daily_ledger_v0,2018-2025,0.683,14.21,-29.08,1,MASTER_SUMMARY,
+MS_075,2026-04-11,EL_absrel_lb126_n2,daily_ledger_v0,2018-2025,0.681,16.44,-35.43,1,MASTER_SUMMARY,
+MS_076,2026-04-11,E_pure_trend_XLK_sma200,daily_ledger_v0,2018-2025,0.678,13.72,-43.7,1,MASTER_SUMMARY,
+MS_077,2026-04-11,FN_fastdd_dd8_w63,daily_ledger_v0,2018-2025,0.677,15.43,-31.93,1,MASTER_SUMMARY,
+MS_078,2026-04-11,FN_ultimate_sma200_dd10_n3,daily_ledger_v0,2018-2025,0.672,14.01,-26.75,1,MASTER_SUMMARY,
+MS_079,2026-04-11,FN_broadrot_top3_sma200,daily_ledger_v0,2018-2025,0.664,12.73,-27.76,1,MASTER_SUMMARY,
+MS_080,2026-04-11,FN_ultimate_sma100_dd6_n2,daily_ledger_v0,2018-2025,0.659,13.56,-29.08,1,MASTER_SUMMARY,
+MS_081,2026-04-11,EL_soxx_dd_sma100_dd8,daily_ledger_v0,2018-2025,0.657,13.54,-37.87,1,MASTER_SUMMARY,
+MS_082,2026-04-11,EL_soxx_dd_sma100_dd10,daily_ledger_v0,2018-2025,0.657,13.54,-37.87,1,MASTER_SUMMARY,
+MS_083,2026-04-11,EL_soxx_dd_sma100_dd12,daily_ledger_v0,2018-2025,0.657,13.54,-37.87,1,MASTER_SUMMARY,
+MS_084,2026-04-11,EL_soxx_dd_sma100_dd15,daily_ledger_v0,2018-2025,0.657,13.54,-37.87,1,MASTER_SUMMARY,
+MS_085,2026-04-11,EL_soxx_gold_sma100_mom42,daily_ledger_v0,2018-2025,0.656,13.27,-39.33,1,MASTER_SUMMARY,
+MS_086,2026-04-11,FN_broad_sector_rot,daily_ledger_v0,2018-2025,0.655,12.86,-26.68,1,MASTER_SUMMARY,
+MS_087,2026-04-11,FN_broadrot_top2_sma200,daily_ledger_v0,2018-2025,0.655,12.86,-26.68,1,MASTER_SUMMARY,
+MS_088,2026-04-11,FN_broadrot_top3_sma150,daily_ledger_v0,2018-2025,0.652,12.44,-27.76,1,MASTER_SUMMARY,
+MS_089,2026-04-11,FN_ultimate_sma150_dd6_n2,daily_ledger_v0,2018-2025,0.648,13.26,-27.18,1,MASTER_SUMMARY,
+MS_090,2026-04-11,adaptive_top3_lb126,daily_ledger_v0,2018-2025,0.647,7.37,-20.79,1,MASTER_SUMMARY,
+MS_091,2026-04-11,EL_compound_f42_s189,daily_ledger_v0,2018-2025,0.647,14.49,-42.4,1,MASTER_SUMMARY,
+MS_092,2026-04-11,E_soxx_qqq_sma150_mom42,daily_ledger_v0,2018-2025,0.645,14.24,-45.98,1,MASTER_SUMMARY,
+MS_093,2026-04-11,E_soxx_qqq_sma200_mom126,daily_ledger_v0,2018-2025,0.645,15.26,-40.68,1,MASTER_SUMMARY,
+MS_094,2026-04-11,E_pure_trend_XLK_sma150,daily_ledger_v0,2018-2025,0.643,12.75,-43.02,1,MASTER_SUMMARY,
+MS_095,2026-04-11,FN_broadrot_top2_sma150,daily_ledger_v0,2018-2025,0.643,12.54,-26.68,1,MASTER_SUMMARY,
+MS_096,2026-04-11,sector_mom_top2_lb252_tfFalse,daily_ledger_v0,2018-2025,0.636,12.1,-33.38,1,MASTER_SUMMARY,
+MS_097,2026-04-11,EL_abs_rel_growth_mom,daily_ledger_v0,2018-2025,0.636,14.99,-39.44,1,MASTER_SUMMARY,
+MS_098,2026-04-11,EL_absrel_lb126_n5,daily_ledger_v0,2018-2025,0.636,14.99,-39.44,1,MASTER_SUMMARY,
+MS_099,2026-04-11,EL_compound_f42_s252,daily_ledger_v0,2018-2025,0.635,14.23,-42.4,1,MASTER_SUMMARY,
+MS_100,2026-04-11,EL_soxx_gold_sma200_mom42,daily_ledger_v0,2018-2025,0.634,13.06,-41.72,1,MASTER_SUMMARY,
+MS_101,2026-04-11,EL_multisig_soxx_50_150,daily_ledger_v0,2018-2025,0.631,13.51,-35.82,1,MASTER_SUMMARY,
+MS_102,2026-04-11,growth_trend,daily_ledger_v0,2018-2025,0.629,11.46,-41.96,1,MASTER_SUMMARY,
+MS_103,2026-04-11,growth_trend_QQQ_sma200,daily_ledger_v0,2018-2025,0.629,11.46,-41.96,1,MASTER_SUMMARY,
+MS_104,2026-04-11,E_pure_trend_QQQ_sma200,daily_ledger_v0,2018-2025,0.629,11.46,-41.96,1,MASTER_SUMMARY,
+MS_105,2026-04-11,FN_ultimate_sma100_dd8_n3,daily_ledger_v0,2018-2025,0.629,12.64,-29.89,1,MASTER_SUMMARY,
+MS_106,2026-04-11,FN_ultimate_sma100_dd10_n3,daily_ledger_v0,2018-2025,0.629,12.64,-29.89,1,MASTER_SUMMARY,
+MS_107,2026-04-11,E_pure_trend_XLK_sma250,daily_ledger_v0,2018-2025,0.628,12.63,-38.47,1,MASTER_SUMMARY,
+MS_108,2026-04-11,EL_absrel_lb126_n3,daily_ledger_v0,2018-2025,0.628,14.54,-37.89,1,MASTER_SUMMARY,
+MS_109,2026-04-11,FN_ultimate_sma150_dd8_n2,daily_ledger_v0,2018-2025,0.628,12.83,-27.18,1,MASTER_SUMMARY,
+MS_110,2026-04-11,bold_aa,daily_ledger_v0,2018-2025,0.626,10.37,-28.46,1,MASTER_SUMMARY,
+MS_111,2026-04-11,adaptive_top6_lb63,daily_ledger_v0,2018-2025,0.626,5.73,-22.33,1,MASTER_SUMMARY,
+MS_112,2026-04-11,bold_SPY_QQQ_EFA_EEM,daily_ledger_v0,2018-2025,0.626,10.37,-28.46,1,MASTER_SUMMARY,
+MS_113,2026-04-11,E_pure_trend_SOXX_sma100,daily_ledger_v0,2018-2025,0.625,13.9,-45.98,1,MASTER_SUMMARY,
+MS_114,2026-04-11,EL_soxx_dd_sma150_dd8,daily_ledger_v0,2018-2025,0.625,12.87,-43.32,1,MASTER_SUMMARY,
+MS_115,2026-04-11,EL_multisig_soxx_20_150,daily_ledger_v0,2018-2025,0.623,13.4,-43.56,1,MASTER_SUMMARY,
+MS_116,2026-04-11,FN_absmom_lb126_n3,daily_ledger_v0,2018-2025,0.622,14.75,-42.3,1,MASTER_SUMMARY,
+MS_117,2026-04-11,EL_compound_f42_s126,daily_ledger_v0,2018-2025,0.62,13.58,-43.56,1,MASTER_SUMMARY,
+MS_118,2026-04-11,FN_fastdd_dd5_w63,daily_ledger_v0,2018-2025,0.62,13.26,-29.08,1,MASTER_SUMMARY,
+MS_119,2026-04-11,FN_absmom_lb126_n2,daily_ledger_v0,2018-2025,0.618,14.65,-41.12,1,MASTER_SUMMARY,
+MS_120,2026-04-11,sector_mom_top3_lb252_tfFalse,daily_ledger_v0,2018-2025,0.617,10.69,-31.79,1,MASTER_SUMMARY,
+MS_121,2026-04-11,accel_dual_momentum,daily_ledger_v0,2018-2025,0.614,9.85,-33.85,1,MASTER_SUMMARY,
+MS_122,2026-04-11,EL_vol_adjusted_growth,daily_ledger_v0,2018-2025,0.613,10.61,-29.63,1,MASTER_SUMMARY,
+MS_123,2026-04-11,E_accel_tech_switch,daily_ledger_v0,2018-2025,0.612,14.03,-43.95,1,MASTER_SUMMARY,
+MS_124,2026-04-11,EL_aggrot_top3_sma150,daily_ledger_v0,2018-2025,0.61,10.83,-32.88,1,MASTER_SUMMARY,
+MS_125,2026-04-11,FN_growtheng_sma150_n2,daily_ledger_v0,2018-2025,0.61,13.17,-34.73,1,MASTER_SUMMARY,
+MS_126,2026-04-11,EL_maxgrowth_sma100_dd8_n2,daily_ledger_v0,2018-2025,0.609,12.13,-27.45,1,MASTER_SUMMARY,
+MS_127,2026-04-11,EL_maxgrowth_sma100_dd10_n2,daily_ledger_v0,2018-2025,0.609,12.13,-27.45,1,MASTER_SUMMARY,
+MS_128,2026-04-11,EL_maxgrowth_sma100_dd12_n2,daily_ledger_v0,2018-2025,0.609,12.13,-27.45,1,MASTER_SUMMARY,
+MS_129,2026-04-11,EL_soxx_breakout,daily_ledger_v0,2018-2025,0.606,11.53,-28.64,1,MASTER_SUMMARY,
+MS_130,2026-04-11,EL_breakout_SOXX_lb63,daily_ledger_v0,2018-2025,0.606,11.53,-28.64,1,MASTER_SUMMARY,
+MS_131,2026-04-11,FN_ultimate_sma100_dd6_n3,daily_ledger_v0,2018-2025,0.605,12.0,-29.89,1,MASTER_SUMMARY,
+MS_132,2026-04-11,EL_soxx_gold_sma150_mom21,daily_ledger_v0,2018-2025,0.604,11.99,-41.72,1,MASTER_SUMMARY,
+MS_133,2026-04-11,EL_soxx_dd_sma200_dd10,daily_ledger_v0,2018-2025,0.603,12.43,-43.32,1,MASTER_SUMMARY,
+MS_134,2026-04-11,EL_soxx_dd_sma200_dd12,daily_ledger_v0,2018-2025,0.603,12.43,-43.32,1,MASTER_SUMMARY,
+MS_135,2026-04-11,EL_soxx_dd_sma200_dd15,daily_ledger_v0,2018-2025,0.603,12.43,-43.32,1,MASTER_SUMMARY,
+MS_136,2026-04-11,EL_maxgrowth_sma150_dd8_n2,daily_ledger_v0,2018-2025,0.603,12.08,-27.72,1,MASTER_SUMMARY,
+MS_137,2026-04-11,EL_maxgrowth_sma200_dd8_n2,daily_ledger_v0,2018-2025,0.603,12.08,-27.72,1,MASTER_SUMMARY,
+MS_138,2026-04-11,EL_max_growth_composite,daily_ledger_v0,2018-2025,0.602,12.18,-26.64,1,MASTER_SUMMARY,
+MS_139,2026-04-11,EL_maxgrowth_sma150_dd10_n3,daily_ledger_v0,2018-2025,0.602,12.18,-26.64,1,MASTER_SUMMARY,
+MS_140,2026-04-11,EL_maxgrowth_sma150_dd12_n3,daily_ledger_v0,2018-2025,0.602,12.18,-26.64,1,MASTER_SUMMARY,
+MS_141,2026-04-11,EL_maxgrowth_sma200_dd10_n3,daily_ledger_v0,2018-2025,0.602,12.18,-26.64,1,MASTER_SUMMARY,
+MS_142,2026-04-11,EL_maxgrowth_sma200_dd12_n3,daily_ledger_v0,2018-2025,0.602,12.18,-26.64,1,MASTER_SUMMARY,
+MS_143,2026-04-11,sector_mom_top5_lb252_tfFalse,daily_ledger_v0,2018-2025,0.601,9.84,-32.48,1,MASTER_SUMMARY,
+MS_144,2026-04-11,FN_ultimate_sma150_dd6_n3,daily_ledger_v0,2018-2025,0.598,11.81,-27.49,1,MASTER_SUMMARY,
+MS_145,2026-04-11,EL_multisig_soxx_20_100,daily_ledger_v0,2018-2025,0.597,12.66,-43.56,1,MASTER_SUMMARY,
+MS_146,2026-04-11,E_soxx_qqq_sma100_mom63,daily_ledger_v0,2018-2025,0.594,12.43,-46.31,1,MASTER_SUMMARY,
+MS_147,2026-04-11,E_soxx_qqq_sma150_mom126,daily_ledger_v0,2018-2025,0.591,13.3,-44.96,1,MASTER_SUMMARY,
+MS_148,2026-04-11,EL_soxx_gold_sma150_mom63,daily_ledger_v0,2018-2025,0.591,11.9,-39.66,1,MASTER_SUMMARY,
+MS_149,2026-04-11,FN_diversified_growth_energy,daily_ledger_v0,2018-2025,0.59,11.72,-35.41,1,MASTER_SUMMARY,
+MS_150,2026-04-11,sector_mom_top2_lb252_tfTrue,daily_ledger_v0,2018-2025,0.587,10.77,-30.59,1,MASTER_SUMMARY,
+MS_151,2026-04-11,E_pure_trend_XLK_sma100,daily_ledger_v0,2018-2025,0.585,10.46,-42.1,1,MASTER_SUMMARY,
+MS_152,2026-04-11,FN_ultimate_final,daily_ledger_v0,2018-2025,0.584,11.56,-27.49,1,MASTER_SUMMARY,
+MS_153,2026-04-11,FN_ultimate_sma150_dd8_n3,daily_ledger_v0,2018-2025,0.584,11.56,-27.49,1,MASTER_SUMMARY,
+MS_154,2026-04-11,growth_trend_QQQ_sma150,daily_ledger_v0,2018-2025,0.582,10.4,-42.74,1,MASTER_SUMMARY,
+MS_155,2026-04-11,E_pure_trend_QQQ_sma150,daily_ledger_v0,2018-2025,0.582,10.4,-42.74,1,MASTER_SUMMARY,
+MS_156,2026-04-11,E_canary_growth,daily_ledger_v0,2018-2025,0.58,10.2,-30.68,1,MASTER_SUMMARY,
+MS_157,2026-04-11,E_soxx_qqq_sma200_mom63,daily_ledger_v0,2018-2025,0.58,12.56,-40.68,1,MASTER_SUMMARY,
+MS_158,2026-04-11,EL_aggrot_top2_sma150,daily_ledger_v0,2018-2025,0.58,10.49,-34.15,1,MASTER_SUMMARY,
+MS_159,2026-04-11,EL_breakout_SOXX_lb126,daily_ledger_v0,2018-2025,0.578,10.64,-28.64,1,MASTER_SUMMARY,
+MS_160,2026-04-11,EL_aggrot_top1_sma150,daily_ledger_v0,2018-2025,0.576,11.62,-35.28,1,MASTER_SUMMARY,
+MS_161,2026-04-11,sector_mom_top2_lb126_tfFalse,daily_ledger_v0,2018-2025,0.574,10.36,-29.71,1,MASTER_SUMMARY,
+MS_162,2026-04-11,EL_aggrot_top3_sma200,daily_ledger_v0,2018-2025,0.573,9.95,-32.88,1,MASTER_SUMMARY,
+MS_163,2026-04-11,E_pure_soxx_trend,daily_ledger_v0,2018-2025,0.571,13.23,-40.68,1,MASTER_SUMMARY,
+MS_164,2026-04-11,E_pure_trend_SOXX_sma200,daily_ledger_v0,2018-2025,0.571,13.23,-40.68,1,MASTER_SUMMARY,
+MS_165,2026-04-11,lev_growth_QQQ_XLK_SOXX,daily_ledger_v0,2018-2025,0.57,11.28,-25.09,1,MASTER_SUMMARY,
+MS_166,2026-04-11,EL_compound_f21_s189,daily_ledger_v0,2018-2025,0.569,12.35,-41.27,1,MASTER_SUMMARY,
+MS_167,2026-04-11,FN_growth_energy_rot,daily_ledger_v0,2018-2025,0.569,11.89,-35.0,1,MASTER_SUMMARY,
+MS_168,2026-04-11,FN_growtheng_sma150_n3,daily_ledger_v0,2018-2025,0.569,11.89,-35.0,1,MASTER_SUMMARY,
+MS_169,2026-04-11,FN_ultimate_sma200_dd6_n2,daily_ledger_v0,2018-2025,0.565,11.17,-27.18,1,MASTER_SUMMARY,
+MS_170,2026-04-11,E_concentrated_tech,daily_ledger_v0,2018-2025,0.564,10.91,-28.27,1,MASTER_SUMMARY,
+MS_171,2026-04-11,E_conc_tech_sma50_200,daily_ledger_v0,2018-2025,0.564,10.91,-28.27,1,MASTER_SUMMARY,
+MS_172,2026-04-11,E_conc_tech_sma50_150,daily_ledger_v0,2018-2025,0.564,10.86,-28.27,1,MASTER_SUMMARY,
+MS_173,2026-04-11,FN_ultimate_sma200_dd8_n2,daily_ledger_v0,2018-2025,0.564,11.22,-27.18,1,MASTER_SUMMARY,
+MS_174,2026-04-11,sector_momentum,daily_ledger_v0,2018-2025,0.562,9.7,-29.58,1,MASTER_SUMMARY,
+MS_175,2026-04-11,sector_mom_top3_lb252_tfTrue,daily_ledger_v0,2018-2025,0.562,9.7,-29.58,1,MASTER_SUMMARY,
+MS_176,2026-04-11,sector_mom_top4_lb252_tfFalse,daily_ledger_v0,2018-2025,0.562,9.15,-30.83,1,MASTER_SUMMARY,
+MS_177,2026-04-11,EL_compound_momentum,daily_ledger_v0,2018-2025,0.561,12.16,-41.27,1,MASTER_SUMMARY,
+MS_178,2026-04-11,EL_compound_f21_s252,daily_ledger_v0,2018-2025,0.561,12.16,-41.27,1,MASTER_SUMMARY,
+MS_179,2026-04-11,EL_multi_signal_soxx,daily_ledger_v0,2018-2025,0.559,11.56,-35.82,1,MASTER_SUMMARY,
+MS_180,2026-04-11,EL_multisig_soxx_50_200,daily_ledger_v0,2018-2025,0.559,11.56,-35.82,1,MASTER_SUMMARY,
+MS_181,2026-04-11,E_pure_trend_QQQ_sma100,daily_ledger_v0,2018-2025,0.555,9.26,-43.08,1,MASTER_SUMMARY,
+MS_182,2026-04-11,EL_aggrot_top1_sma200,daily_ledger_v0,2018-2025,0.554,10.98,-35.28,1,MASTER_SUMMARY,
+MS_183,2026-04-11,FN_absmom_lb84_n5,daily_ledger_v0,2018-2025,0.553,12.1,-32.57,1,MASTER_SUMMARY,
+MS_184,2026-04-11,sector_mom_top4_lb189_tfFalse,daily_ledger_v0,2018-2025,0.552,9.03,-30.86,1,MASTER_SUMMARY,
+MS_185,2026-04-11,E_pure_trend_SOXX_sma250,daily_ledger_v0,2018-2025,0.549,12.58,-44.54,1,MASTER_SUMMARY,
+MS_186,2026-04-11,EL_breakout_SOXX_lb42,daily_ledger_v0,2018-2025,0.548,10.18,-28.64,1,MASTER_SUMMARY,
+MS_187,2026-04-11,EL_aggressive_rotation,daily_ledger_v0,2018-2025,0.546,9.67,-34.15,1,MASTER_SUMMARY,
+MS_188,2026-04-11,EL_aggrot_top2_sma200,daily_ledger_v0,2018-2025,0.546,9.67,-34.15,1,MASTER_SUMMARY,
+MS_189,2026-04-11,FN_growtheng_sma150_n1,daily_ledger_v0,2018-2025,0.545,12.22,-42.76,1,MASTER_SUMMARY,
+MS_190,2026-04-11,sector_mom_top5_lb189_tfFalse,daily_ledger_v0,2018-2025,0.542,8.67,-33.32,1,MASTER_SUMMARY,
+MS_191,2026-04-11,FN_absmom_lb42_n2,daily_ledger_v0,2018-2025,0.541,11.0,-38.8,1,MASTER_SUMMARY,
+MS_192,2026-04-11,sector_mom_top3_lb126_tfFalse,daily_ledger_v0,2018-2025,0.54,9.23,-34.16,1,MASTER_SUMMARY,
+MS_193,2026-04-11,EL_compound_f21_s126,daily_ledger_v0,2018-2025,0.538,11.09,-40.53,1,MASTER_SUMMARY,
+MS_194,2026-04-11,EL_absrel_lb189_n5,daily_ledger_v0,2018-2025,0.533,11.66,-35.14,1,MASTER_SUMMARY,
+MS_195,2026-04-11,FN_growtheng_sma100_n2,daily_ledger_v0,2018-2025,0.533,10.81,-30.93,1,MASTER_SUMMARY,
+MS_196,2026-04-11,EL_soxx_gold_sma200_mom21,daily_ledger_v0,2018-2025,0.532,10.22,-41.72,1,MASTER_SUMMARY,
+MS_197,2026-04-11,dual_momentum_lb189_skip21,daily_ledger_v0,2018-2025,0.528,8.16,-33.85,1,MASTER_SUMMARY,
+MS_198,2026-04-11,FN_growtheng_sma200_n2,daily_ledger_v0,2018-2025,0.527,10.84,-34.73,1,MASTER_SUMMARY,
+MS_199,2026-04-11,composite_mom_mr,daily_ledger_v0,2018-2025,0.525,7.33,-23.69,1,MASTER_SUMMARY,
+MS_200,2026-04-11,growth_trend_SPY_sma150,daily_ledger_v0,2018-2025,0.525,7.44,-39.49,1,MASTER_SUMMARY,
+MS_201,2026-04-11,sector_mom_top3_lb189_tfFalse,daily_ledger_v0,2018-2025,0.523,8.88,-31.63,1,MASTER_SUMMARY,
+MS_202,2026-04-11,EL_absrel_lb189_n3,daily_ledger_v0,2018-2025,0.523,11.19,-35.86,1,MASTER_SUMMARY,
+MS_203,2026-04-11,EL_maxgrowth_sma100_dd8_n3,daily_ledger_v0,2018-2025,0.52,9.88,-26.37,1,MASTER_SUMMARY,
+MS_204,2026-04-11,EL_maxgrowth_sma100_dd10_n3,daily_ledger_v0,2018-2025,0.52,9.88,-26.37,1,MASTER_SUMMARY,
+MS_205,2026-04-11,EL_maxgrowth_sma100_dd12_n3,daily_ledger_v0,2018-2025,0.52,9.88,-26.37,1,MASTER_SUMMARY,
+MS_206,2026-04-11,FN_absmom_lb42_n5,daily_ledger_v0,2018-2025,0.52,10.44,-38.55,1,MASTER_SUMMARY,
+MS_207,2026-04-11,EL_soxx_gold_sma100_mom21,daily_ledger_v0,2018-2025,0.519,9.69,-41.96,1,MASTER_SUMMARY,
+MS_208,2026-04-11,EL_aggrot_top3_sma100,daily_ledger_v0,2018-2025,0.519,8.53,-29.45,1,MASTER_SUMMARY,
+MS_209,2026-04-11,EL_soxx_dd_sma200_dd8,daily_ledger_v0,2018-2025,0.518,10.08,-43.32,1,MASTER_SUMMARY,
+MS_210,2026-04-11,sector_mom_top5_lb126_tfFalse,daily_ledger_v0,2018-2025,0.517,8.27,-33.78,1,MASTER_SUMMARY,
+MS_211,2026-04-11,FN_absmom_lb42_n3,daily_ledger_v0,2018-2025,0.517,10.29,-39.5,1,MASTER_SUMMARY,
+MS_212,2026-04-11,EL_maxgrowth_sma150_dd8_n3,daily_ledger_v0,2018-2025,0.516,9.83,-26.64,1,MASTER_SUMMARY,
+MS_213,2026-04-11,EL_maxgrowth_sma200_dd8_n3,daily_ledger_v0,2018-2025,0.516,9.83,-26.64,1,MASTER_SUMMARY,
+MS_214,2026-04-11,E_soxx_qqq_switch,daily_ledger_v0,2018-2025,0.515,10.48,-45.98,1,MASTER_SUMMARY,
+MS_215,2026-04-11,E_soxx_qqq_sma150_mom63,daily_ledger_v0,2018-2025,0.515,10.48,-45.98,1,MASTER_SUMMARY,
+MS_216,2026-04-11,EL_absrel_lb189_n2,daily_ledger_v0,2018-2025,0.515,11.1,-35.43,1,MASTER_SUMMARY,
+MS_217,2026-04-11,FN_broadrot_top1_sma150,daily_ledger_v0,2018-2025,0.515,10.44,-29.91,1,MASTER_SUMMARY,
+MS_218,2026-04-11,FN_broadrot_top1_sma200,daily_ledger_v0,2018-2025,0.515,10.44,-29.91,1,MASTER_SUMMARY,
+MS_219,2026-04-11,FN_ultimate_sma200_dd6_n3,daily_ledger_v0,2018-2025,0.514,9.73,-27.76,1,MASTER_SUMMARY,
+MS_220,2026-04-11,FN_ultimate_sma200_dd8_n3,daily_ledger_v0,2018-2025,0.513,9.78,-27.49,1,MASTER_SUMMARY,
+MS_221,2026-04-11,EL_absrel_lb252_n5,daily_ledger_v0,2018-2025,0.511,11.25,-37.92,1,MASTER_SUMMARY,
+MS_222,2026-04-11,dual_momentum,daily_ledger_v0,2018-2025,0.51,7.86,-33.85,1,MASTER_SUMMARY,
+MS_223,2026-04-11,dual_momentum_lb252_skip21,daily_ledger_v0,2018-2025,0.51,7.86,-33.85,1,MASTER_SUMMARY,
+MS_224,2026-04-11,EL_soxx_gold_sma200_mom63,daily_ledger_v0,2018-2025,0.51,9.81,-39.66,1,MASTER_SUMMARY,
+MS_225,2026-04-11,EL_aggrot_top2_sma100,daily_ledger_v0,2018-2025,0.506,8.52,-31.4,1,MASTER_SUMMARY,
+MS_226,2026-04-11,adaptive_top4_lb63,daily_ledger_v0,2018-2025,0.502,5.24,-23.89,1,MASTER_SUMMARY,
+MS_227,2026-04-11,sector_mom_top2_lb189_tfFalse,daily_ledger_v0,2018-2025,0.501,8.91,-33.19,1,MASTER_SUMMARY,
+MS_228,2026-04-11,sector_mom_top5_lb252_tfTrue,daily_ledger_v0,2018-2025,0.501,7.93,-30.1,1,MASTER_SUMMARY,
+MS_229,2026-04-11,EL_compound_f14_s189,daily_ledger_v0,2018-2025,0.501,10.47,-44.26,1,MASTER_SUMMARY,
+MS_230,2026-04-11,hybrid_mom_quality,daily_ledger_v0,2018-2025,0.496,7.97,-33.05,1,MASTER_SUMMARY,
+MS_231,2026-04-11,E_opt_soxx_qqq_sma150_w73,daily_ledger_v0,2018-2025,0.495,9.98,-48.19,1,MASTER_SUMMARY,
+MS_232,2026-04-11,growth_trend_SPY_sma250,daily_ledger_v0,2018-2025,0.494,7.24,-33.6,1,MASTER_SUMMARY,
+MS_233,2026-04-11,EL_compound_f14_s252,daily_ledger_v0,2018-2025,0.489,10.16,-44.26,1,MASTER_SUMMARY,
+MS_234,2026-04-11,FN_growtheng_sma100_n3,daily_ledger_v0,2018-2025,0.487,9.44,-30.93,1,MASTER_SUMMARY,
+MS_235,2026-04-11,E_multi_tf_growth,daily_ledger_v0,2018-2025,0.486,9.0,-44.52,1,MASTER_SUMMARY,
+MS_236,2026-04-11,EL_aggrot_top1_sma100,daily_ledger_v0,2018-2025,0.486,9.0,-32.05,1,MASTER_SUMMARY,
+MS_237,2026-04-11,sector_mom_top4_lb126_tfFalse,daily_ledger_v0,2018-2025,0.484,7.72,-33.04,1,MASTER_SUMMARY,
+MS_238,2026-04-11,EL_soxx_gold_sma100_mom63,daily_ledger_v0,2018-2025,0.484,8.94,-41.96,1,MASTER_SUMMARY,
+MS_239,2026-04-11,adaptive_top5_lb63,daily_ledger_v0,2018-2025,0.482,4.49,-23.33,1,MASTER_SUMMARY,
+MS_240,2026-04-11,FN_growtheng_sma200_n3,daily_ledger_v0,2018-2025,0.48,9.41,-35.0,1,MASTER_SUMMARY,
+MS_241,2026-04-11,sector_mom_top4_lb252_tfTrue,daily_ledger_v0,2018-2025,0.479,7.6,-30.12,1,MASTER_SUMMARY,
+MS_242,2026-04-11,risk_parity,daily_ledger_v0,2018-2025,0.478,4.44,-21.86,1,MASTER_SUMMARY,
+MS_243,2026-04-11,multi_asset_mom_vol,daily_ledger_v0,2018-2025,0.477,5.68,-24.87,1,MASTER_SUMMARY,
+MS_244,2026-04-11,ma_mom_vol_top4_tv10,daily_ledger_v0,2018-2025,0.477,5.68,-24.87,1,MASTER_SUMMARY,
+MS_245,2026-04-11,ma_mom_vol_top4_tv12,daily_ledger_v0,2018-2025,0.477,5.68,-24.87,1,MASTER_SUMMARY,
+MS_246,2026-04-11,ma_mom_vol_top4_tv15,daily_ledger_v0,2018-2025,0.477,5.68,-24.87,1,MASTER_SUMMARY,
+MS_247,2026-04-11,growth_trend_QQQ_sma250,daily_ledger_v0,2018-2025,0.472,8.03,-46.23,1,MASTER_SUMMARY,
+MS_248,2026-04-11,E_pure_trend_QQQ_sma250,daily_ledger_v0,2018-2025,0.472,8.03,-46.23,1,MASTER_SUMMARY,
+MS_249,2026-04-11,adaptive_top4_lb126,daily_ledger_v0,2018-2025,0.468,4.72,-23.1,1,MASTER_SUMMARY,
+MS_250,2026-04-11,E_optimized_soxx_qqq_tlt,daily_ledger_v0,2018-2025,0.465,9.11,-48.19,1,MASTER_SUMMARY,
+MS_251,2026-04-11,E_opt_soxx_qqq_sma150_w64,daily_ledger_v0,2018-2025,0.465,9.11,-48.19,1,MASTER_SUMMARY,
+MS_252,2026-04-11,E_ensemble_voting,daily_ledger_v0,2018-2025,0.464,9.29,-42.07,1,MASTER_SUMMARY,
+MS_253,2026-04-11,EL_compound_f14_s126,daily_ledger_v0,2018-2025,0.463,9.16,-43.56,1,MASTER_SUMMARY,
+MS_254,2026-04-11,E_conc_tech_sma20_150,daily_ledger_v0,2018-2025,0.461,8.33,-35.57,1,MASTER_SUMMARY,
+MS_255,2026-04-11,FN_growtheng_sma200_n1,daily_ledger_v0,2018-2025,0.461,9.56,-42.76,1,MASTER_SUMMARY,
+MS_256,2026-04-11,E_growth_riskoff_20_150,daily_ledger_v0,2018-2025,0.456,8.84,-49.07,1,MASTER_SUMMARY,
+MS_257,2026-04-11,E_pure_trend_SOXX_sma150,daily_ledger_v0,2018-2025,0.455,9.32,-45.98,1,MASTER_SUMMARY,
+MS_258,2026-04-11,EL_absrel_lb252_n3,daily_ledger_v0,2018-2025,0.453,9.31,-36.79,1,MASTER_SUMMARY,
+MS_259,2026-04-11,E_growth_riskoff_30_100,daily_ledger_v0,2018-2025,0.449,8.65,-47.4,1,MASTER_SUMMARY,
+MS_260,2026-04-11,E_dual_gb_g100,daily_ledger_v0,2018-2025,0.448,8.19,-42.77,1,MASTER_SUMMARY,
+MS_261,2026-04-11,FN_growtheng_sma100_n1,daily_ledger_v0,2018-2025,0.445,8.89,-42.76,1,MASTER_SUMMARY,
+MS_262,2026-04-11,enhanced_growth_trend,daily_ledger_v0,2018-2025,0.444,6.64,-34.26,1,MASTER_SUMMARY,
+MS_263,2026-04-11,sector_mom_top3_lb126_tfTrue,daily_ledger_v0,2018-2025,0.44,7.02,-30.63,1,MASTER_SUMMARY,
+MS_264,2026-04-11,E_dual_gb_g90,daily_ledger_v0,2018-2025,0.439,7.45,-40.62,1,MASTER_SUMMARY,
+MS_265,2026-04-11,E_dual_gb_g80,daily_ledger_v0,2018-2025,0.427,6.68,-38.4,1,MASTER_SUMMARY,
+MS_266,2026-04-11,E_opt_soxx_qqq_sma150_w55,daily_ledger_v0,2018-2025,0.426,8.12,-47.21,1,MASTER_SUMMARY,
+MS_267,2026-04-11,EL_absrel_lb252_n2,daily_ledger_v0,2018-2025,0.423,8.5,-40.15,1,MASTER_SUMMARY,
+MS_268,2026-04-11,dual_momentum_lb126_skip21,daily_ledger_v0,2018-2025,0.417,5.9,-33.85,1,MASTER_SUMMARY,
+MS_269,2026-04-11,sector_mom_top2_lb189_tfTrue,daily_ledger_v0,2018-2025,0.415,6.82,-30.09,1,MASTER_SUMMARY,
+MS_270,2026-04-11,E_dual_growth_bond,daily_ledger_v0,2018-2025,0.412,5.86,-36.11,1,MASTER_SUMMARY,
+MS_271,2026-04-11,E_growth_riskoff_10_50,daily_ledger_v0,2018-2025,0.412,7.2,-49.16,1,MASTER_SUMMARY,
+MS_272,2026-04-11,E_dual_gb_g70,daily_ledger_v0,2018-2025,0.412,5.86,-36.11,1,MASTER_SUMMARY,
+MS_273,2026-04-11,sector_mom_top2_lb126_tfTrue,daily_ledger_v0,2018-2025,0.41,6.58,-30.09,1,MASTER_SUMMARY,
+MS_274,2026-04-11,sector_mom_top5_lb189_tfTrue,daily_ledger_v0,2018-2025,0.41,6.07,-29.87,1,MASTER_SUMMARY,
+MS_275,2026-04-11,sector_mom_top4_lb189_tfTrue,daily_ledger_v0,2018-2025,0.402,6.02,-29.4,1,MASTER_SUMMARY,
+MS_276,2026-04-11,E_growth_fast_riskoff,daily_ledger_v0,2018-2025,0.402,7.32,-49.07,1,MASTER_SUMMARY,
+MS_277,2026-04-11,E_growth_riskoff_20_100,daily_ledger_v0,2018-2025,0.402,7.32,-49.07,1,MASTER_SUMMARY,
+MS_278,2026-04-11,FN_absmom_lb126_n5,daily_ledger_v0,2018-2025,0.4,7.67,-45.54,1,MASTER_SUMMARY,
+MS_279,2026-04-11,adaptive_aa,daily_ledger_v0,2018-2025,0.396,3.73,-25.52,1,MASTER_SUMMARY,
+MS_280,2026-04-11,adaptive_top5_lb126,daily_ledger_v0,2018-2025,0.396,3.73,-25.52,1,MASTER_SUMMARY,
+MS_281,2026-04-11,E_opt_soxx_qqq_sma200_w73,daily_ledger_v0,2018-2025,0.393,7.11,-48.19,1,MASTER_SUMMARY,
+MS_282,2026-04-11,sector_mom_top3_lb189_tfTrue,daily_ledger_v0,2018-2025,0.392,6.03,-29.81,1,MASTER_SUMMARY,
+MS_283,2026-04-11,dual_momentum_lb252_skip0,daily_ledger_v0,2018-2025,0.39,5.38,-33.85,1,MASTER_SUMMARY,
+MS_284,2026-04-11,E_dual_gb_g60,daily_ledger_v0,2018-2025,0.39,5.0,-33.77,1,MASTER_SUMMARY,
+MS_285,2026-04-11,E_adaptive_concentration,daily_ledger_v0,2018-2025,0.38,6.71,-47.01,1,MASTER_SUMMARY,
+MS_286,2026-04-11,E_opt_soxx_qqq_sma100_w73,daily_ledger_v0,2018-2025,0.371,6.41,-51.0,1,MASTER_SUMMARY,
+MS_287,2026-04-11,E_opt_soxx_qqq_sma100_w64,daily_ledger_v0,2018-2025,0.371,6.41,-51.0,1,MASTER_SUMMARY,
+MS_288,2026-04-11,vigilant_aa,daily_ledger_v0,2018-2025,0.367,3.7,-20.06,1,MASTER_SUMMARY,
+MS_289,2026-04-11,vigilant_SPY_EFA_EEM_AGG,daily_ledger_v0,2018-2025,0.367,3.7,-20.06,1,MASTER_SUMMARY,
+MS_290,2026-04-11,E_opt_soxx_qqq_sma200_w64,daily_ledger_v0,2018-2025,0.363,6.27,-48.19,1,MASTER_SUMMARY,
+MS_291,2026-04-11,growth_trend_SPY_sma200,daily_ledger_v0,2018-2025,0.362,4.69,-39.49,1,MASTER_SUMMARY,
+MS_292,2026-04-11,ma_mom_vol_top5_tv10,daily_ledger_v0,2018-2025,0.358,3.81,-25.94,1,MASTER_SUMMARY,
+MS_293,2026-04-11,ma_mom_vol_top5_tv12,daily_ledger_v0,2018-2025,0.358,3.81,-25.94,1,MASTER_SUMMARY,
+MS_294,2026-04-11,ma_mom_vol_top5_tv15,daily_ledger_v0,2018-2025,0.358,3.81,-25.94,1,MASTER_SUMMARY,
+MS_295,2026-04-11,sector_mom_top5_lb126_tfTrue,daily_ledger_v0,2018-2025,0.356,5.06,-30.35,1,MASTER_SUMMARY,
+MS_296,2026-04-11,sector_mom_top4_lb126_tfTrue,daily_ledger_v0,2018-2025,0.339,4.77,-30.29,1,MASTER_SUMMARY,
+MS_297,2026-04-11,E_opt_soxx_qqq_sma100_w55,daily_ledger_v0,2018-2025,0.333,5.43,-50.07,1,MASTER_SUMMARY,
+MS_298,2026-04-11,adaptive_top3_lb63,daily_ledger_v0,2018-2025,0.331,3.42,-32.3,1,MASTER_SUMMARY,
+MS_299,2026-04-11,ma_mom_vol_top3_tv10,daily_ledger_v0,2018-2025,0.328,3.83,-25.33,1,MASTER_SUMMARY,
+MS_300,2026-04-11,ma_mom_vol_top3_tv12,daily_ledger_v0,2018-2025,0.328,3.83,-25.33,1,MASTER_SUMMARY,
+MS_301,2026-04-11,ma_mom_vol_top3_tv15,daily_ledger_v0,2018-2025,0.328,3.83,-25.33,1,MASTER_SUMMARY,
+MS_302,2026-04-11,E_opt_soxx_qqq_sma200_w55,daily_ledger_v0,2018-2025,0.327,5.3,-47.21,1,MASTER_SUMMARY,
+MS_303,2026-04-11,dual_momentum_lb126_skip0,daily_ledger_v0,2018-2025,0.315,3.82,-34.05,1,MASTER_SUMMARY,
+MS_304,2026-04-11,adaptive_top6_lb126,daily_ledger_v0,2018-2025,0.315,2.58,-29.55,1,MASTER_SUMMARY,
+MS_305,2026-04-11,dual_momentum_lb189_skip0,daily_ledger_v0,2018-2025,0.314,3.94,-33.85,1,MASTER_SUMMARY,
+MS_306,2026-04-11,E_conc_tech_sma20_100,daily_ledger_v0,2018-2025,0.313,4.62,-39.37,1,MASTER_SUMMARY,
+MS_307,2026-04-11,growth_trend_weekly,daily_ledger_v0,2018-2025,0.307,4.25,-48.34,1,MASTER_SUMMARY,
+MS_308,2026-04-11,ma_mom_vol_top6_tv10,daily_ledger_v0,2018-2025,0.305,2.99,-25.66,1,MASTER_SUMMARY,
+MS_309,2026-04-11,ma_mom_vol_top6_tv12,daily_ledger_v0,2018-2025,0.305,2.99,-25.66,1,MASTER_SUMMARY,
+MS_310,2026-04-11,ma_mom_vol_top6_tv15,daily_ledger_v0,2018-2025,0.305,2.99,-25.66,1,MASTER_SUMMARY,
+MS_311,2026-04-11,trend_following,daily_ledger_v0,2018-2025,0.225,2.05,-28.59,1,MASTER_SUMMARY,
+MS_312,2026-04-11,leveraged_growth_weekly,daily_ledger_v0,2018-2025,0.206,2.09,-36.35,1,MASTER_SUMMARY,
+MS_313,2026-04-11,enhanced_growth_trend_weekly,daily_ledger_v0,2018-2025,0.105,0.26,-35.48,1,MASTER_SUMMARY,
+MS_314,2026-04-11,accel_dual_momentum_weekly,daily_ledger_v0,2018-2025,-0.049,-2.35,-42.1,1,MASTER_SUMMARY,
+MS_315,2026-04-11,bold_aa_weekly,daily_ledger_v0,2018-2025,-0.124,-3.78,-48.95,1,MASTER_SUMMARY,
+MS_316,2026-04-11,vigilant_aa_weekly,daily_ledger_v0,2018-2025,-0.298,-3.99,-38.2,1,MASTER_SUMMARY,
+AUTO_P42,2026-04-13,P42,fwd21_proxy,2008-05..2025-12,1.74,28.03,-12.66,1,tests/autonomous BEST.md,"P27 + FOMC(post=1,defer=4)"
+AUTO_P44,2026-04-13,P44,fwd21_proxy,2008-05..2025-12,1.78,28.34,-12.66,1,tests/autonomous BEST.md,classifier retrained CORE+credit+yc (superseded by pruned P45)
+AUTO_P45,2026-04-13,P45,fwd21_proxy,2008-05..2025-12,1.81,28.71,-12.66,1,tests/autonomous BEST.md,P42 + 6 pruned credit/yield-curve features
+AUTO_P46,2026-04-13,P46,fwd21_proxy,2008-05..2025-12,1.83,28.85,-12.66,1,tests/autonomous BEST.md,P45 + copper_gold_ratio; pred_proba_p46.pkl cache source
+AUTO_P47,2026-04-13,P47,fwd21_proxy,2008-05..2025-12,1.84,28.95,-12.66,1,tests/autonomous BEST.md,P46 + XLF in transition universe
+AUTO_P49,2026-04-13,P49,fwd21_proxy,2008-05..2025-12,1.86,29.2,-12.66,1,tests/autonomous BEST.md,P47 + self-DD adaptive sizing
+AUTO_P50,2026-04-13,P50,fwd21_proxy,2008-05..2025-12,1.86,29.58,-12.66,1,tests/autonomous BEST.md,P47 + symmetric 6m/6m Kelly
+AUTO_P51,2026-04-13,P51,fwd21_proxy,2008-05..2025-12,1.87,29.92,-12.66,1,tests/autonomous BEST.md,"P47 + asymmetric Kelly (DD 3m/-2%, boost 9m/+30%)"
+AUTO_P52,2026-04-13,P52,fwd21_proxy,2008-05..2025-12,1.88,30.12,-12.66,1,tests/autonomous BEST.md,P51 + SPY 63d>12% boost trigger
+AUTO_P53,2026-04-13,P53,fwd21_proxy,2008-05..2025-12,1.88,30.2,-12.66,1,tests/autonomous BEST.md,P52 + 4-state warmup boost
+AUTO_P54,2026-04-13,P54,fwd21_proxy,2008-05..2025-12,1.89,30.23,-12.66,1,tests/autonomous BEST.md,signal-margin de-concentration; flagged OVERFIT (hurts 2018-2026 half)
+AUTO_P55,2026-04-13,P55,fwd21_proxy,2008-05..2025-12,1.89,30.27,-12.66,1,tests/autonomous BEST.md,stagflation defend override
+AUTO_P56,2026-04-13,P56,fwd21_proxy,2008-05..2025-12,1.9,30.34,-12.66,1,tests/autonomous BEST.md,high-conf transition defend thr=0.85
+AUTO_P57,2026-04-13,P57,fwd21_proxy,2008-05..2025-12,1.9,30.48,-12.66,1,tests/autonomous BEST.md,P55 + high-conf trans defend 0.82 + own-vol sizing; flagged first-half-overfit; live race slot 9
+AUTO_P58,2026-04-13,P58,fwd21_proxy,2008-05..2025-12,1.88,30.37,-12.66,1,tests/autonomous BEST.md,P53 + full-boost weight 0.78
+AUTO_P59,2026-04-13,P59,fwd21_proxy,2008-05..2025-12,1.88,30.73,-12.66,1,tests/autonomous BEST.md,pre-purge 10-layer full stack; live race slot 8
+AUTO_ROBUST_STACK,2026-04-14,ROBUST_STACK,fwd21_proxy,2008-05..2025-12,1.925,29.8,-12.84,1,tests/autonomous BEST.md,6-layer post-purge champion; live race slot 2
+AUTO_ROBUST_VAR,2026-04-14,ROBUST_VAR,fwd21_proxy,2008-05..2025-12,1.989,30.96,-12.79,1,tests/autonomous BEST.md,ROBUST_STACK + inverse-variance basket weighting; headline champion; live race slot 7
+AUTO_DROPOVERLAP,2026-04-13,DROPOVERLAP,fwd21_proxy,2008-05..2025-12,1.58,23.96,-12.84,1,tests/autonomous BEST.md,OPTIMIZED minus VGT/XLK; live race slot 3
+AUTO_T2_BALANCED,2026-04-13,T2_BALANCED,fwd21_proxy,2008-05..2025-12,1.22,19.3,-21.0,1,tests/autonomous BEST.md,rules-only Tier-2 runner-up; live race slot 4
+AUTO_AGG_REMAINDER,2026-04-14,autonomous_suite_unnamed_trials,fwd21_proxy,2008-05..2025-12,,,,280,tests/autonomous LOG.md,aggregate of ~300-trial 49-phase autonomous search minus the 20 named champions above; best_reported_sharpe=1.989 (ROBUST_VAR); no holdout
+ETM01,2026-07-02,ewtop3_63d_U0_base_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.69,0.0946,-0.3992,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM02,2026-07-02,ewtop3_63d_U0_base_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.639,0.0865,-0.4024,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM03,2026-07-02,ewtop3_63d_U1_smh_for_soxx_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.674,0.0908,-0.3977,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM04,2026-07-02,ewtop3_63d_U1_smh_for_soxx_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.62,0.0824,-0.401,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM05,2026-07-02,ewtop3_63d_U2_xlk_for_vgt_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.69,0.094,-0.4018,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM06,2026-07-02,ewtop3_63d_U2_xlk_for_vgt_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.643,0.0864,-0.4047,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM07,2026-07-02,ewtop3_63d_U3_both_10bps,daily_ledger_v1,2005-01-01..2017-12-31,0.663,0.089,-0.3977,1,exec_timing_micro,"twin substitution check, cost=10bps/side"
+ETM08,2026-07-02,ewtop3_63d_U3_both_20bps,daily_ledger_v1,2005-01-01..2017-12-31,0.615,0.0814,-0.401,1,exec_timing_micro,"twin substitution check, cost=20bps/side"
+ETM09,2026-07-02,R1_gem_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.594,0.0835,,1,exec_timing_micro,"engineering measurement (fill-convention study), gross"
+ETM10,2026-07-02,R2_ewtop3_63d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.949,0.1574,,1,exec_timing_micro,"engineering measurement (fill-convention study), gross"
+ETM11,2026-07-02,R3_top1_63d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.882,0.1854,,1,exec_timing_micro,"engineering measurement (fill-convention study), gross"
+ETM12,2026-07-02,R1_gem_delay1d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.586,0.0825,,1,exec_timing_micro,1-day-delay bracket; cagr = base + measured delta (-10.5 bps/yr)
+ETM13,2026-07-02,R2_ewtop3_63d_delay1d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.906,0.1502,,1,exec_timing_micro,1-day-delay bracket; cagr = base + measured delta (-72.1 bps/yr)
+ETM14,2026-07-02,R3_top1_63d_delay1d_fullwin_0bps_measurement,daily_ledger_v1,2005-01-01..2026-06-30,0.818,0.1709,,1,exec_timing_micro,1-day-delay bracket; cagr = base + measured delta (-144.8 bps/yr)
+study2_tl_001,2026-07-02,study2_gem_offset0,daily_ledger_v1,2005-04-01..2026-07-01,0.6194,0.0898,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+0td; 10bps shown; 20bps: sharpe=0.5937 cagr=0.0854; turn=4.05x; engineering measurement, offset NOT selectable"
+study2_tl_002,2026-07-02,study2_gem_offset2,daily_ledger_v1,2005-04-01..2026-07-01,0.585,0.0847,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+2td; 10bps shown; 20bps: sharpe=0.5596 cagr=0.0803; turn=4.05x; engineering measurement, offset NOT selectable"
+study2_tl_003,2026-07-02,study2_gem_offset4,daily_ledger_v1,2005-04-01..2026-07-01,0.5666,0.081,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+4td; 10bps shown; 20bps: sharpe=0.5405 cagr=0.0765; turn=4.14x; engineering measurement, offset NOT selectable"
+study2_tl_004,2026-07-02,study2_gem_offset5,daily_ledger_v1,2005-04-01..2026-07-01,0.5381,0.0755,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+5td; 10bps shown; 20bps: sharpe=0.5142 cagr=0.0715; turn=3.76x; engineering measurement, offset NOT selectable"
+study2_tl_005,2026-07-02,study2_gem_offset6,daily_ledger_v1,2005-04-01..2026-07-01,0.5334,0.076,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+6td; 10bps shown; 20bps: sharpe=0.5125 cagr=0.0723; turn=3.39x; engineering measurement, offset NOT selectable"
+study2_tl_006,2026-07-02,study2_gem_offset8,daily_ledger_v1,2005-04-01..2026-07-01,0.5355,0.0755,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+8td; 10bps shown; 20bps: sharpe=0.5123 cagr=0.0715; turn=3.67x; engineering measurement, offset NOT selectable"
+study2_tl_007,2026-07-02,study2_gem_offset10,daily_ledger_v1,2005-04-01..2026-07-01,0.5825,0.0832,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+10td; 10bps shown; 20bps: sharpe=0.5617 cagr=0.0796; turn=3.29x; engineering measurement, offset NOT selectable"
+study2_tl_008,2026-07-02,study2_gem_offset12,daily_ledger_v1,2005-04-01..2026-07-01,0.5754,0.0826,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+12td; 10bps shown; 20bps: sharpe=0.5523 cagr=0.0786; turn=3.67x; engineering measurement, offset NOT selectable"
+study2_tl_009,2026-07-02,study2_gem_offset14,daily_ledger_v1,2005-04-01..2026-07-01,0.5414,0.0759,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+14td; 10bps shown; 20bps: sharpe=0.5199 cagr=0.0722; turn=3.39x; engineering measurement, offset NOT selectable"
+study2_tl_010,2026-07-02,study2_gem_offset15,daily_ledger_v1,2005-04-01..2026-07-01,0.5463,0.0768,-0.3373,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+15td; 10bps shown; 20bps: sharpe=0.5235 cagr=0.0729; turn=3.58x; engineering measurement, offset NOT selectable"
+study2_tl_011,2026-07-02,study2_gem_offset16,daily_ledger_v1,2005-04-01..2026-07-01,0.5416,0.0753,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+16td; 10bps shown; 20bps: sharpe=0.5185 cagr=0.0715; turn=3.58x; engineering measurement, offset NOT selectable"
+study2_tl_012,2026-07-02,study2_gem_offset18,daily_ledger_v1,2005-04-01..2026-07-01,0.6063,0.0887,-0.3372,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+18td; 10bps shown; 20bps: sharpe=0.5840 cagr=0.0848; turn=3.58x; engineering measurement, offset NOT selectable"
+study2_tl_013,2026-07-02,study2_rot63_offset0,daily_ledger_v1,2005-04-01..2026-07-01,0.9352,0.1409,-0.2038,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+0td; 10bps shown; 20bps: sharpe=0.8708 cagr=0.1297; turn=9.85x; engineering measurement, offset NOT selectable"
+study2_tl_014,2026-07-02,study2_rot63_offset2,daily_ledger_v1,2005-04-01..2026-07-01,0.7604,0.115,-0.2446,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+2td; 10bps shown; 20bps: sharpe=0.6942 cagr=0.1033; turn=10.48x; engineering measurement, offset NOT selectable"
+study2_tl_015,2026-07-02,study2_rot63_offset4,daily_ledger_v1,2005-04-01..2026-07-01,0.8754,0.1355,-0.2709,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+4td; 10bps shown; 20bps: sharpe=0.8151 cagr=0.1246; turn=9.58x; engineering measurement, offset NOT selectable"
+study2_tl_016,2026-07-02,study2_rot63_offset5,daily_ledger_v1,2005-04-01..2026-07-01,0.8009,0.1224,-0.3007,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+5td; 10bps shown; 20bps: sharpe=0.7400 cagr=0.1115; turn=9.73x; engineering measurement, offset NOT selectable"
+study2_tl_017,2026-07-02,study2_rot63_offset6,daily_ledger_v1,2005-04-01..2026-07-01,0.6817,0.1011,-0.2275,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+6td; 10bps shown; 20bps: sharpe=0.6155 cagr=0.0895; turn=10.54x; engineering measurement, offset NOT selectable"
+study2_tl_018,2026-07-02,study2_rot63_offset8,daily_ledger_v1,2005-04-01..2026-07-01,0.62,0.0883,-0.2712,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+8td; 10bps shown; 20bps: sharpe=0.5543 cagr=0.0772; turn=10.20x; engineering measurement, offset NOT selectable"
+study2_tl_019,2026-07-02,study2_rot63_offset10,daily_ledger_v1,2005-04-01..2026-07-01,0.7037,0.1058,-0.2779,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+10td; 10bps shown; 20bps: sharpe=0.6412 cagr=0.0947; turn=10.04x; engineering measurement, offset NOT selectable"
+study2_tl_020,2026-07-02,study2_rot63_offset12,daily_ledger_v1,2005-04-01..2026-07-01,0.7363,0.1143,-0.3009,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+12td; 10bps shown; 20bps: sharpe=0.6748 cagr=0.1031; turn=10.07x; engineering measurement, offset NOT selectable"
+study2_tl_021,2026-07-02,study2_rot63_offset14,daily_ledger_v1,2005-04-01..2026-07-01,0.7478,0.115,-0.298,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+14td; 10bps shown; 20bps: sharpe=0.6853 cagr=0.1037; turn=10.15x; engineering measurement, offset NOT selectable"
+study2_tl_022,2026-07-02,study2_rot63_offset15,daily_ledger_v1,2005-04-01..2026-07-01,0.7986,0.1194,-0.2586,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+15td; 10bps shown; 20bps: sharpe=0.7345 cagr=0.1083; turn=9.94x; engineering measurement, offset NOT selectable"
+study2_tl_023,2026-07-02,study2_rot63_offset16,daily_ledger_v1,2005-04-01..2026-07-01,0.8339,0.127,-0.242,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+16td; 10bps shown; 20bps: sharpe=0.7714 cagr=0.1159; turn=9.85x; engineering measurement, offset NOT selectable"
+study2_tl_024,2026-07-02,study2_rot63_offset18,daily_ledger_v1,2005-04-01..2026-07-01,0.8069,0.1188,-0.2662,1,study2_timing_luck,"timing-luck grid; monthly rebal at month-end+18td; 10bps shown; 20bps: sharpe=0.7407 cagr=0.1076; turn=10.06x; engineering measurement, offset NOT selectable"
+study2_tl_025,2026-07-02,study2_gem_tranche2,daily_ledger_v1,2005-04-01..2026-07-01,0.6067,0.0866,-0.3372,1,study2_timing_luck,staggered tranches +0/+10; equal sub-accounts of per-offset ledger runs; 10bps shown; 20bps: sharpe=0.5831 cagr=0.0826; turn=3.68x trades/yr=7
+study2_tl_026,2026-07-02,study2_gem_tranche4,daily_ledger_v1,2005-04-01..2026-07-01,0.5805,0.0816,-0.3372,1,study2_timing_luck,staggered tranches +0/+5/+10/+15; equal sub-accounts of per-offset ledger runs; 10bps shown; 20bps: sharpe=0.5569 cagr=0.0776; turn=3.69x trades/yr=15
+study2_tl_027,2026-07-02,study2_rot63_tranche2,daily_ledger_v1,2005-04-01..2026-07-01,0.8626,0.1261,-0.1985,1,study2_timing_luck,staggered tranches +0/+10; equal sub-accounts of per-offset ledger runs; 10bps shown; 20bps: sharpe=0.7968 cagr=0.1149; turn=9.91x trades/yr=97
+study2_tl_028,2026-07-02,study2_rot63_tranche4,daily_ledger_v1,2005-04-01..2026-07-01,0.8496,0.1236,-0.2299,1,study2_timing_luck,staggered tranches +0/+5/+10/+15; equal sub-accounts of per-offset ledger runs; 10bps shown; 20bps: sharpe=0.7838 cagr=0.1125; turn=9.86x trades/yr=194
+study2_tl_029,2026-07-02,study2_gem_phase_2_12,daily_ledger_v1,2005-04-01..2026-07-01,0.5862,0.0837,-0.3372,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.5617 cagr=0.0795"
+study2_tl_030,2026-07-02,study2_gem_phase_4_14,daily_ledger_v1,2005-04-01..2026-07-01,0.5602,0.0785,-0.3372,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.5360 cagr=0.0744"
+study2_tl_031,2026-07-02,study2_gem_phase_6_16,daily_ledger_v1,2005-04-01..2026-07-01,0.543,0.0756,-0.3372,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.5208 cagr=0.0719"
+study2_tl_032,2026-07-02,study2_gem_phase_8_18,daily_ledger_v1,2005-04-01..2026-07-01,0.5773,0.0825,-0.3372,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.5545 cagr=0.0786"
+study2_tl_033,2026-07-02,study2_gem_phase_2_6_12_16,daily_ledger_v1,2005-04-01..2026-07-01,0.5675,0.0798,-0.3372,1,study2_timing_luck,"phase-shifted 4tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.5439 cagr=0.0758"
+study2_tl_034,2026-07-02,study2_gem_phase_4_8_14_18,daily_ledger_v1,2005-04-01..2026-07-01,0.5706,0.0805,-0.3372,1,study2_timing_luck,"phase-shifted 4tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.5471 cagr=0.0765"
+study2_tl_035,2026-07-02,study2_rot63_phase_2_12,daily_ledger_v1,2005-04-01..2026-07-01,0.7661,0.1147,-0.2718,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.7005 cagr=0.1032"
+study2_tl_036,2026-07-02,study2_rot63_phase_4_14,daily_ledger_v1,2005-04-01..2026-07-01,0.8399,0.1262,-0.2801,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.7769 cagr=0.1152"
+study2_tl_037,2026-07-02,study2_rot63_phase_6_16,daily_ledger_v1,2005-04-01..2026-07-01,0.7859,0.1156,-0.218,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.7202 cagr=0.1043"
+study2_tl_038,2026-07-02,study2_rot63_phase_8_18,daily_ledger_v1,2005-04-01..2026-07-01,0.745,0.1057,-0.2609,1,study2_timing_luck,"phase-shifted 2tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.6772 cagr=0.0945"
+study2_tl_039,2026-07-02,study2_rot63_phase_2_6_12_16,daily_ledger_v1,2005-04-01..2026-07-01,0.7834,0.1151,-0.2452,1,study2_timing_luck,"phase-shifted 4tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.7170 cagr=0.1038"
+study2_tl_040,2026-07-02,study2_rot63_phase_4_8_14_18,daily_ledger_v1,2005-04-01..2026-07-01,0.8076,0.1169,-0.2535,1,study2_timing_luck,"phase-shifted 4tr book (dispersion measurement, derived from offset runs); 10bps shown; 20bps: sharpe=0.7417 cagr=0.1058"
+s3_A0_dev,2026-07-02,study3_rotA_top3_63d_invvol_baseline,daily_ledger_v1,2005-01-31..2017-12-29,0.848,0.1112,-0.2038,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.773 CAGR=10.01%; TO=10.03x drag=100.3bps/yr
+s3_A1_dev,2026-07-02,study3_rotA_rank_hysteresis_m1,daily_ledger_v1,2005-01-31..2017-12-29,0.885,0.1188,-0.2038,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.829 CAGR=11.02%; TO=7.72x (-23%) drag=77.2bps/yr; qualified on dev; REFUTED on validation
+s3_A2_dev,2026-07-02,study3_rotA_rank_hysteresis_m2,daily_ledger_v1,2005-01-31..2017-12-29,0.769,0.1069,-0.2563,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.725; TO=6.31x; fails decision rule (Sharpe below baseline both levels)
+s3_A3_dev,2026-07-02,study3_rotA_posband_5pct,daily_ledger_v1,2005-01-31..2017-12-29,0.840,0.1072,-0.2031,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.767; TO=9.56x (-4.7% only); fails: rotation churn is membership swaps not weight tweaks
+s3_A4_dev,2026-07-02,study3_rotA_hyst_m2_plus_posband_5pct,daily_ledger_v1,2005-01-31..2017-12-29,0.781,0.1066,-0.2484,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.739; TO=5.90x; fails decision rule
+s3_B0_dev,2026-07-02,study3_two_sleeve_baseline,daily_ledger_v1,2007-01-31..2017-12-29,0.801,0.0661,-0.1020,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.748 CAGR=6.14%; TO=4.46x drag=44.6bps/yr
+s3_B1_dev,2026-07-02,study3_two_sleeve_posband_2pct,daily_ledger_v1,2007-01-31..2017-12-29,0.792,0.0647,-0.0966,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.740; TO=4.29x (-3.8% only); fails: loses more gross than cost saved
+s3_B2_dev,2026-07-02,study3_two_sleeve_posband_5pct,daily_ledger_v1,2007-01-31..2017-12-29,0.726,0.0560,-0.1124,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.678; TO=3.75x; fails decision rule
+s3_B3_dev,2026-07-02,study3_two_sleeve_posband_10pct,daily_ledger_v1,2007-01-31..2017-12-29,0.735,0.0534,-0.1313,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.691; TO=3.28x; fails decision rule
+s3_B4_dev,2026-07-02,study3_two_sleeve_skip_halfTO_lt_10pct,daily_ledger_v1,2007-01-31..2017-12-29,0.735,0.0607,-0.1307,1,research/droplets/study3_no_trade_bands,10bps shown; @20bps Sharpe=0.686; TO=4.13x; fails decision rule; rule B result = do not band (null)
+s3_A0_val,2026-07-02,study3_rotA_baseline_VALIDATION,daily_ledger_v1,2018-01-31..2026-07-01,1.018,0.1803,-0.1686,1,research/droplets/study3_no_trade_bands,validation reference for the single look; @20bps Sharpe=0.963 CAGR=16.88%; TO=9.79x drag=97.9bps/yr
+s3_A1_val,2026-07-02,study3_rotA_rank_hysteresis_m1_VALIDATION,daily_ledger_v1,2018-01-31..2026-07-01,0.897,0.1674,-0.2441,1,research/droplets/study3_no_trade_bands,THE single validation look; @20bps Sharpe=0.853 CAGR=15.76%; TO=8.43x; REFUTED: worse than baseline at both cost levels despite 13.6-27.2bps/yr cost saving; verdict DO NOT ADOPT
+S4BM_001,2026-07-02,a_pin_63,daily_ledger_v1,2006-2017_dev,0.931,11.28,-16.20,1,dev,cost=10bps
+S4BM_002,2026-07-02,a_pin_63,daily_ledger_v1,2006-2017_dev,0.855,10.25,-16.76,1,dev,cost=20bps
+S4BM_003,2026-07-02,b_pin_252_21,daily_ledger_v1,2006-2017_dev,0.941,12.27,-17.37,1,dev,cost=10bps
+S4BM_004,2026-07-02,b_pin_252_21,daily_ledger_v1,2006-2017_dev,0.893,11.58,-17.37,1,dev,cost=20bps
+S4BM_005,2026-07-02,c_blend_63_126_252,daily_ledger_v1,2006-2017_dev,0.934,12.49,-18.99,1,dev,cost=10bps
+S4BM_006,2026-07-02,c_blend_63_126_252,daily_ledger_v1,2006-2017_dev,0.876,11.62,-19.95,1,dev,cost=20bps
+S4BM_007,2026-07-02,d_blend_21_63_126_252,daily_ledger_v1,2006-2017_dev,0.888,11.67,-23.80,1,dev,cost=10bps
+S4BM_008,2026-07-02,d_blend_21_63_126_252,daily_ledger_v1,2006-2017_dev,0.818,10.63,-25.08,1,dev,cost=20bps
+S4BM_009,2026-07-02,e_voladj_63,daily_ledger_v1,2006-2017_dev,0.788,7.90,-21.82,1,dev,cost=10bps
+S4BM_010,2026-07-02,e_voladj_63,daily_ledger_v1,2006-2017_dev,0.704,6.97,-22.46,1,dev,cost=20bps
+S4BM_011,2026-07-02,f_voladj_blend_63_126_252,daily_ledger_v1,2006-2017_dev,0.557,5.49,-20.00,1,dev,cost=10bps
+S4BM_012,2026-07-02,f_voladj_blend_63_126_252,daily_ledger_v1,2006-2017_dev,0.484,4.68,-23.32,1,dev,cost=20bps
+S4BM_013,2026-07-02,g_blend_skip252,daily_ledger_v1,2006-2017_dev,0.983,13.17,-14.29,1,dev,cost=10bps
+S4BM_014,2026-07-02,g_blend_skip252,daily_ledger_v1,2006-2017_dev,0.929,12.35,-14.75,1,dev,cost=20bps
+S4BM_015,2026-07-02,h_voladj_blend_skip252,daily_ledger_v1,2006-2017_dev,0.581,5.68,-20.31,1,dev,cost=10bps
+S4BM_016,2026-07-02,h_voladj_blend_skip252,daily_ledger_v1,2006-2017_dev,0.512,4.92,-21.97,1,dev,cost=20bps
+S4BM_017,2026-07-02,i_blend_126_252,daily_ledger_v1,2006-2017_dev,1.005,13.81,-17.37,1,dev,cost=10bps
+S4BM_018,2026-07-02,i_blend_126_252,daily_ledger_v1,2006-2017_dev,0.958,13.09,-18.20,1,dev,cost=20bps
+S4BM_C00,2026-07-02,i_blend_126_252__base,daily_ledger_v1,2006-2017_dev,1.005,13.81,-17.37,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_C01,2026-07-02,i_blend_126_252__leg0_126to101,daily_ledger_v1,2006-2017_dev,0.949,12.85,-17.37,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_C02,2026-07-02,i_blend_126_252__leg0_126to151,daily_ledger_v1,2006-2017_dev,0.915,12.37,-17.30,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_C03,2026-07-02,i_blend_126_252__leg1_252to202,daily_ledger_v1,2006-2017_dev,0.937,12.56,-17.37,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_C04,2026-07-02,i_blend_126_252__leg1_252to302,daily_ledger_v1,2006-2017_dev,0.975,13.32,-17.37,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_C05,2026-07-02,i_blend_126_252__incumbent_base,daily_ledger_v1,2006-2017_dev,0.931,11.28,-16.20,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_C06,2026-07-02,i_blend_126_252__incumbent_63to50,daily_ledger_v1,2006-2017_dev,0.823,9.57,-15.67,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_C07,2026-07-02,i_blend_126_252__incumbent_63to76,daily_ledger_v1,2006-2017_dev,0.855,10.54,-20.47,1,cliff_test,cost=10bps;robustness-not-candidate
+S4BM_V00,2026-07-02,i_blend_126_252,daily_ledger_v1,2018-latest_validation,0.822,14.16,-17.04,1,validation,cost=10bps;THE-one-look
+S4BM_V01,2026-07-02,i_blend_126_252,daily_ledger_v1,2018-latest_validation,0.771,13.10,-18.03,1,validation,cost=20bps;THE-one-look
+S5_001,2026-07-02,S5_base_63d_top3_invvol_sma200_SHY,daily_ledger_v1,2005-10-31..2017-12-29 (dev),1.036,13.93,-18.87,1,study5_voltarget_defensive,10bps shown; 20bps Sharpe=0.974 CAGR=12.97 MaxDD=-19.97; TO=8.4x; reference base for A/B overlays; DSR@623trials=0.47
+S5_002,2026-07-02,S5_A1_voltarget10,daily_ledger_v1,2005-10-31..2017-12-29 (dev),0.969,9.32,-13.34,1,study5_voltarget_defensive,10bps shown; 20bps Sharpe=0.886; avg gross exposure 0.788; FAIL pre-registered rule (needs base+0.05 at both costs); vol targeting on gated rotation cuts Sharpe AND CAGR
+S5_003,2026-07-02,S5_A2_voltarget12,daily_ledger_v1,2005-10-31..2017-12-29 (dev),0.966,10.79,-15.88,1,study5_voltarget_defensive,10bps shown; 20bps Sharpe=0.891; avg gross 0.880; FAIL
+S5_004,2026-07-02,S5_A3_voltarget15,daily_ledger_v1,2005-10-31..2017-12-29 (dev),0.983,12.34,-18.06,1,study5_voltarget_defensive,10bps shown; 20bps Sharpe=0.915; avg gross 0.956; FAIL
+S5_005,2026-07-02,S5_B1_defensive_trendmenu_SHY_IEF_GLD_126d,daily_ledger_v1,2005-10-31..2017-12-29 (dev),0.896,13.53,-20.24,1,study5_voltarget_defensive,10bps shown; 20bps Sharpe=0.829; turnover 10.4x vs base 8.4x; FAIL; worst config - 126d trend chases defensive assets late
+S5_006,2026-07-02,S5_B2_defensive_5050_IEF_GLD,daily_ledger_v1,2005-10-31..2017-12-29 (dev),1.033,15.36,-16.79,1,study5_voltarget_defensive,10bps shown; 20bps Sharpe=0.977; +1.4pp CAGR and 2pp better MaxDD vs base but Sharpe delta ~0.00 (needs +0.05); FAIL per pre-registered rule - more risk-off-period risk not more edge
+S5_007,2026-07-02,S5_B3_defensive_SHV,daily_ledger_v1,2005-10-31..2017-12-29 (dev),1.009,13.49,-19.33,1,study5_voltarget_defensive,10bps shown; 20bps Sharpe=0.946; FAIL; SHY vs SHV park is a wash on dev (-0.03 Sharpe for SHV)
+s6_01,2026-07-02,sma200_park_SHY_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7833,0.093563,-0.2814,1,study6_cash_yield,engineering; SMA200 gate parks in SHY; cost 10bps/side; cash sleeve SHV
+s6_02,2026-07-02,sma200_park_SHY_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7588,0.090291,-0.2900,1,study6_cash_yield,engineering; SMA200 gate parks in SHY; cost 20bps/side
+s6_03,2026-07-02,sma200_park_SHV_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7702,0.091543,-0.2578,1,study6_cash_yield,engineering; SMA200 gate parks in SHV; cost 10bps/side
+s6_04,2026-07-02,sma200_park_SHV_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.7457,0.088277,-0.2666,1,study6_cash_yield,engineering; SMA200 gate parks in SHV; cost 20bps/side
+s6_05,2026-07-02,sma200_park_pure_cash_10bps,daily_ledger_v1,2007-01-31..2026-06-30,0.7541,0.089349,-0.2608,1,study6_cash_yield,engineering; SMA200 gate parks in 0%-cash (free legs; flattered); cost 10bps/side
+s6_06,2026-07-02,sma200_park_pure_cash_20bps,daily_ledger_v1,2007-01-31..2026-06-30,0.7419,0.087721,-0.2652,1,study6_cash_yield,engineering; SMA200 gate parks in 0%-cash; cost 20bps/side
+s6_07,2026-07-02,tsmom_off_SHV_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.5058,0.044539,-0.2783,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve SHV (spec); cost 10bps/side
+s6_08,2026-07-02,tsmom_off_SHV_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.4602,0.040035,-0.2993,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve SHV; cost 20bps/side
+s6_09,2026-07-02,tsmom_off_SHY_10bps,daily_ledger_v1,2007-01-31..2026-07-01,0.5052,0.044506,-0.2790,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve swapped to SHY; cost 10bps/side
+s6_10,2026-07-02,tsmom_off_SHY_20bps,daily_ledger_v1,2007-01-31..2026-07-01,0.4597,0.040003,-0.3002,1,study6_cash_yield,engineering; MOP tsmom OFF sleeve swapped to SHY; cost 20bps/side
+study7_dev_tsmom,2026-07-02,study7_dev_tsmom,daily_ledger_v1,2007-01-31..2017-12-29,0.8532,0.0653,-0.1621,1,study7_diagnostic,existing baseline sleeve re-windowed to dev; 10bps only
+study7_dev_gem,2026-07-02,study7_dev_gem,daily_ledger_v1,2007-01-31..2017-12-29,0.5425,0.0725,-0.2460,1,study7_diagnostic,existing baseline sleeve re-windowed to dev; 10bps only
+study7_dev_spy_sma200,2026-07-02,study7_dev_spy_sma200,daily_ledger_v1,2005-10-31..2017-12-29,0.9351,0.1093,-0.1731,1,study7_diagnostic,S_bar reference for decision rule; 10bps only
+study7_R0,2026-07-02,study7_two_sleeve_R0,daily_ledger_v1,2007-01-31..2017-12-29,0.8013,0.0661,-0.1020,1,study7_diagnostic,20bps: sharpe=0.748 cagr=0.0614 dd=-0.1039; T12/IV/vt=0.1/frac=0.6/gemfb=AGG; reference: current two_sleeve (not in budget)
+study7_C1,2026-07-02,study7_two_sleeve_C1,daily_ledger_v1,2007-01-31..2017-12-29,0.7823,0.0698,-0.1085,1,study7_prereg,20bps: sharpe=0.738 cagr=0.0655 dd=-0.1093; T12/IV/vt=None/frac=0.6/gemfb=AGG; pre-registered config
+study7_C2,2026-07-02,study7_two_sleeve_C2,daily_ledger_v1,2007-01-31..2017-12-29,0.6803,0.0600,-0.1329,1,study7_prereg,20bps: sharpe=0.628 cagr=0.0549 dd=-0.1355; T12/EW/vt=0.1/frac=0.6/gemfb=AGG; pre-registered config
+study7_C3,2026-07-02,study7_two_sleeve_C3,daily_ledger_v1,2007-01-31..2017-12-29,0.7507,0.0628,-0.1402,1,study7_prereg,20bps: sharpe=0.687 cagr=0.0570 dd=-0.1447; ENS/IV/vt=0.1/frac=0.6/gemfb=AGG; pre-registered config
+study7_C4,2026-07-02,study7_two_sleeve_C4,daily_ledger_v1,2007-01-31..2017-12-29,0.7952,0.0655,-0.1220,1,study7_prereg,20bps: sharpe=0.736 cagr=0.0603 dd=-0.1244; FAB/IV/vt=0.1/frac=0.6/gemfb=AGG; pre-registered config
+study7_C5,2026-07-02,study7_two_sleeve_C5,daily_ledger_v1,2007-01-31..2017-12-29,0.6391,0.0653,-0.1808,1,study7_prereg,20bps: sharpe=0.591 cagr=0.0599 dd=-0.1844; ENS/EW/vt=None/frac=0.6/gemfb=AGG; pre-registered config
+study7_C6,2026-07-02,study7_two_sleeve_C6,daily_ledger_v1,2007-01-31..2017-12-29,0.6087,0.0608,-0.2060,1,study7_prereg,20bps: sharpe=0.563 cagr=0.0557 dd=-0.2086; FAB/EW/vt=None/frac=0.6/gemfb=AGG; pre-registered config
+study7_C7,2026-07-02,study7_two_sleeve_C7,daily_ledger_v1,2007-01-31..2017-12-29,0.6710,0.0647,-0.1663,1,study7_prereg,20bps: sharpe=0.615 cagr=0.0587 dd=-0.1704; ENS/EW/vt=0.12/frac=0.6/gemfb=AGG; pre-registered config
+study7_C8,2026-07-02,study7_two_sleeve_C8,daily_ledger_v1,2007-01-31..2017-12-29,0.6395,0.0637,-0.1710,1,study7_prereg,20bps: sharpe=0.591 cagr=0.0583 dd=-0.1746; ENS/EW/vt=None/frac=0.7/gemfb=AGG; pre-registered config
+study7_C9,2026-07-02,study7_two_sleeve_C9,daily_ledger_v1,2007-01-31..2017-12-29,0.6210,0.0638,-0.1547,1,study7_prereg,20bps: sharpe=0.574 cagr=0.0584 dd=-0.1583; ENS/EW/vt=None/frac=0.6/gemfb=IEF; pre-registered config
+study7_C10,2026-07-02,study7_two_sleeve_C10,daily_ledger_v1,2007-01-31..2017-12-29,0.8462,0.0697,-0.1139,1,study7_prereg,20bps: sharpe=0.799 cagr=0.0655 dd=-0.1151; T12/IV/vt=0.12/frac=0.7/gemfb=AGG; adaptive assembly slot per pre-registered rule
+s10_turn_of_month_spy_2bps_full,2026-07-02,turn_of_month_spy net @2bps/side full,daily_ledger_v1,full,0.4292,0.03722,-0.28814,1,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md
+s10_turn_of_month_spy_2bps_half1_2005_2015,2026-07-02,turn_of_month_spy net @2bps/side half1_2005_2015,daily_ledger_v1,half1_2005_2015,0.2684,0.02206,-0.28814,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_turn_of_month_spy_2bps_half2_2016_2026,2026-07-02,turn_of_month_spy net @2bps/side half2_2016_2026,daily_ledger_v1,half2_2016_2026,0.6274,0.05457,-0.13882,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_turn_of_month_spy_10bps_full,2026-07-02,turn_of_month_spy net @10bps/side full,daily_ledger_v1,full,0.0301,-0.00177,-0.36028,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_turn_of_month_spy_10bps_half1_2005_2015,2026-07-02,turn_of_month_spy net @10bps/side half1_2005_2015,daily_ledger_v1,half1_2005_2015,-0.1136,-0.01638,-0.32351,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_turn_of_month_spy_10bps_half2_2016_2026,2026-07-02,turn_of_month_spy net @10bps/side half2_2016_2026,daily_ledger_v1,half2_2016_2026,0.2054,0.01474,-0.16248,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_turn_of_month_spy_20bps_full,2026-07-02,turn_of_month_spy net @20bps/side full,daily_ledger_v1,full,-0.4597,-0.04854,-0.68775,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_turn_of_month_spy_20bps_half1_2005_2015,2026-07-02,turn_of_month_spy net @20bps/side half1_2005_2015,daily_ledger_v1,half1_2005_2015,-0.5822,-0.06248,-0.53649,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_turn_of_month_spy_20bps_half2_2016_2026,2026-07-02,turn_of_month_spy net @20bps/side half2_2016_2026,daily_ledger_v1,half2_2016_2026,-0.3128,-0.03302,-0.33054,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_0bps_full,2026-07-02,overnight_qqq gross @0bps/side full,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",full,0.9439,0.11614,-0.27432,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_0bps_half1_2005_2015,2026-07-02,overnight_qqq gross @0bps/side half1_2005_2015,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half1_2005_2015,0.9609,0.10764,-0.2468,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_0bps_half2_2016_2026,2026-07-02,overnight_qqq gross @0bps/side half2_2016_2026,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half2_2016_2026,0.9365,0.12522,-0.27432,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_1bps_full,2026-07-02,overnight_qqq net @1bps/side full,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",full,0.5405,0.06138,-0.30821,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_1bps_half1_2005_2015,2026-07-02,overnight_qqq net @1bps/side half1_2005_2015,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half1_2005_2015,0.5154,0.05322,-0.29024,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_1bps_half2_2016_2026,2026-07-02,overnight_qqq net @1bps/side half2_2016_2026,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half2_2016_2026,0.5666,0.07004,-0.30821,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_2bps_full,2026-07-02,overnight_qqq net @2bps/side full,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",full,0.137,0.00929,-0.3531,1,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md
+s10_overnight_qqq_2bps_half1_2005_2015,2026-07-02,overnight_qqq net @2bps/side half1_2005_2015,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half1_2005_2015,0.0698,0.00147,-0.33118,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_2bps_half2_2016_2026,2026-07-02,overnight_qqq net @2bps/side half2_2016_2026,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half2_2016_2026,0.1966,0.01756,-0.3531,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_10bps_full,2026-07-02,overnight_qqq net @10bps/side full,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",full,-3.0955,-0.32529,-0.9998,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_10bps_half1_2005_2015,2026-07-02,overnight_qqq net @10bps/side half1_2005_2015,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half1_2005_2015,-3.5,-0.33086,-0.98808,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_10bps_half2_2016_2026,2026-07-02,overnight_qqq net @10bps/side half2_2016_2026,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half2_2016_2026,-2.7674,-0.31962,-0.98303,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_20bps_full,2026-07-02,overnight_qqq net @20bps/side full,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",full,-7.147,-0.59235,-1.0,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_20bps_half1_2005_2015,2026-07-02,overnight_qqq net @20bps/side half1_2005_2015,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half1_2005_2015,-7.9743,-0.59597,-0.99995,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_overnight_qqq_20bps_half2_2016_2026,2026-07-02,overnight_qqq net @20bps/side half2_2016_2026,"daily_ledger_v1 (overnight leg via ledger _build_return_frames, NAV compounded daily)",half2_2016_2026,-6.4824,-0.5888,-0.99991,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_2bps_full,2026-07-02,pre_fomc_spy net @2bps/side full,daily_ledger_v1,full,0.6256,0.02973,-0.11795,1,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md
+s10_pre_fomc_spy_2bps_half1_2005_2015,2026-07-02,pre_fomc_spy net @2bps/side half1_2005_2015,daily_ledger_v1,half1_2005_2015,0.8212,0.04517,-0.11795,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_2bps_half2_2016_2026,2026-07-02,pre_fomc_spy net @2bps/side half2_2016_2026,daily_ledger_v1,half2_2016_2026,0.3616,0.01382,-0.1086,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_10bps_full,2026-07-02,pre_fomc_spy net @10bps/side full,daily_ledger_v1,full,0.1017,0.00381,-0.30992,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_10bps_half1_2005_2015,2026-07-02,pre_fomc_spy net @10bps/side half1_2005_2015,daily_ledger_v1,half1_2005_2015,0.3589,0.0187,-0.16386,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_10bps_half2_2016_2026,2026-07-02,pre_fomc_spy net @10bps/side half2_2016_2026,daily_ledger_v1,half2_2016_2026,-0.263,-0.01157,-0.21934,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_20bps_full,2026-07-02,pre_fomc_spy net @20bps/side full,daily_ledger_v1,full,-0.5276,-0.02774,-0.55455,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_20bps_half1_2005_2015,2026-07-02,pre_fomc_spy net @20bps/side half1_2005_2015,daily_ledger_v1,half1_2005_2015,-0.2093,-0.01351,-0.30079,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+s10_pre_fomc_spy_20bps_half2_2016_2026,2026-07-02,pre_fomc_spy net @20bps/side half2_2016_2026,daily_ledger_v1,half2_2016_2026,-0.9809,-0.04246,-0.37614,0,research/droplets/study10_calendar/run_study10.py,OWNER-AUTHORIZED quarterly spec-budget expansion; study10 pre-registered HYPOTHESIS.md; same config re-costed/sub-window (n_rep counted once on primary full row)
+S11WB_001,2026-07-02,A_b126_252_n8_wk_fON,daily_ledger_v1,2008-2017_dev,0.382,4.14,-21.88,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_002,2026-07-02,A_b126_252_n8_wk_fON,daily_ledger_v1,2008-2017_dev,0.204,1.8,-25.8,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_003,2026-07-02,B_b63_126_n8_wk_fON,daily_ledger_v1,2008-2017_dev,0.205,1.84,-24.8,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_004,2026-07-02,B_b63_126_n8_wk_fON,daily_ledger_v1,2008-2017_dev,-0.011,-0.99,-26.58,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_005,2026-07-02,C_b126_252_n5_wk_fON,daily_ledger_v1,2008-2017_dev,0.183,1.65,-31.34,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_006,2026-07-02,C_b126_252_n5_wk_fON,daily_ledger_v1,2008-2017_dev,0.017,-0.95,-37.75,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_007,2026-07-02,D_b126_252_n12_wk_fON,daily_ledger_v1,2008-2017_dev,0.496,4.97,-16.75,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_008,2026-07-02,D_b126_252_n12_wk_fON,daily_ledger_v1,2008-2017_dev,0.332,3.1,-18.49,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_009,2026-07-02,E_b126_252_n8_bw_fON,daily_ledger_v1,2008-2017_dev,0.495,5.66,-21.6,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_010,2026-07-02,E_b126_252_n8_bw_fON,daily_ledger_v1,2008-2017_dev,0.384,4.17,-23.48,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_011,2026-07-02,F_b126_252_n8_wk_fOFF,daily_ledger_v1,2008-2017_dev,0.372,4.01,-21.88,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_012,2026-07-02,F_b126_252_n8_wk_fOFF,daily_ledger_v1,2008-2017_dev,0.195,1.68,-26.67,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_013,2026-07-02,G_b63_126_n5_wk_fON,daily_ledger_v1,2008-2017_dev,0.092,0.22,-29.9,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_014,2026-07-02,G_b63_126_n5_wk_fON,daily_ledger_v1,2008-2017_dev,-0.107,-2.82,-40.07,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_015,2026-07-02,H_b63_126_n8_bw_fON,daily_ledger_v1,2008-2017_dev,0.409,4.64,-19.17,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_016,2026-07-02,H_b63_126_n8_bw_fON,daily_ledger_v1,2008-2017_dev,0.27,2.73,-20.27,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_017,2026-07-02,I_b126_252_n12_bw_fON,daily_ledger_v1,2008-2017_dev,0.594,6.11,-18.78,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_018,2026-07-02,I_b126_252_n12_bw_fON,daily_ledger_v1,2008-2017_dev,0.496,4.98,-19.47,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_019,2026-07-02,J_b63_126_n12_wk_fON,daily_ledger_v1,2008-2017_dev,0.504,5.19,-18.98,1,dev,cost=10bps;owner-authorized-budget-expansion
+S11WB_020,2026-07-02,J_b63_126_n12_wk_fON,daily_ledger_v1,2008-2017_dev,0.298,2.77,-20.88,1,dev,cost=20bps;owner-authorized-budget-expansion
+S11WB_021,2026-07-02,I_b126_252_n12_bw_fON,daily_ledger_v1,2008-2017_dev,0.692,7.26,-18.16,1,diagnostic,cost=0bps;signal-vs-cost-attribution;owner-authorized-budget-expansion
+S12_R01,2026-07-02,arm_blend_126_252_single_tranche,daily_ledger_v1,2007-2017_dev,0.969,12.98,-16.97,1,dev_reference,cost=10bps;owner-authorized-budget-expansion;exempt-published-arm-rewindow-common-calendar
+S12_R02,2026-07-02,arm_blend_126_252_single_tranche,daily_ledger_v1,2007-2017_dev,0.918,12.21,-18.00,1,dev_reference,cost=20bps;owner-authorized-budget-expansion;exempt-published-arm-rewindow-common-calendar
+S12_R03,2026-07-02,arm_gem,daily_ledger_v1,2007-2017_dev,0.543,7.25,-24.60,1,dev_reference,cost=10bps;owner-authorized-budget-expansion;exempt-published-arm-rewindow-common-calendar
+S12_R04,2026-07-02,arm_gem,daily_ledger_v1,2007-2017_dev,0.507,6.67,-24.75,1,dev_reference,cost=20bps;owner-authorized-budget-expansion;exempt-published-arm-rewindow-common-calendar
+S12_R05,2026-07-02,arm_spy_sma200,daily_ledger_v1,2007-2017_dev,0.864,10.20,-17.31,1,dev_reference,cost=10bps;owner-authorized-budget-expansion;exempt-published-arm-rewindow-common-calendar
+S12_R06,2026-07-02,arm_spy_sma200,daily_ledger_v1,2007-2017_dev,0.847,9.98,-17.31,1,dev_reference,cost=20bps;owner-authorized-budget-expansion;exempt-published-arm-rewindow-common-calendar
+S12_R07,2026-07-02,arm_blend_126_252_single_tranche,daily_ledger_v1,2007-2026_full,0.889,13.51,-16.97,1,diagnostic,cost=10bps;owner-authorized-budget-expansion;exempt-published-arm-full-window-diagnostic
+S12_R08,2026-07-02,arm_blend_126_252_single_tranche,daily_ledger_v1,2007-2026_full,0.839,12.62,-18.00,1,diagnostic,cost=20bps;owner-authorized-budget-expansion;exempt-published-arm-full-window-diagnostic
+S12_R09,2026-07-02,arm_gem,daily_ledger_v1,2007-2026_full,0.597,8.78,-33.72,1,diagnostic,cost=10bps;owner-authorized-budget-expansion;exempt-published-arm-full-window-diagnostic
+S12_R10,2026-07-02,arm_gem,daily_ledger_v1,2007-2026_full,0.569,8.30,-33.72,1,diagnostic,cost=20bps;owner-authorized-budget-expansion;exempt-published-arm-full-window-diagnostic
+S12_R11,2026-07-02,arm_spy_sma200,daily_ledger_v1,2007-2026_full,0.783,9.36,-28.14,1,diagnostic,cost=10bps;owner-authorized-budget-expansion;exempt-published-arm-full-window-diagnostic
+S12_R12,2026-07-02,arm_spy_sma200,daily_ledger_v1,2007-2026_full,0.759,9.03,-29.00,1,diagnostic,cost=20bps;owner-authorized-budget-expansion;exempt-published-arm-full-window-diagnostic
+S12_001,2026-07-02,book_EW_thirds,daily_ledger_v1,2007-2017_dev,0.856,10.27,-14.98,1,dev,cost=10bps;owner-authorized-budget-expansion;fr(BLEND/GEM/SMA)=0.333/0.333/0.333;netted_cost=45.9bps/yr;unnetted=47.2
+S12_002,2026-07-02,book_EW_thirds,daily_ledger_v1,2007-2017_dev,0.819,9.76,-15.14,1,dev,cost=20bps;owner-authorized-budget-expansion;fr(BLEND/GEM/SMA)=0.333/0.333/0.333;netted_cost=91.8bps/yr;unnetted=94.5
+S12_003,2026-07-02,book_IVOL_devwindow,daily_ledger_v1,2007-2017_dev,0.866,10.35,-15.00,1,dev,cost=10bps;owner-authorized-budget-expansion;fr(BLEND/GEM/SMA)=0.3303/0.2993/0.3704;netted_cost=44.8bps/yr;unnetted=46.0
+S12_004,2026-07-02,book_IVOL_devwindow,daily_ledger_v1,2007-2017_dev,0.830,9.86,-15.15,1,dev,cost=20bps;owner-authorized-budget-expansion;fr(BLEND/GEM/SMA)=0.3303/0.2993/0.3704;netted_cost=89.6bps/yr;unnetted=91.9
+S12_005,2026-07-02,book_CONV_50_25_25,daily_ledger_v1,2007-2017_dev,0.902,10.97,-14.32,1,dev,cost=10bps;owner-authorized-budget-expansion;fr(BLEND/GEM/SMA)=0.50/0.25/0.25;netted_cost=51.6bps/yr;unnetted=52.5;FINAL-by-rule-but-FAIL
+S12_006,2026-07-02,book_CONV_50_25_25,daily_ledger_v1,2007-2017_dev,0.860,10.39,-14.32,1,dev,cost=20bps;owner-authorized-budget-expansion;fr(BLEND/GEM/SMA)=0.50/0.25/0.25;netted_cost=103.3bps/yr;unnetted=105.0;FINAL-by-rule-but-FAIL
+S13RP_001,2026-07-02,blend,daily_ledger_v1,2018-latest,0.816,13.92,-16.93,1,power_input,cost=10bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_002,2026-07-02,gem,daily_ledger_v1,2018-latest,0.653,10.66,-33.72,1,power_input,cost=10bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_003,2026-07-02,spy_sma200,daily_ledger_v1,2018-latest,0.677,8.17,-28.14,1,power_input,cost=10bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_004,2026-07-02,blend,daily_ledger_v1,full-common,0.838,12.3,-17.37,1,spa_input,cost=10bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_005,2026-07-02,gem,daily_ledger_v1,full-common,0.597,8.78,-33.72,1,spa_input,cost=10bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_006,2026-07-02,spy_sma200,daily_ledger_v1,full-common,0.827,9.83,-28.14,1,spa_input,cost=10bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_007,2026-07-02,promotion_rule_vs_gem,daily_ledger_v1,12m-bootstrap,0.163,,,1,power_analysis,cost=10bps;FPR=0.338;FNR=0.570;block=21;B=5000;owner-authorized-budget-expansion
+S13RP_008,2026-07-02,promotion_rule_vs_spy_sma200,daily_ledger_v1,12m-bootstrap,0.139,,,1,power_analysis,cost=10bps;FPR=0.354;FNR=0.502;block=21;B=5000;owner-authorized-budget-expansion
+S13RP_009,2026-07-02,spa_blend_vs_gem,daily_ledger_v1,2007-02-01..2026-07-01,0.293,,,1,spa_test,cost=10bps;p_consistent=0.0593;block=21;reps=10000;owner-authorized-budget-expansion
+S13RP_010,2026-07-02,spa_blend_vs_spy_sma200,daily_ledger_v1,2007-02-01..2026-07-01,0.105,,,1,spa_test,cost=10bps;p_consistent=0.0081;block=21;reps=10000;owner-authorized-budget-expansion
+S13RP_011,2026-07-02,blend,daily_ledger_v1,2018-latest,0.764,12.86,-17.77,1,power_input,cost=20bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_012,2026-07-02,gem,daily_ledger_v1,2018-latest,0.633,10.27,-33.72,1,power_input,cost=20bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_013,2026-07-02,spy_sma200,daily_ledger_v1,2018-latest,0.642,7.68,-29.0,1,power_input,cost=20bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_014,2026-07-02,blend,daily_ledger_v1,full-common,0.788,11.44,-18.0,1,spa_input,cost=20bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_015,2026-07-02,gem,daily_ledger_v1,full-common,0.569,8.3,-33.72,1,spa_input,cost=20bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_016,2026-07-02,spy_sma200,daily_ledger_v1,full-common,0.804,9.52,-29.0,1,spa_input,cost=20bps;arm-rerun-not-new-config;owner-authorized-budget-expansion
+S13RP_017,2026-07-02,promotion_rule_vs_gem,daily_ledger_v1,12m-bootstrap,0.131,,,1,power_analysis,cost=20bps;FPR=0.350;FNR=0.555;block=21;B=5000;owner-authorized-budget-expansion
+S13RP_018,2026-07-02,promotion_rule_vs_spy_sma200,daily_ledger_v1,12m-bootstrap,0.122,,,1,power_analysis,cost=20bps;FPR=0.353;FNR=0.505;block=21;B=5000;owner-authorized-budget-expansion
+S13RP_019,2026-07-02,spa_blend_vs_gem,daily_ledger_v1,2007-02-01..2026-07-01,0.271,,,1,spa_test,cost=20bps;p_consistent=0.0750;block=21;reps=10000;owner-authorized-budget-expansion
+S13RP_020,2026-07-02,spa_blend_vs_spy_sma200,daily_ledger_v1,2007-02-01..2026-07-01,0.079,,,1,spa_test,cost=20bps;p_consistent=0.0178;block=21;reps=10000;owner-authorized-budget-expansion
+study14_t01,2026-07-02,isk_vs_depa_100k_8pct,analytic_tax_v1,10y_forward,,0.0120,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; cagr col = ISK-minus-depa after-tax CAGR advantage at MID friction (120bps); low/high friction in scenario_results.csv
+study14_t02,2026-07-02,isk_vs_depa_100k_12pct,analytic_tax_v1,10y_forward,,0.0240,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +240bps MID / +300 LOW / +110 HIGH
+study14_t03,2026-07-02,isk_vs_depa_100k_16pct,analytic_tax_v1,10y_forward,,0.0357,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +357bps MID
+study14_t04,2026-07-02,isk_vs_depa_300k_8pct,analytic_tax_v1,10y_forward,,0.0090,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +90bps MID / -36 HIGH (Avanza auto-FX kills it at 8pct)
+study14_t05,2026-07-02,isk_vs_depa_300k_12pct,analytic_tax_v1,10y_forward,,0.0197,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +197bps MID
+study14_t06,2026-07-02,isk_vs_depa_300k_16pct,analytic_tax_v1,10y_forward,,0.0308,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +308bps MID
+study14_t07,2026-07-02,isk_vs_depa_1M_8pct,analytic_tax_v1,10y_forward,,0.0033,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +33bps MID / -95 HIGH; friction-dominated cell
+study14_t08,2026-07-02,isk_vs_depa_1M_12pct,analytic_tax_v1,10y_forward,,0.0148,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +148bps MID; central real-money cell; clears the 100bps falsification bar in HYPOTHESIS.md
+study14_t09,2026-07-02,isk_vs_depa_1M_16pct,analytic_tax_v1,10y_forward,,0.0264,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +264bps MID
+study14_t10,2026-07-02,isk_vs_depa_3M_8pct,analytic_tax_v1,10y_forward,,0.0017,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +17bps MID / -113 HIGH; ONLY cell where recommendation flips to either/friction-dominated
+study14_t11,2026-07-02,isk_vs_depa_3M_12pct,analytic_tax_v1,10y_forward,,0.0134,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +134bps MID / +5 HIGH
+study14_t12,2026-07-02,isk_vs_depa_3M_16pct,analytic_tax_v1,10y_forward,,0.0252,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +252bps MID
+S15-01,2026-07-02,blend126_252_true_signal_monthend_10bps,daily_ledger_v1,2005-01-01..2026-06-30,0.848,0.1242,-0.1737,1,study15_cls_flip,"engineering measurement (stale-signal bracket baseline), cost=10bps/side, cash SHV; OWNER-AUTHORIZED quarterly budget expansion"
+S15-02,2026-07-02,blend126_252_true_signal_monthend_20bps,daily_ledger_v1,2005-01-01..2026-06-30,0.798,0.1157,-0.1800,1,study15_cls_flip,"engineering measurement (stale-signal bracket baseline), cost=20bps/side, cash SHV; OWNER-AUTHORIZED quarterly budget expansion"
+S15-03,2026-07-02,blend126_252_stale_tminus1_signal_monthend_10bps,daily_ledger_v1,2005-01-01..2026-06-30,0.815,0.1211,-0.2101,1,study15_cls_flip,"one-day-stale signal at same decision dates (upper bound on 15:45 staleness): -31 bps/yr / -0.033 Sharpe vs true, cost=10bps/side; OWNER-AUTHORIZED quarterly budget expansion"
+S15-04,2026-07-02,blend126_252_stale_tminus1_signal_monthend_20bps,daily_ledger_v1,2005-01-01..2026-06-30,0.768,0.1130,-0.2193,1,study15_cls_flip,"one-day-stale signal at same decision dates (upper bound on 15:45 staleness): -27 bps/yr / -0.029 Sharpe vs true, cost=20bps/side; OWNER-AUTHORIZED quarterly budget expansion"
+S15-05,2026-07-02,flip_stats_monthend_t_vs_tminus1,daily_ledger_v1,2005-01-01..2026-06-30,,,,1,study15_cls_flip,engineering measurement (no NAV): top-3 set identical 72.5% (bar >=90) / gate flips 3.1% (bar <=2) at offset 0 -> pre-registered viability bar FAILS; rates are upper bounds on the real 15:45-vs-close gap; OWNER-AUTHORIZED quarterly budget expansion
+S8UN_001,2026-07-02,U1_incumbent__blend,daily_ledger_v1,dev_to_2017-12-31,0.920,12.31,-17.37,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_002,2026-07-02,U1_incumbent__blend,daily_ledger_v1,dev_to_2017-12-31,0.868,11.52,-18.00,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_003,2026-07-02,U1_incumbent__blend,daily_ledger_v1,full_2005_latest,0.868,13.09,-17.37,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_004,2026-07-02,U1_incumbent__blend,daily_ledger_v1,full_2005_latest,0.817,12.20,-18.00,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_005,2026-07-02,U1_incumbent__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.915,10.83,-17.31,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_006,2026-07-02,U1_incumbent__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.899,10.63,-17.31,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_007,2026-07-02,U1_incumbent__gate_baseline,daily_ledger_v1,full_2005_latest,0.754,9.02,-28.14,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_008,2026-07-02,U1_incumbent__gate_baseline,daily_ledger_v1,full_2005_latest,0.729,8.69,-29.00,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_009,2026-07-02,U2_sectors__blend,daily_ledger_v1,dev_to_2017-12-31,0.704,8.26,-17.94,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_010,2026-07-02,U2_sectors__blend,daily_ledger_v1,dev_to_2017-12-31,0.641,7.43,-19.10,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_011,2026-07-02,U2_sectors__blend,daily_ledger_v1,full_2005_latest,0.632,7.37,-23.20,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_012,2026-07-02,U2_sectors__blend,daily_ledger_v1,full_2005_latest,0.563,6.44,-24.66,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_013,2026-07-02,U2_sectors__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.915,10.83,-17.31,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_014,2026-07-02,U2_sectors__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.899,10.63,-17.31,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_015,2026-07-02,U2_sectors__gate_baseline,daily_ledger_v1,full_2005_latest,0.754,9.02,-28.14,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_016,2026-07-02,U2_sectors__gate_baseline,daily_ledger_v1,full_2005_latest,0.729,8.69,-29.00,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_017,2026-07-02,U3_cross_asset__blend,daily_ledger_v1,dev_to_2017-12-31,0.916,11.06,-14.97,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_018,2026-07-02,U3_cross_asset__blend,daily_ledger_v1,dev_to_2017-12-31,0.862,10.32,-16.38,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_019,2026-07-02,U3_cross_asset__blend,daily_ledger_v1,full_2005_latest,0.731,8.74,-25.00,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_020,2026-07-02,U3_cross_asset__blend,daily_ledger_v1,full_2005_latest,0.669,7.91,-25.64,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_021,2026-07-02,U3_cross_asset__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.898,10.72,-17.31,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_022,2026-07-02,U3_cross_asset__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.880,10.49,-17.31,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_023,2026-07-02,U3_cross_asset__gate_baseline,daily_ledger_v1,full_2005_latest,0.737,8.86,-28.14,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_024,2026-07-02,U3_cross_asset__gate_baseline,daily_ledger_v1,full_2005_latest,0.711,8.51,-29.00,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_025,2026-07-02,U4_no_semis__blend,daily_ledger_v1,dev_to_2017-12-31,1.021,13.32,-16.81,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_026,2026-07-02,U4_no_semis__blend,daily_ledger_v1,dev_to_2017-12-31,0.977,12.67,-17.85,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_027,2026-07-02,U4_no_semis__blend,daily_ledger_v1,full_2005_latest,0.893,12.78,-16.81,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_028,2026-07-02,U4_no_semis__blend,daily_ledger_v1,full_2005_latest,0.850,12.06,-17.85,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_029,2026-07-02,U4_no_semis__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.915,10.83,-17.31,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_030,2026-07-02,U4_no_semis__gate_baseline,daily_ledger_v1,dev_to_2017-12-31,0.899,10.63,-17.31,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_031,2026-07-02,U4_no_semis__gate_baseline,daily_ledger_v1,full_2005_latest,0.754,9.02,-28.14,1,frozen_eval,cost=10bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_032,2026-07-02,U4_no_semis__gate_baseline,daily_ledger_v1,full_2005_latest,0.729,8.69,-29.00,1,frozen_eval,cost=20bps;frozen-rule-eval;owner-authorized-budget-expansion
+S8UN_T01,2026-07-02,U1_incumbent__blend_s4tiebreak,daily_ledger_v1,dev_to_2017-12-31,1.005,13.81,-17.37,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+S8UN_T02,2026-07-02,U1_incumbent__blend_s4tiebreak,daily_ledger_v1,full_2005_latest,0.914,14.06,-17.37,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+S8UN_T03,2026-07-02,U2_sectors__blend_s4tiebreak,daily_ledger_v1,dev_to_2017-12-31,0.637,7.47,-17.00,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+S8UN_T04,2026-07-02,U2_sectors__blend_s4tiebreak,daily_ledger_v1,full_2005_latest,0.625,7.39,-20.77,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+S8UN_T05,2026-07-02,U3_cross_asset__blend_s4tiebreak,daily_ledger_v1,dev_to_2017-12-31,0.964,11.75,-14.67,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+S8UN_T06,2026-07-02,U3_cross_asset__blend_s4tiebreak,daily_ledger_v1,full_2005_latest,0.733,8.85,-25.00,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+S8UN_T07,2026-07-02,U4_no_semis__blend_s4tiebreak,daily_ledger_v1,dev_to_2017-12-31,1.021,13.32,-16.81,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+S8UN_T08,2026-07-02,U4_no_semis__blend_s4tiebreak,daily_ledger_v1,full_2005_latest,0.893,12.78,-16.81,1,tiebreak_diag,cost=10bps;posthoc-diagnostic;owner-authorized-budget-expansion
+s9_m01,2026-07-02,open_slip_SOXX_vwap5m_vs_open,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; measurement not a backtest; mean signed +0.36 bps / med abs 12.29 / p90 abs 34.77; n=2637 days
+s9_m02,2026-07-02,open_slip_QQQ_vwap5m_vs_open,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; mean signed +0.49 / med abs 5.87 / p90 17.41 bps
+s9_m03,2026-07-02,open_slip_XLE_vwap5m_vs_open,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; mean signed -0.57 / med abs 14.89 / p90 42.63 bps
+s9_m04,2026-07-02,open_slip_GLD_vwap5m_vs_open,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; mean signed -0.23 / med abs 2.66 / p90 8.22 bps
+s9_m05,2026-07-02,open_slip_SHY_vwap5m_vs_open,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; mean signed -0.07 / med abs 0.26 / p90 1.06 bps
+s9_m06,2026-07-02,open_slip_SPY_vwap5m_vs_open,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; mean signed +0.43 / med abs 3.73 / p90 11.40 bps
+s9_m07,2026-07-02,spread_am_vs_pm_range_proxy_6syms,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; pm 15:45-54 cheaper than open 09:30-34 on 87-100% of days all risk legs (SOXX 20.9->6.1 bps); SHY flat ~0.8 bps
+s9_m08,2026-07-02,nbbo_quoted_spread_open_vs_pm_6syms,alpaca_sip_measurement,63 days 2016-2026 sampled,,,,1,study9_intraday/analyze.py,"owner-authorized batch; med quoted spread 09:30:15 vs 15:45: SOXX 8.51->1.98, XLE 2.26->1.46, QQQ 0.62->0.48, GLD 0.84->0.62, SPY 0.39->0.34, SHY 1.20->1.20 bps"
+s9_m09,2026-07-02,close_drift_1544_to_close_6syms,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; med abs bps: SOXX 15.04 QQQ 10.70 XLE 12.85 GLD 4.53 SHY 1.17 SPY 9.28; decision-day med abs max 14.47 (SOXX)
+s9_m10,2026-07-02,last10min_vwap_vs_official_close_6syms,alpaca_sip_measurement,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; med abs bps: SOXX 6.47 QQQ 4.33 XLE 5.59 GLD 2.10 SHY 0.73 SPY 4.03 - closing auction cheapest
+s9_m11,2026-07-02,rank_flip_blend126_252_1544proxy,alpaca_sip_measurement+parquet,2016-01-04..2026-07-01,,,,1,study9_intraday/analyze.py,owner-authorized batch; top-3 flips 7.7% all days / 6.8% of 502 tranche decision days (<=10% pre-reg bar PASS); gate flips 0.49%; XLK/VGT/IGV proxied by official close (undercount); cls lead SUPPORTED pending shadow study
+s9_m12,2026-07-02,feed_capability_probe,alpaca_api_probe,2026-07-02,,,,1,study9_intraday/probe_api.py,"owner-authorized batch; keys serve SIP historical: 1Min bars from 2016-01-04, NBBO quotes from 2016, 15-min delay only; IEX 1Min starts 2020-07-27; adjustment=split matches parquet convention (raw is 3x/2x off for SOXX/XLE)"
+wsI_000,2026-07-02,tranche_wiring_engineering,daily_ledger_v1,none,,,,0,workstream_I,OWNER-AUTHORIZED expansion of the quarterly spec budget (this batch). Engineering-only workstream: wired the already-adopted candidate_blend_rotation (frozen blend_126_252 spec) into scripts/run_rebalance.py via the engine: rotation accounts.yaml path. ZERO signal configs evaluated; no backtests run; no hypothesis file needed (no experiment). Evidence base unchanged: study2/study4 pre-registered results in results/DROPLET_LEDGER.md.

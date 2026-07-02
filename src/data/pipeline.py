@@ -25,6 +25,11 @@ FFILL_LIMITS = {"daily": 2, "weekly": 5, "monthly": 45, "quarterly": 66}
 # Stale thresholds (calendar days) per frequency for the refresh status report.
 STALE_DAYS = {"daily": 7, "weekly": 14, "monthly": 75, "quarterly": 200}
 
+# Live-extension forward-fill budget in trading-day rows (~45 calendar days).
+# Applied to NON-TARGET_ feature columns only when `load_panel(live_extend=True)`
+# stretches the stale master-panel index onto the fresh price-feature calendar.
+LIVE_FFILL_LIMIT = 31
+
 
 @dataclass
 class PanelBundle:
@@ -36,6 +41,7 @@ class PanelBundle:
     fwd21: dict[str, np.ndarray]          # ticker -> forward-21d returns
     spy_dist_sma200: np.ndarray           # (NDAYS,)
     is_fomc_day: np.ndarray               # (NDAYS,) bool
+    freshness: dict | None = None         # live_extend metadata (see load_panel)
 
 
 def load_config(root: Path) -> dict:
@@ -44,21 +50,58 @@ def load_config(root: Path) -> dict:
         return yaml.safe_load(f)
 
 
-def load_panel(root: Path, cfg: dict) -> PanelBundle:
-    """Load master panel, returns, atr, and derived arrays needed by the engine."""
+def load_panel(root: Path, cfg: dict, live_extend: bool = False) -> PanelBundle:
+    """Load master panel, returns, atr, and derived arrays needed by the engine.
+
+    With ``live_extend=False`` (research/backtest path) the output is
+    byte-identical to the historical behavior: everything is reindexed onto
+    the master panel's own DatetimeIndex.
+
+    With ``live_extend=True`` (live signal path) the panel index is extended
+    to the union with the fresh per-feature price parquets (which are rebuilt
+    nightly and may run months past a stale master panel):
+
+    - ``quality_dist_sma200__<ticker>`` columns are overwritten from the fresh
+      ``quality_dist_sma200.parquet`` so the SMA gate input is never stale/NaN
+      at the tail while the parquet has data.
+    - All NON-``TARGET_`` feature columns are forward-filled with a budget of
+      ``LIVE_FFILL_LIMIT`` trading days. ``TARGET_`` columns are NEVER filled.
+    - ``fwd21`` prefers the panel's ``TARGET_FWD21_<t>`` values but backfills
+      post-panel dates from the fresh ``returns_21d`` table (honest NaN tail).
+    - ``bundle.freshness`` records ``panel_raw_max`` (pre-extension max),
+      ``as_of`` (post-extension max), ``extended_days`` (rows added), and
+      ``stale_core_features`` (CORE columns whose raw data ends more than
+      ``LIVE_FFILL_LIMIT`` trading days before ``as_of``).
+    """
     root = Path(root)
     panel_path = root / cfg["paths"]["master_panel"]
     rdir = root / cfg["paths"]["returns_dir"]
     log.info("loading master panel: %s", panel_path)
     df = pd.read_parquet(panel_path)
     dates = df.index
+    freshness: dict | None = None
+
+    if live_extend:
+        panel_raw_max = dates.max()
+        n_raw = len(dates)
+        r63_idx = pd.read_parquet(rdir / "returns_63d.parquet").index
+        q_fresh = pd.read_parquet(rdir / "quality_dist_sma200.parquet")
+        new_dates = dates.union(r63_idx).union(q_fresh.index)
+        if len(new_dates) > n_raw:
+            log.info("live_extend: panel index %s -> %s (+%d rows)",
+                     panel_raw_max.date(), new_dates.max().date(),
+                     len(new_dates) - n_raw)
+        df = df.reindex(new_dates)
+        dates = df.index
 
     # Universe + any extras the feature frames cover
     universe = list(cfg["universe"])
     extras = list(cfg.get("feature_extras", []))
     all_tickers = sorted(set(universe) | set(extras) | {cfg["reference_index"]})
 
-    # Pre-computed N-day total return tables (used for momentum + fwd21)
+    # Pre-computed N-day total return tables (used for momentum + fwd21).
+    # In live_extend mode `dates` is already the extended index, so the fresh
+    # tail of these tables survives the reindex instead of being truncated.
     returns = {}
     for n in (10, 21, 42, 63, 126):
         p = rdir / f"returns_{n}d.parquet"
@@ -67,13 +110,89 @@ def load_panel(root: Path, cfg: dict) -> PanelBundle:
 
     atr21 = pd.read_parquet(rdir / "atr_21d.parquet").reindex(dates)
 
+    if live_extend:
+        # Overwrite quality_dist_sma200__<t> from the fresh parquet wherever
+        # it has data (the panel copy is stale at — or missing from — the tail).
+        q_aligned = q_fresh.reindex(dates)
+        for col in df.columns:
+            if not col.startswith("quality_dist_sma200__"):
+                continue
+            t = col.split("__", 1)[1]
+            if t in q_aligned.columns:
+                df[col] = q_aligned[t].combine_first(df[col])
+
+        # Staleness audit BEFORE forward-fill so the ffill cannot mask it.
+        with open(root / "configs/feature_sets.yaml", "r") as f:
+            core_cols = list(yaml.safe_load(f).get("core", []))
+        n_days = len(dates)
+        stale_core: list[str] = []
+        for c in core_cols:
+            if c not in df.columns:
+                continue
+            lv = df[c].last_valid_index()
+            if lv is None or (n_days - 1 - dates.get_loc(lv)) > LIVE_FFILL_LIMIT:
+                stale_core.append(c)
+        if stale_core:
+            log.warning("live_extend: %d CORE features end > %d trading days "
+                        "before as_of (first few: %s)",
+                        len(stale_core), LIVE_FFILL_LIMIT, stale_core[:5])
+
+        # Forward-fill features into the EXTENSION ROWS ONLY — never TARGET_
+        # columns, and never historical rows: the panel build deliberately
+        # left historical NaN gaps (per-frequency FFILL_LIMITS), and filling
+        # them here would train the live classifier on inputs the research
+        # path never saw.
+        non_target = [c for c in df.columns if not c.startswith("TARGET_")]
+        ext_mask = dates > panel_raw_max
+        if ext_mask.any():
+            filled = df[non_target].ffill(limit=LIVE_FFILL_LIMIT)
+            df.loc[ext_mask, non_target] = filled.loc[ext_mask, non_target]
+
+        # The FOMC flag is a binary EVENT, not a level — forward-filling it
+        # would smear (or hide) meetings across the live tail. Fill extension
+        # rows from the actual FOMC calendar instead.
+        fomc_col = "timing__is_fomc_day"
+        if fomc_col in df.columns and ext_mask.any():
+            df.loc[ext_mask, fomc_col] = 0.0
+            fomc_path = root / cfg["paths"].get("fomc_calendar", "")
+            if fomc_path.is_file():
+                cal = pd.read_parquet(fomc_path)
+                if "is_fomc_day" in cal.columns:
+                    flag = cal["is_fomc_day"].reindex(dates).fillna(0.0)
+                    df.loc[ext_mask, fomc_col] = flag[ext_mask].values
+            else:
+                log.warning("live_extend: FOMC calendar missing — extension "
+                            "rows assume no FOMC days")
+
+        # Raw (pre-ffill) recency of the SMA-gate input — the rebalance gate
+        # refuses to trade when this lags, because a forward-filled gate value
+        # passes a NaN check while being weeks old.
+        gate_ticker = cfg.get("sma_gate_index", "SPY")
+        spy_dist_last_valid = (
+            q_fresh[gate_ticker].last_valid_index()
+            if gate_ticker in q_fresh.columns else None
+        )
+
+        freshness = {
+            "panel_raw_max": panel_raw_max,
+            "as_of": dates.max(),
+            "extended_days": int(len(dates) - n_raw),
+            "stale_core_features": stale_core,
+            "spy_dist_last_valid": spy_dist_last_valid,
+        }
+
     # forward 21d return per ticker — prefer TARGET_FWD21_<t> columns if present,
     # else shift the returns_21d frame (matches run_m26_deep.py:60-65)
     fwd21 = {}
     for t in all_tickers:
         col = f"TARGET_FWD21_{t}"
         if col in df.columns:
-            fwd21[t] = df[col].values
+            s = df[col]
+            if live_extend and 21 in returns and t in returns[21].columns:
+                # Post-panel dates get real forward returns where computable;
+                # the last 21 rows stay NaN (honest tail).
+                s = s.combine_first(returns[21][t].shift(-21))
+            fwd21[t] = s.values
         elif 21 in returns and t in returns[21].columns:
             fwd21[t] = returns[21][t].shift(-21).reindex(dates).values
         else:
@@ -101,6 +220,7 @@ def load_panel(root: Path, cfg: dict) -> PanelBundle:
         fwd21=fwd21,
         spy_dist_sma200=spy_dist,
         is_fomc_day=is_fomc_day,
+        freshness=freshness,
     )
 
 
@@ -386,7 +506,8 @@ def rebuild_features(root: Path | None = None) -> dict:
     from src.features import engineer as eng  # noqa: WPS433
     from src.features import macro_features as macf  # noqa: WPS433
 
-    out = {"price_features": "ok", "macro_features": "ok", "errors": []}
+    out = {"price_features": "ok", "macro_features": "ok",
+           "interaction_features": "ok", "errors": []}
 
     try:
         prices = eng.load_prices(eng.ALL_TICKERS)
@@ -413,6 +534,22 @@ def rebuild_features(root: Path | None = None) -> dict:
         log.exception("macro feature rebuild failed")
         out["macro_features"] = "error"
         out["errors"].append(f"macro: {e}")
+
+    # Interaction + target features consume the price/macro parquets built
+    # above; without this step the CORE interaction features (mom63_when_*,
+    # cross_asset_*) freeze at their last manual build and the classifier's
+    # live tail degrades to ffill/NaN.
+    try:
+        from src.features import interactions_targets as itf  # noqa: WPS433
+        with contextlib.redirect_stdout(_io.StringIO()):
+            int_prices = itf.load_prices(eng.ALL_TICKERS)
+            int_close = itf._stack("adj_close", int_prices)
+            itf.build_interactions(int_close)
+            itf.build_targets(int_close)
+    except Exception as e:
+        log.exception("interaction/target feature rebuild failed")
+        out["interaction_features"] = "error"
+        out["errors"].append(f"interaction: {e}")
 
     return out
 

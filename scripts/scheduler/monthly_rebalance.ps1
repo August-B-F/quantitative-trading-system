@@ -63,6 +63,12 @@ if ($exitCode -eq 2) {
         py -3 -c "from src.risk.notify import send_alert; send_alert('Rebalance deferred: data unavailable', 'WARNING')" *>&1 |
             Out-File -Append -Encoding utf8 logs/alerts.log
     } catch { }
+} elseif ($exitCode -eq 3) {
+    "$timestamp Rebalance blocked: another instance running (exit 3)" | Out-File -Append -Encoding utf8 logs/alerts.log
+    try {
+        py -3 -c "from src.risk.notify import send_alert; send_alert('Rebalance blocked: another instance running', 'ALERT')" *>&1 |
+            Out-File -Append -Encoding utf8 logs/alerts.log
+    } catch { }
 } elseif ($exitCode -ne 0) {
     "$timestamp Rebalance FAILED (exit $exitCode)" | Out-File -Append -Encoding utf8 logs/alerts.log
     try {

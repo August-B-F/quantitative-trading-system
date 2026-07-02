@@ -46,11 +46,60 @@ ROOT = Path(__file__).resolve().parents[2]
 P46_CACHE = ROOT / "tests" / "autonomous" / "cache" / "pred_proba_p46.pkl"
 
 
-def _load_p46_proba():
-    """Load the P46 classifier cache (pred_reg + max_proba) used by S2/7/8/9."""
+def _load_p46_proba(n_days: int | None = None):
+    """Load the P46 classifier cache (pred_reg + max_proba) used by S2/7/8/9.
+
+    The cached arrays are positionally aligned to the panel index at the time
+    the cache was written. When ``n_days`` is given, alignment is made
+    explicit by PREFIX to the current panel: a shorter cache is padded with
+    -1 predictions (select_momentum treats -1 as stable) and 0.0 proba
+    (keeps every confidence gate off — conservative); a longer cache means
+    the panel shrank and we refuse to guess.
+    """
+    # Trusted local artifact — produced by tests/autonomous research scripts
+    # in this repo, never sourced from the network.
     with open(P46_CACHE, "rb") as f:
         pr_raw, mp_raw = pickle.load(f)
+    pr_raw = np.asarray(pr_raw)
+    mp_raw = np.asarray(mp_raw, dtype=float)
+    if n_days is None:
+        return pr_raw, mp_raw
+    if len(pr_raw) > n_days:
+        raise RuntimeError(
+            f"pred_proba_p46 cache has {len(pr_raw)} rows but panel has "
+            f"{n_days} — panel shrank; refusing to guess alignment"
+        )
+    if len(pr_raw) < n_days:
+        pad = n_days - len(pr_raw)
+        # WARNING, not info: the padded region covers every live decision
+        # date. There the champion transition-universe switch and P57's
+        # high-confidence defend are inert (pred=-1 -> stable momentum,
+        # proba=0.0 -> confidence gates off). This cache is only rebuilt by
+        # the autonomous research suite, never by run_retrain — so live,
+        # the champion ML layers run in rules-only mode by construction.
+        log.warning(
+            "p46 proba cache padded by %d rows (pred=-1, proba=0.0) — "
+            "champion classifier layers are INERT on the live tail", pad
+        )
+        pr_raw = np.concatenate([pr_raw, np.full(pad, -1, dtype=pr_raw.dtype)])
+        mp_raw = np.concatenate([mp_raw, np.zeros(pad)])
     return pr_raw, mp_raw
+
+
+def _cum_hist(hist: list[float], k: int, default: float = 0.05) -> float:
+    """Trailing-k compounded return over the realised monthly history.
+
+    Returns ``default`` when the window is short or contains non-finite
+    values (the honest live tail has no realised forward return yet), so
+    the champion sizing rules fall back to their W_NORM branch instead of
+    propagating NaN.
+    """
+    if len(hist) < k:
+        return default
+    window = np.asarray(hist[-k:], dtype=float)
+    if not np.all(np.isfinite(window)):
+        return default
+    return float(np.prod(1.0 + window) - 1.0)
 
 
 def _build_rank_signal(bundle, lookbacks_and_weights):
@@ -409,7 +458,7 @@ def _run_champion_loop(bundle, cfg_global, test_dates, *,
 
 def run_robust_stack(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     """6-layer post-purge winner. Sizing: normal 0.50, full-boost 0.82."""
-    pr_raw, mp_raw = _load_p46_proba()
+    pr_raw, mp_raw = _load_p46_proba(len(bundle.dates))
 
     W_NORM, W_FULL = 0.50, 0.82
     BOOST_LB_M = 9
@@ -417,10 +466,7 @@ def run_robust_stack(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     SPY_FAST_THR = 0.12
 
     def sizing(i, hist, spy_v63, spy_v21, pr, mp, cur_i):
-        if len(hist) >= BOOST_LB_M:
-            cum_9 = float(np.prod([1 + h for h in hist[-BOOST_LB_M:]]) - 1)
-        else:
-            cum_9 = 0.05
+        cum_9 = _cum_hist(hist, BOOST_LB_M)
         return W_FULL if (cum_9 > BOOST_THR or spy_v63 > SPY_FAST_THR) else W_NORM
 
     return _run_champion_loop(
@@ -441,7 +487,7 @@ def run_robust_stack(cfg_file, bundle, pred_reg, test_dates, cfg_global):
 # ---------------------------------------------------------------------------
 
 def run_robust_var(cfg_file, bundle, pred_reg, test_dates, cfg_global):
-    pr_raw, mp_raw = _load_p46_proba()
+    pr_raw, mp_raw = _load_p46_proba(len(bundle.dates))
 
     W_NORM, W_FULL = 0.50, 0.82
     BOOST_LB_M = 9
@@ -449,10 +495,7 @@ def run_robust_var(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     SPY_FAST_THR = 0.12
 
     def sizing(i, hist, spy_v63, spy_v21, pr, mp, cur_i):
-        if len(hist) >= BOOST_LB_M:
-            cum_9 = float(np.prod([1 + h for h in hist[-BOOST_LB_M:]]) - 1)
-        else:
-            cum_9 = 0.05
+        cum_9 = _cum_hist(hist, BOOST_LB_M)
         return W_FULL if (cum_9 > BOOST_THR or spy_v63 > SPY_FAST_THR) else W_NORM
 
     return _run_champion_loop(
@@ -473,7 +516,7 @@ def run_robust_var(cfg_file, bundle, pred_reg, test_dates, cfg_global):
 # ---------------------------------------------------------------------------
 
 def run_p59(cfg_file, bundle, pred_reg, test_dates, cfg_global):
-    pr_raw, mp_raw = _load_p46_proba()
+    pr_raw, mp_raw = _load_p46_proba(len(bundle.dates))
 
     W_DD, W_NORM, W_WARM, W_FULL = 0.40, 0.62, 0.70, 0.82
     DD_LB_M, DD_THR = 3, -0.02
@@ -481,15 +524,10 @@ def run_p59(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     FULL_LB_M, FULL_THR = 9, 0.30
     SPY_WARM_THR, SPY_FULL_THR = 0.10, 0.12
 
-    def cum(hist, k):
-        if len(hist) >= k:
-            return float(np.prod([1 + h for h in hist[-k:]]) - 1)
-        return 0.05
-
     def sizing(i, hist, spy_v63, spy_v21, pr, mp, cur_i):
-        cum_dd = cum(hist, DD_LB_M)
-        cum_warm = cum(hist, WARM_LB_M)
-        cum_full = cum(hist, FULL_LB_M)
+        cum_dd = _cum_hist(hist, DD_LB_M)
+        cum_warm = _cum_hist(hist, WARM_LB_M)
+        cum_full = _cum_hist(hist, FULL_LB_M)
         if cum_dd < DD_THR:
             return W_DD
         if (cum_full > FULL_THR) or (spy_v63 > SPY_FULL_THR):
@@ -524,7 +562,7 @@ def run_p57(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     stacks the three overrides described in ``tests/autonomous/BEST.md`` on
     the P53 4-state sizing baseline.
     """
-    pr_raw, mp_raw = _load_p46_proba()
+    pr_raw, mp_raw = _load_p46_proba(len(bundle.dates))
 
     W_DD, W_NORM, W_WARM, W_FULL = 0.45, 0.62, 0.70, 0.78
     W_DEFEND = 0.45
@@ -537,11 +575,6 @@ def run_p57(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     HIGH_CONF_THR = 0.82
     VOL_WIN_M = 12
     VOL_LOW, VOL_HIGH = 0.12, 0.25
-
-    def cum(hist, k):
-        if len(hist) >= k:
-            return float(np.prod([1 + h for h in hist[-k:]]) - 1)
-        return 0.05
 
     cur_full = np.asarray(_cr(bundle.df).index)
 
@@ -558,9 +591,9 @@ def run_p57(cfg_file, bundle, pred_reg, test_dates, cfg_global):
         ):
             return W_DEFEND
         # P53-style 4-state
-        cum_dd = cum(hist, DD_LB_M)
-        cum_warm = cum(hist, WARM_LB_M)
-        cum_full = cum(hist, FULL_LB_M)
+        cum_dd = _cum_hist(hist, DD_LB_M)
+        cum_warm = _cum_hist(hist, WARM_LB_M)
+        cum_full = _cum_hist(hist, FULL_LB_M)
         if cum_dd < DD_THR:
             base = W_DD
         elif (cum_full > FULL_THR) or (spy_v63 > SPY_FULL_THR):
@@ -569,13 +602,16 @@ def run_p57(cfg_file, bundle, pred_reg, test_dates, cfg_global):
             base = W_WARM
         else:
             base = W_NORM
-        # Own-vol regime override — annualised std of trailing 12m history
+        # Own-vol regime override — annualised std of trailing 12m history.
+        # Skipped when the window has NaN (honest live tail): base wins.
         if len(hist) >= VOL_WIN_M:
-            rv = float(np.std(hist[-VOL_WIN_M:], ddof=1)) * np.sqrt(12)
-            if rv < VOL_LOW:
-                return max(base, W_LOWVOL)
-            if rv > VOL_HIGH:
-                return min(base, W_HIGHVOL)
+            window = np.asarray(hist[-VOL_WIN_M:], dtype=float)
+            if np.all(np.isfinite(window)):
+                rv = float(np.std(window, ddof=1)) * np.sqrt(12)
+                if rv < VOL_LOW:
+                    return max(base, W_LOWVOL)
+                if rv > VOL_HIGH:
+                    return min(base, W_HIGHVOL)
         return base
 
     # sizing may return any float in a discrete set; pre-build engines

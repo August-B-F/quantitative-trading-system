@@ -1,0 +1,230 @@
+{
+  "q1_open_vs_close": {
+    "R1_gem": {
+      "name": "R1_gem",
+      "n_rebalances": 43,
+      "years": 21.49,
+      "ann_turnover_x": 4.0,
+      "mean_gap_buy_bps_per_unit": 6.22,
+      "mean_gap_sell_bps_per_unit": -7.17,
+      "open_drift_cost_bps_yr": 26.81,
+      "open_minus_close_fill_bps_yr": 13.41,
+      "oc_delta_tstat": 0.75,
+      "ledger_sharpe": 0.594,
+      "ledger_cagr": 0.0835,
+      "one_day_delay_cagr_delta_bps_yr": -10.5,
+      "delay_sharpe": 0.586
+    },
+    "R2_ewtop3_63d": {
+      "name": "R2_ewtop3_63d",
+      "n_rebalances": 233,
+      "years": 21.49,
+      "ann_turnover_x": 7.77,
+      "mean_gap_buy_bps_per_unit": 18.92,
+      "mean_gap_sell_bps_per_unit": 7.04,
+      "open_drift_cost_bps_yr": 46.16,
+      "open_minus_close_fill_bps_yr": 63.97,
+      "oc_delta_tstat": 1.8,
+      "ledger_sharpe": 0.949,
+      "ledger_cagr": 0.1574,
+      "one_day_delay_cagr_delta_bps_yr": -72.1,
+      "delay_sharpe": 0.906
+    },
+    "R3_top1_63d": {
+      "name": "R3_top1_63d",
+      "n_rebalances": 116,
+      "years": 21.49,
+      "ann_turnover_x": 10.8,
+      "mean_gap_buy_bps_per_unit": 19.88,
+      "mean_gap_sell_bps_per_unit": 10.55,
+      "open_drift_cost_bps_yr": 50.34,
+      "open_minus_close_fill_bps_yr": 135.81,
+      "oc_delta_tstat": 1.94,
+      "ledger_sharpe": 0.882,
+      "ledger_cagr": 0.1854,
+      "one_day_delay_cagr_delta_bps_yr": -144.8,
+      "delay_sharpe": 0.818
+    }
+  },
+  "q2_twin_table": [
+    {
+      "pair": "SOXX/SMH",
+      "corr": 0.9766,
+      "te_ann_pct": 6.62,
+      "med_dollar_vol_SOXX_$M": 885.1,
+      "med_dollar_vol_SMH_$M": 1778.4
+    },
+    {
+      "pair": "XLK/VGT",
+      "corr": 0.983,
+      "te_ann_pct": 4.2,
+      "med_dollar_vol_XLK_$M": 1309.6,
+      "med_dollar_vol_VGT_$M": 291.3
+    },
+    {
+      "pair": "QQQ/XLK",
+      "corr": 0.9617,
+      "te_ann_pct": 6.18,
+      "med_dollar_vol_QQQ_$M": 20905.1,
+      "med_dollar_vol_XLK_$M": 1309.6
+    },
+    {
+      "pair": "QQQ/VGT",
+      "corr": 0.9729,
+      "te_ann_pct": 5.32,
+      "med_dollar_vol_QQQ_$M": 20905.1,
+      "med_dollar_vol_VGT_$M": 291.3
+    }
+  ],
+  "q2_u0_ann_traded_by_ticker_x": {
+    "GLD": 0.943,
+    "IGV": 1.085,
+    "QQQ": 0.939,
+    "SHV": 0.077,
+    "SHY": 0.577,
+    "SOXX": 1.014,
+    "VGT": 0.752,
+    "XLE": 0.855,
+    "XLK": 1.182
+  },
+  "q2_ledger_dev": {
+    "U0_base": {
+      "10bps": {
+        "name": "U0_base@10",
+        "sharpe": 0.69,
+        "cagr": 0.0946,
+        "max_dd": -0.3992,
+        "ann_turnover": 7.42,
+        "ann_cost_drag_bps": 74.2,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      },
+      "20bps": {
+        "name": "U0_base@20",
+        "sharpe": 0.639,
+        "cagr": 0.0865,
+        "max_dd": -0.4024,
+        "ann_turnover": 7.42,
+        "ann_cost_drag_bps": 148.5,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      }
+    },
+    "U1_smh_for_soxx": {
+      "10bps": {
+        "name": "U1_smh_for_soxx@10",
+        "sharpe": 0.674,
+        "cagr": 0.0908,
+        "max_dd": -0.3977,
+        "ann_turnover": 7.72,
+        "ann_cost_drag_bps": 77.2,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      },
+      "20bps": {
+        "name": "U1_smh_for_soxx@20",
+        "sharpe": 0.62,
+        "cagr": 0.0824,
+        "max_dd": -0.401,
+        "ann_turnover": 7.72,
+        "ann_cost_drag_bps": 154.4,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      }
+    },
+    "U2_xlk_for_vgt": {
+      "10bps": {
+        "name": "U2_xlk_for_vgt@10",
+        "sharpe": 0.69,
+        "cagr": 0.094,
+        "max_dd": -0.4018,
+        "ann_turnover": 6.91,
+        "ann_cost_drag_bps": 69.1,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      },
+      "20bps": {
+        "name": "U2_xlk_for_vgt@20",
+        "sharpe": 0.643,
+        "cagr": 0.0864,
+        "max_dd": -0.4047,
+        "ann_turnover": 6.91,
+        "ann_cost_drag_bps": 138.2,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      }
+    },
+    "U3_both": {
+      "10bps": {
+        "name": "U3_both@10",
+        "sharpe": 0.663,
+        "cagr": 0.089,
+        "max_dd": -0.3977,
+        "ann_turnover": 6.95,
+        "ann_cost_drag_bps": 69.5,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      },
+      "20bps": {
+        "name": "U3_both@20",
+        "sharpe": 0.615,
+        "cagr": 0.0814,
+        "max_dd": -0.401,
+        "ann_turnover": 6.95,
+        "ann_cost_drag_bps": 139.1,
+        "start": "2005-01-03",
+        "end": "2017-12-29"
+      }
+    }
+  },
+  "q3_gap_miss_table": {
+    "SOXX": {
+      "pct_days_abs_gap_gt_20bp": 77.7,
+      "pct_days_buy_miss": 44.1,
+      "mean_overshoot_when_missed_bps": 70.6
+    },
+    "QQQ": {
+      "pct_days_abs_gap_gt_20bp": 67.7,
+      "pct_days_buy_miss": 39.0,
+      "mean_overshoot_when_missed_bps": 47.6
+    },
+    "XLK": {
+      "pct_days_abs_gap_gt_20bp": 70.3,
+      "pct_days_buy_miss": 40.2,
+      "mean_overshoot_when_missed_bps": 52.9
+    },
+    "VGT": {
+      "pct_days_abs_gap_gt_20bp": 70.7,
+      "pct_days_buy_miss": 41.9,
+      "mean_overshoot_when_missed_bps": 51.7
+    },
+    "IGV": {
+      "pct_days_abs_gap_gt_20bp": 70.3,
+      "pct_days_buy_miss": 39.2,
+      "mean_overshoot_when_missed_bps": 51.6
+    },
+    "XLE": {
+      "pct_days_abs_gap_gt_20bp": 77.9,
+      "pct_days_buy_miss": 43.0,
+      "mean_overshoot_when_missed_bps": 64.7
+    },
+    "GLD": {
+      "pct_days_abs_gap_gt_20bp": 72.5,
+      "pct_days_buy_miss": 39.3,
+      "mean_overshoot_when_missed_bps": 55.1
+    },
+    "SHY": {
+      "pct_days_abs_gap_gt_20bp": 2.0,
+      "pct_days_buy_miss": 1.3,
+      "mean_overshoot_when_missed_bps": 10.4
+    }
+  },
+  "q3_live_slippage_bps": {
+    "n": 47,
+    "mean": 1.9,
+    "median": -0.13,
+    "std": 17.1,
+    "min": -11.96,
+    "max": 115.21
+  }
+}

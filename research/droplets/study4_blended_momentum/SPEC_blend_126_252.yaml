@@ -1,0 +1,32 @@
+# Study 4 deliverable — adopted ranking spec "blend_126_252"
+# Pre-registered in HYPOTHESIS.md; adopted by the frozen decision rule on 2026-07-02.
+# Replaces the pinned lookback_stable=63 ranking (configs/strategy.yaml:10) in any
+# relaunch candidate. Integrator applies; this file changes nothing by itself.
+name: blend_126_252
+engine_validated: daily_ledger_v1
+universe: [SOXX, QQQ, XLK, VGT, IGV, XLE, GLD, SHY]   # ex-ante, unchanged from live
+cadence: monthly            # decision at last trading day of month, fill next open
+gate:
+  type: sma
+  ticker: SPY
+  window: 200               # on adj_close; risk-off when adj_close <= SMA200
+  risk_off_asset: SHY       # 100% SHY when gated
+ranking:
+  # score(t, d) = mean over legs of cross-sectional rank of leg return
+  # leg return r_L(t, d) = adj_close_t[d] / adj_close_t[d - L bars] - 1  (data <= d only)
+  # rank: ascending (best = 8), ties = average, across the 8-ticker universe
+  legs:
+    - {lookback_days: 126, skip_days: 0, vol_adjust: false, weight: 0.5}
+    - {lookback_days: 252, skip_days: 0, vol_adjust: false, weight: 0.5}
+  vol_adjust_anywhere: false   # measured HARMFUL in this universe (dev Sharpe 0.56 vs 0.93)
+selection:
+  top_n: 3
+  weighting: inverse_vol
+  vol_lookback_days: 63     # annualized std of daily adj_close returns
+costs_assumed_bps_per_side: [10, 20]
+cash_sleeve: SHV
+# Dev (2006-02-28..2017-12-29): Sharpe 1.005/0.958 @10/20bps, CAGR 13.8%/13.1%,
+#   MaxDD -17.4%/-18.2%, turnover 6.3x/yr. Incumbent pin_63: 0.931/0.855.
+# Validation (ONE look, 2018-01-02..2026-07-01): Sharpe 0.822/0.771 @10/20bps,
+#   CAGR 14.16%/13.10%, MaxDD -17.0%/-18.0%, turnover 9.2x/yr.
+# Cliff (+/-20% per leg, dev, 10bps): Sharpe in [0.915, 1.005] vs incumbent [0.823, 0.931].

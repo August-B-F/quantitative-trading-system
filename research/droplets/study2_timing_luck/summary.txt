@@ -1,0 +1,32 @@
+gem cost=10 cagr: min=0.0753 p5=0.0754 median=0.0818 max=0.0898 std=0.0055 spread=0.0145
+gem cost=10 sharpe: min=0.5334 p5=0.5344 median=0.5710 max=0.6194 std=0.0304 spread=0.0860
+gem cost=10 max_dd: min=-0.3372 p5=-0.3372 median=-0.3372 max=-0.3372 std=0.0000 spread=0.0000
+gem cost=10 regret_avoided: cagr=0.0064 sharpe=0.0367
+gem cost=10 tranche2: cagr=0.0866 sharpe=0.6067 max_dd=-0.3372 turn=3.677 cost_drag_bps=36.77 trades/yr=7.3 sharpe_vs_median=+0.0357
+gem cost=10 tranche4: cagr=0.0816 sharpe=0.5805 max_dd=-0.3372 turn=3.685 cost_drag_bps=36.85 trades/yr=14.7 sharpe_vs_median=+0.0095
+gem cost=20 cagr: min=0.0715 p5=0.0715 median=0.0776 max=0.0854 std=0.0053 spread=0.0139
+gem cost=20 sharpe: min=0.5123 p5=0.5124 median=0.5464 max=0.5937 std=0.0297 spread=0.0814
+gem cost=20 max_dd: min=-0.3372 p5=-0.3372 median=-0.3372 max=-0.3372 std=0.0000 spread=0.0000
+gem cost=20 regret_avoided: cagr=0.0061 sharpe=0.0340
+gem cost=20 tranche2: cagr=0.0826 sharpe=0.5831 max_dd=-0.3372 turn=3.674 cost_drag_bps=73.48 trades/yr=7.3 sharpe_vs_median=+0.0367
+gem cost=20 tranche4: cagr=0.0776 sharpe=0.5569 max_dd=-0.3372 turn=3.682 cost_drag_bps=73.63 trades/yr=14.7 sharpe_vs_median=+0.0105
+rot63 cost=10 cagr: min=0.0883 p5=0.0940 median=0.1150 max=0.1409 std=0.0157 spread=0.0526
+rot63 cost=10 sharpe: min=0.6200 p5=0.6477 median=0.7541 max=0.9352 std=0.0944 spread=0.3153
+rot63 cost=10 max_dd: min=-0.3009 p5=-0.2996 median=-0.2685 max=-0.2038 std=0.0307 spread=0.0971
+rot63 cost=10 regret_avoided: cagr=0.0209 sharpe=0.1064
+rot63 cost=10 tranche2: cagr=0.1261 sharpe=0.8626 max_dd=-0.1985 turn=9.914 cost_drag_bps=99.14 trades/yr=97.0 sharpe_vs_median=+0.1085
+rot63 cost=10 tranche4: cagr=0.1236 sharpe=0.8496 max_dd=-0.2299 turn=9.861 cost_drag_bps=98.61 trades/yr=193.5 sharpe_vs_median=+0.0955
+rot63 cost=20 cagr: min=0.0772 p5=0.0827 median=0.1035 max=0.1297 std=0.0158 spread=0.0525
+rot63 cost=20 sharpe: min=0.5543 p5=0.5818 median=0.6898 max=0.8708 std=0.0952 spread=0.3165
+rot63 cost=20 max_dd: min=-0.3014 p5=-0.3001 median=-0.2722 max=-0.2074 std=0.0295 spread=0.0940
+rot63 cost=20 regret_avoided: cagr=0.0208 sharpe=0.1080
+rot63 cost=20 tranche2: cagr=0.1149 sharpe=0.7968 max_dd=-0.2001 turn=9.911 cost_drag_bps=198.22 trades/yr=97.0 sharpe_vs_median=+0.1070
+rot63 cost=20 tranche4: cagr=0.1125 sharpe=0.7838 max_dd=-0.2313 turn=9.856 cost_drag_bps=197.11 trades/yr=193.5 sharpe_vs_median=+0.0941
+gem cost=10 2tr phase-shift books (n=5): sharpe mean=0.5747 std=0.0244 (single-date std=0.0304); cagr mean=0.0814 std=0.0043 (single-date std=0.0055)
+gem cost=10 4tr phase-shift books (n=3): sharpe mean=0.5729 std=0.0068 (single-date std=0.0304); cagr mean=0.0807 std=0.0009 (single-date std=0.0055)
+gem cost=20 2tr phase-shift books (n=5): sharpe mean=0.5512 std=0.0240 (single-date std=0.0297); cagr mean=0.0774 std=0.0042 (single-date std=0.0053)
+gem cost=20 4tr phase-shift books (n=3): sharpe mean=0.5493 std=0.0068 (single-date std=0.0297); cagr mean=0.0767 std=0.0009 (single-date std=0.0053)
+rot63 cost=10 2tr phase-shift books (n=5): sharpe mean=0.7999 std=0.0497 (single-date std=0.0944); cagr mean=0.1176 std=0.0087 (single-date std=0.0157)
+rot63 cost=10 4tr phase-shift books (n=3): sharpe mean=0.8135 std=0.0335 (single-date std=0.0944); cagr mean=0.1185 std=0.0045 (single-date std=0.0157)
+rot63 cost=20 2tr phase-shift books (n=5): sharpe mean=0.7343 std=0.0508 (single-date std=0.0952); cagr mean=0.1064 std=0.0087 (single-date std=0.0158)
+rot63 cost=20 4tr phase-shift books (n=3): sharpe mean=0.7475 std=0.0338 (single-date std=0.0952); cagr mean=0.1074 std=0.0046 (single-date std=0.0158)

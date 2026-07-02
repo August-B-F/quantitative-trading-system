@@ -1,0 +1,82 @@
+name: CANDIDATE_TWO_SLEEVE
+status: candidate-not-live
+tier: literature_candidate
+description: >
+  Literature-parameterized minimal portfolio. Two sleeves combined
+  60/40 and vol-targeted to 10% annualized. ZERO parameter search —
+  every number is verbatim from the published spec it cites; nothing
+  was fit on our data. Implemented in src/strategy/sleeves.py and
+  measured only through the daily-ledger engine (CONSTITUTION rule 5).
+type: rules_two_sleeve
+module: src/strategy/sleeves.py:two_sleeve_weights
+universe:
+  tsmom: [SPY, EFA, EEM, IEF, TLT, LQD, GLD, DBC, VNQ]
+  gem_risk: [SPY, EFA]
+  gem_fallback: AGG
+cash_proxy: SHV
+reference_index: SPY
+rebalance: month_end
+sleeves:
+  - name: tsmom
+    fraction: 0.6
+    signal:
+      kind: tsmom_12m_long_only
+      lookback_days: 252
+      hurdle: SHV_total_return_same_window
+      citation: >
+        Moskowitz, Ooi & Pedersen (2012), "Time Series Momentum",
+        Journal of Financial Economics 104(2) — 12-month lookback,
+        sign-of-excess-return signal, long-only implementation.
+    sizing:
+      kind: inverse_vol
+      vol_lookback_days: 63
+      normalize: across_on_assets
+      off_weight_to: SHV
+  - name: gem
+    fraction: 0.4
+    signal:
+      kind: dual_momentum_12m1
+      lookback_days: 252
+      skip_days: 21
+      relative_set: [SPY, EFA]
+      absolute_hurdle: SHV_total_return_same_window
+      fallback: AGG
+      citation: >
+        Antonacci (2014), "Dual Momentum Investing" — GEM: 12-1 month
+        relative momentum SPY vs developed ex-US (EFA here; VEA absent
+        from data/clean/prices), absolute momentum vs T-bills, bonds
+        when both fail.
+overlay:
+  kind: vol_target
+  target_vol_ann: 0.10
+  vol_lookback_days: 63
+  max_leverage: 1.0
+  excess_to: SHV
+  citation: >
+    Moskowitz, Ooi & Pedersen (2012) scale positions by inverse
+    ex-ante vol; 10% is the conventional multi-asset target used
+    across the AQR TSMOM literature (e.g. Hurst, Ooi & Pedersen 2017,
+    "A Century of Evidence on Trend-Following Investing").
+costs:
+  cost_bps_per_side: 10
+  note: measured via src/backtest/ledger.py; EVALUATION entry gates re-check at 20 bps
+gate: null
+fomc_defer:
+  enabled: false
+classifier: null
+baseline: >
+  Named naive baselines per CONSTITUTION rule 4: GEM dual momentum
+  standalone and SPY/SMA200 trend, stats frozen in results/BASELINES.md
+  (regenerated only by scripts/run_baselines.py).
+evaluation: >
+  Per EVALUATION.md — must pass the DSR gate (Deflated Sharpe >= 0.95
+  vs the cumulative results/TRIAL_LEDGER.csv count) and the SPA gate
+  (paired bootstrap, 95% CI on the edge over the named baseline
+  strictly above zero) before entering the 12-month paper race against
+  the permanent controls. Not live; no account assigned.
+notes: >
+  The point of this candidate is that it is UN-TUNED: if the tuned
+  in-house strategies cannot beat two textbook sleeves at published
+  parameters net of costs, the complexity is not paying for itself.
+  All signal inputs use data strictly <= the decision date; decisions
+  fill at the next day's open in the ledger engine.

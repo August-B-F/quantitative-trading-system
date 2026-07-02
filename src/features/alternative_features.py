@@ -25,7 +25,9 @@ PRICE_CLEAN = DATA_DIR / "clean" / "prices"
 CAL_CLEAN = DATA_DIR / "clean" / "calendar"
 
 START = "2005-01-03"
-END = "2026-04-10"
+# The builder must never clamp time — always build through today. Upstream
+# raw sources may still be stale; that is monitored elsewhere.
+END = pd.Timestamp.today().normalize()
 
 
 def _align(df: pd.DataFrame, freq: str = "daily") -> pd.DataFrame:

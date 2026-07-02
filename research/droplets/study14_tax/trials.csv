@@ -1,0 +1,13 @@
+trial_id,date,name,engine,window,sharpe,cagr,max_dd,n_trials_represented,source,notes
+study14_t01,2026-07-02,isk_vs_depa_100k_8pct,analytic_tax_v1,10y_forward,,0.0120,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; cagr col = ISK-minus-depa after-tax CAGR advantage at MID friction (120bps); low/high friction in scenario_results.csv
+study14_t02,2026-07-02,isk_vs_depa_100k_12pct,analytic_tax_v1,10y_forward,,0.0240,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +240bps MID / +300 LOW / +110 HIGH
+study14_t03,2026-07-02,isk_vs_depa_100k_16pct,analytic_tax_v1,10y_forward,,0.0357,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +357bps MID
+study14_t04,2026-07-02,isk_vs_depa_300k_8pct,analytic_tax_v1,10y_forward,,0.0090,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +90bps MID / -36 HIGH (Avanza auto-FX kills it at 8pct)
+study14_t05,2026-07-02,isk_vs_depa_300k_12pct,analytic_tax_v1,10y_forward,,0.0197,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +197bps MID
+study14_t06,2026-07-02,isk_vs_depa_300k_16pct,analytic_tax_v1,10y_forward,,0.0308,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +308bps MID
+study14_t07,2026-07-02,isk_vs_depa_1M_8pct,analytic_tax_v1,10y_forward,,0.0033,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +33bps MID / -95 HIGH; friction-dominated cell
+study14_t08,2026-07-02,isk_vs_depa_1M_12pct,analytic_tax_v1,10y_forward,,0.0148,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +148bps MID; central real-money cell; clears the 100bps falsification bar in HYPOTHESIS.md
+study14_t09,2026-07-02,isk_vs_depa_1M_16pct,analytic_tax_v1,10y_forward,,0.0264,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +264bps MID
+study14_t10,2026-07-02,isk_vs_depa_3M_8pct,analytic_tax_v1,10y_forward,,0.0017,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +17bps MID / -113 HIGH; ONLY cell where recommendation flips to either/friction-dominated
+study14_t11,2026-07-02,isk_vs_depa_3M_12pct,analytic_tax_v1,10y_forward,,0.0134,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +134bps MID / +5 HIGH
+study14_t12,2026-07-02,isk_vs_depa_3M_16pct,analytic_tax_v1,10y_forward,,0.0252,,3,research/droplets/study14_tax/tax_scenarios.py,OWNER-AUTHORIZED budget expansion; adv +252bps MID

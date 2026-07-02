@@ -1,0 +1,112 @@
+{
+  "study": "study15_cls_flip",
+  "date": "2026-07-02",
+  "window": "2005-01-01..2026-06-30",
+  "per_offset_flip_stats": {
+    "0": {
+      "n_month_ends": 258,
+      "top3_set_identical_pct": 72.48,
+      "top3_set_differs_pct": 27.52,
+      "gate_flips_pct": 3.1,
+      "composition_flips_pct": 25.97,
+      "n_flip_months_with_fwd": 67,
+      "flip_cost_fwd1m_mean_bps": 21.7,
+      "flip_cost_fwd1m_median_bps": -11.2,
+      "flip_cost_t_stat": 0.78,
+      "annualized_stale_drag_bps": 67.6
+    },
+    "5": {
+      "n_month_ends": 257,
+      "top3_set_identical_pct": 78.6,
+      "top3_set_differs_pct": 21.4,
+      "gate_flips_pct": 1.17,
+      "composition_flips_pct": 17.9,
+      "n_flip_months_with_fwd": 45,
+      "flip_cost_fwd1m_mean_bps": 62.4,
+      "flip_cost_fwd1m_median_bps": 21.4,
+      "flip_cost_t_stat": 1.98,
+      "annualized_stale_drag_bps": 134.1
+    },
+    "10": {
+      "n_month_ends": 257,
+      "top3_set_identical_pct": 79.38,
+      "top3_set_differs_pct": 20.62,
+      "gate_flips_pct": 2.72,
+      "composition_flips_pct": 18.68,
+      "n_flip_months_with_fwd": 48,
+      "flip_cost_fwd1m_mean_bps": 22.7,
+      "flip_cost_fwd1m_median_bps": 11.9,
+      "flip_cost_t_stat": 0.72,
+      "annualized_stale_drag_bps": 50.9
+    },
+    "15": {
+      "n_month_ends": 257,
+      "top3_set_identical_pct": 78.99,
+      "top3_set_differs_pct": 21.01,
+      "gate_flips_pct": 2.33,
+      "composition_flips_pct": 17.12,
+      "n_flip_months_with_fwd": 44,
+      "flip_cost_fwd1m_mean_bps": 28.3,
+      "flip_cost_fwd1m_median_bps": 18.1,
+      "flip_cost_t_stat": 0.74,
+      "annualized_stale_drag_bps": 58.1
+    }
+  },
+  "ledger_bracket_full_window": {
+    "true_10bps": {
+      "cagr": 0.1242,
+      "vol": 0.1521,
+      "sharpe": 0.8478,
+      "max_dd": -0.1737,
+      "ann_turnover": 7.5872,
+      "ann_cost_drag": 0.0076,
+      "n_rebalances": "257",
+      "start": "2005-01-03 00:00:00",
+      "end": "2026-06-30 00:00:00"
+    },
+    "stale_10bps": {
+      "cagr": 0.1211,
+      "vol": 0.1554,
+      "sharpe": 0.8152,
+      "max_dd": -0.2101,
+      "ann_turnover": 7.2522,
+      "ann_cost_drag": 0.0073,
+      "n_rebalances": "257",
+      "start": "2005-01-03 00:00:00",
+      "end": "2026-06-30 00:00:00"
+    },
+    "true_20bps": {
+      "cagr": 0.1157,
+      "vol": 0.1521,
+      "sharpe": 0.7976,
+      "max_dd": -0.18,
+      "ann_turnover": 7.5872,
+      "ann_cost_drag": 0.0152,
+      "n_rebalances": "257",
+      "start": "2005-01-03 00:00:00",
+      "end": "2026-06-30 00:00:00"
+    },
+    "stale_20bps": {
+      "cagr": 0.113,
+      "vol": 0.1554,
+      "sharpe": 0.7682,
+      "max_dd": -0.2193,
+      "ann_turnover": 7.2522,
+      "ann_cost_drag": 0.0145,
+      "n_rebalances": "257",
+      "start": "2005-01-03 00:00:00",
+      "end": "2026-06-30 00:00:00"
+    },
+    "delta_10bps": {
+      "sharpe_true_minus_stale": 0.0326,
+      "cagr_true_minus_stale_bps_yr": 31.0
+    },
+    "delta_20bps": {
+      "sharpe_true_minus_stale": 0.0294,
+      "cagr_true_minus_stale_bps_yr": 27.0
+    }
+  },
+  "pre_registered_bar": "top3 set identical >= 90% AND gate flips <= 2% of month-ends (offset 0)",
+  "bar_passed": false,
+  "note": "t-1-vs-t flips OVERSTATE the real 15:45-vs-close flip risk (15 min of drift is a fraction of a full day's move); all rates here are upper bounds."
+}

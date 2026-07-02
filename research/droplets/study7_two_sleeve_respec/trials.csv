@@ -1,0 +1,15 @@
+trial_id,date,name,engine,window,sharpe,cagr,max_dd,n_trials_represented,source,notes
+study7_dev_tsmom,2026-07-02,study7_dev_tsmom,daily_ledger_v1,2007-01-31..2017-12-29,0.8532,0.0653,-0.1621,1,study7_diagnostic,existing baseline sleeve re-windowed to dev; 10bps only
+study7_dev_gem,2026-07-02,study7_dev_gem,daily_ledger_v1,2007-01-31..2017-12-29,0.5425,0.0725,-0.2460,1,study7_diagnostic,existing baseline sleeve re-windowed to dev; 10bps only
+study7_dev_spy_sma200,2026-07-02,study7_dev_spy_sma200,daily_ledger_v1,2005-10-31..2017-12-29,0.9351,0.1093,-0.1731,1,study7_diagnostic,S_bar reference for decision rule; 10bps only
+study7_R0,2026-07-02,study7_two_sleeve_R0,daily_ledger_v1,2007-01-31..2017-12-29,0.8013,0.0661,-0.1020,1,study7_diagnostic,20bps: sharpe=0.748 cagr=0.0614 dd=-0.1039; T12/IV/vt=0.1/frac=0.6/gemfb=AGG; reference: current two_sleeve (not in budget)
+study7_C1,2026-07-02,study7_two_sleeve_C1,daily_ledger_v1,2007-01-31..2017-12-29,0.7823,0.0698,-0.1085,1,study7_prereg,20bps: sharpe=0.738 cagr=0.0655 dd=-0.1093; T12/IV/vt=None/frac=0.6/gemfb=AGG; pre-registered config
+study7_C2,2026-07-02,study7_two_sleeve_C2,daily_ledger_v1,2007-01-31..2017-12-29,0.6803,0.0600,-0.1329,1,study7_prereg,20bps: sharpe=0.628 cagr=0.0549 dd=-0.1355; T12/EW/vt=0.1/frac=0.6/gemfb=AGG; pre-registered config
+study7_C3,2026-07-02,study7_two_sleeve_C3,daily_ledger_v1,2007-01-31..2017-12-29,0.7507,0.0628,-0.1402,1,study7_prereg,20bps: sharpe=0.687 cagr=0.0570 dd=-0.1447; ENS/IV/vt=0.1/frac=0.6/gemfb=AGG; pre-registered config
+study7_C4,2026-07-02,study7_two_sleeve_C4,daily_ledger_v1,2007-01-31..2017-12-29,0.7952,0.0655,-0.1220,1,study7_prereg,20bps: sharpe=0.736 cagr=0.0603 dd=-0.1244; FAB/IV/vt=0.1/frac=0.6/gemfb=AGG; pre-registered config
+study7_C5,2026-07-02,study7_two_sleeve_C5,daily_ledger_v1,2007-01-31..2017-12-29,0.6391,0.0653,-0.1808,1,study7_prereg,20bps: sharpe=0.591 cagr=0.0599 dd=-0.1844; ENS/EW/vt=None/frac=0.6/gemfb=AGG; pre-registered config
+study7_C6,2026-07-02,study7_two_sleeve_C6,daily_ledger_v1,2007-01-31..2017-12-29,0.6087,0.0608,-0.2060,1,study7_prereg,20bps: sharpe=0.563 cagr=0.0557 dd=-0.2086; FAB/EW/vt=None/frac=0.6/gemfb=AGG; pre-registered config
+study7_C7,2026-07-02,study7_two_sleeve_C7,daily_ledger_v1,2007-01-31..2017-12-29,0.6710,0.0647,-0.1663,1,study7_prereg,20bps: sharpe=0.615 cagr=0.0587 dd=-0.1704; ENS/EW/vt=0.12/frac=0.6/gemfb=AGG; pre-registered config
+study7_C8,2026-07-02,study7_two_sleeve_C8,daily_ledger_v1,2007-01-31..2017-12-29,0.6395,0.0637,-0.1710,1,study7_prereg,20bps: sharpe=0.591 cagr=0.0583 dd=-0.1746; ENS/EW/vt=None/frac=0.7/gemfb=AGG; pre-registered config
+study7_C9,2026-07-02,study7_two_sleeve_C9,daily_ledger_v1,2007-01-31..2017-12-29,0.6210,0.0638,-0.1547,1,study7_prereg,20bps: sharpe=0.574 cagr=0.0584 dd=-0.1583; ENS/EW/vt=None/frac=0.6/gemfb=IEF; pre-registered config
+study7_C10,2026-07-02,study7_two_sleeve_C10,daily_ledger_v1,2007-01-31..2017-12-29,0.8462,0.0697,-0.1139,1,study7_prereg,20bps: sharpe=0.799 cagr=0.0655 dd=-0.1151; T12/IV/vt=0.12/frac=0.7/gemfb=AGG; adaptive assembly slot per pre-registered rule

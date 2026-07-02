@@ -1,0 +1,225 @@
+{
+  "generated": "2026-07-02 16:44",
+  "engine": "src/backtest/ledger.py",
+  "cost_bps": 10.0,
+  "cash_ticker": "SHV",
+  "tsmom_universe": [
+    "SPY",
+    "EFA",
+    "EEM",
+    "IEF",
+    "TLT",
+    "LQD",
+    "GLD",
+    "DBC",
+    "VNQ"
+  ],
+  "legacy_8": [
+    "SOXX",
+    "QQQ",
+    "XLK",
+    "VGT",
+    "IGV",
+    "XLE",
+    "GLD",
+    "SHY"
+  ],
+  "windows": {
+    "2005-01-01..latest": {
+      "spy_buy_hold": {
+        "cagr": 0.10865231002974962,
+        "vol": 0.1895699121846807,
+        "sharpe": 0.6399931494282741,
+        "max_dd": -0.5518945075356689,
+        "ann_turnover": 0.09306918078736146,
+        "ann_cost_drag": 9.306918078736145e-05,
+        "n_rebalances": 1,
+        "start": "2005-01-03",
+        "end": "2026-07-01",
+        "description": "buy-and-hold SPY"
+      },
+      "60_40": {
+        "cagr": 0.08038416466444609,
+        "vol": 0.11416998633541174,
+        "sharpe": 0.7355139169162045,
+        "max_dd": -0.35716113566865326,
+        "ann_turnover": 0.2878152434799431,
+        "ann_cost_drag": 0.00028781524347994304,
+        "n_rebalances": 258,
+        "start": "2005-01-31",
+        "end": "2026-07-01",
+        "description": "60/40 SPY/AGG, monthly"
+      },
+      "equal_weight_8": {
+        "cagr": 0.13499856669096877,
+        "vol": 0.17071596899929467,
+        "sharpe": 0.8286489500921969,
+        "max_dd": -0.424987950067776,
+        "ann_turnover": 0.4403677906694214,
+        "ann_cost_drag": 0.0004403677906694217,
+        "n_rebalances": 258,
+        "start": "2005-01-31",
+        "end": "2026-07-01",
+        "description": "equal-weight legacy 8-ETF universe, monthly (reference)"
+      },
+      "gem": {
+        "cagr": 0.08780709128354869,
+        "vol": 0.16391023367921145,
+        "sharpe": 0.5966208318557318,
+        "max_dd": -0.33717267690003416,
+        "ann_turnover": 4.429770131152165,
+        "ann_cost_drag": 0.0044297701311521685,
+        "n_rebalances": 234,
+        "start": "2007-01-31",
+        "end": "2026-07-01",
+        "description": "GEM dual momentum standalone (Antonacci 12-1)"
+      },
+      "spy_sma200": {
+        "cagr": 0.09832713624778622,
+        "vol": 0.12277021976466204,
+        "sharpe": 0.8272275088468112,
+        "max_dd": -0.2813695395072765,
+        "ann_turnover": 2.806637519872814,
+        "ann_cost_drag": 0.0028066375198728157,
+        "n_rebalances": 249,
+        "start": "2005-10-31",
+        "end": "2026-07-01",
+        "description": "SPY/SMA200 trend, month-end checks (honest live S5)"
+      },
+      "inverse_vol": {
+        "cagr": 0.0564130950987809,
+        "vol": 0.07811786453581704,
+        "sharpe": 0.7428996273182815,
+        "max_dd": -0.21653876678605866,
+        "ann_turnover": 1.0112138390319008,
+        "ann_cost_drag": 0.0010112138390319003,
+        "n_rebalances": 245,
+        "start": "2006-02-28",
+        "end": "2026-07-01",
+        "description": "inverse-63d-vol across TSMOM universe, monthly"
+      },
+      "tsmom": {
+        "cagr": 0.04453866387065397,
+        "vol": 0.09529572771772324,
+        "sharpe": 0.5057628510376131,
+        "max_dd": -0.2783221804807716,
+        "ann_turnover": 4.315769650558684,
+        "ann_cost_drag": 0.00431576965055868,
+        "n_rebalances": 234,
+        "start": "2007-01-31",
+        "end": "2026-07-01",
+        "description": "TSMOM sleeve alone (MOP 2012, long-only, inv-vol)"
+      },
+      "two_sleeve": {
+        "cagr": 0.06120284024742095,
+        "vol": 0.09553027195288204,
+        "sharpe": 0.6708154345822258,
+        "max_dd": -0.21142329006985028,
+        "ann_turnover": 4.784680025002713,
+        "ann_cost_drag": 0.0047846800250027155,
+        "n_rebalances": 234,
+        "start": "2007-01-31",
+        "end": "2026-07-01",
+        "description": "candidate: 0.6*TSMOM + 0.4*GEM, 10% vol target"
+      }
+    },
+    "2018-01-01..latest": {
+      "spy_buy_hold": {
+        "cagr": 0.14500756145626137,
+        "vol": 0.1918850547984603,
+        "sharpe": 0.8041026227196315,
+        "max_dd": -0.33717267690003416,
+        "ann_turnover": 0.23549323017408125,
+        "ann_cost_drag": 0.00023549323017408127,
+        "n_rebalances": 1,
+        "start": "2018-01-02",
+        "end": "2026-07-01",
+        "description": "buy-and-hold SPY"
+      },
+      "60_40": {
+        "cagr": 0.09321454992064471,
+        "vol": 0.1198844802531319,
+        "sharpe": 0.8057659672532094,
+        "max_dd": -0.21604208536005043,
+        "ann_turnover": 0.446298768394652,
+        "ann_cost_drag": 0.00044629876839465197,
+        "n_rebalances": 102,
+        "start": "2018-01-31",
+        "end": "2026-07-01",
+        "description": "60/40 SPY/AGG, monthly"
+      },
+      "equal_weight_8": {
+        "cagr": 0.18180130170105024,
+        "vol": 0.19023152494138995,
+        "sharpe": 0.9762347166239096,
+        "max_dd": -0.2712907179496338,
+        "ann_turnover": 0.6455275070009244,
+        "ann_cost_drag": 0.000645527507000924,
+        "n_rebalances": 102,
+        "start": "2018-01-31",
+        "end": "2026-07-01",
+        "description": "equal-weight legacy 8-ETF universe, monthly (reference)"
+      },
+      "gem": {
+        "cagr": 0.10252769205437517,
+        "vol": 0.18130473222872587,
+        "sharpe": 0.6309250850384602,
+        "max_dd": -0.3371726769000344,
+        "ann_turnover": 3.5657338106085263,
+        "ann_cost_drag": 0.0035657338106085275,
+        "n_rebalances": 102,
+        "start": "2018-01-31",
+        "end": "2026-07-01",
+        "description": "GEM dual momentum standalone (Antonacci 12-1)"
+      },
+      "spy_sma200": {
+        "cagr": 0.07679296057367901,
+        "vol": 0.12886455448870213,
+        "sharpe": 0.6406005015964931,
+        "max_dd": -0.28136953950727706,
+        "ann_turnover": 4.516596160104133,
+        "ann_cost_drag": 0.004516596160104135,
+        "n_rebalances": 102,
+        "start": "2018-01-31",
+        "end": "2026-07-01",
+        "description": "SPY/SMA200 trend, month-end checks (honest live S5)"
+      },
+      "inverse_vol": {
+        "cagr": 0.050946540923552996,
+        "vol": 0.08469370084705939,
+        "sharpe": 0.6309055703397248,
+        "max_dd": -0.2125239497535225,
+        "ann_turnover": 1.174799672055604,
+        "ann_cost_drag": 0.001174799672055604,
+        "n_rebalances": 102,
+        "start": "2018-01-31",
+        "end": "2026-07-01",
+        "description": "inverse-63d-vol across TSMOM universe, monthly"
+      },
+      "tsmom": {
+        "cagr": 0.017568202673462263,
+        "vol": 0.11450517335133087,
+        "sharpe": 0.2098508461927448,
+        "max_dd": -0.2783221804807703,
+        "ann_turnover": 5.8858424341861495,
+        "ann_cost_drag": 0.0058858424341861485,
+        "n_rebalances": 102,
+        "start": "2018-01-31",
+        "end": "2026-07-01",
+        "description": "TSMOM sleeve alone (MOP 2012, long-only, inv-vol)"
+      },
+      "two_sleeve": {
+        "cagr": 0.05234451128122486,
+        "vol": 0.10862893207710356,
+        "sharpe": 0.5255277074341704,
+        "max_dd": -0.2114232900698504,
+        "ann_turnover": 5.448589946142875,
+        "ann_cost_drag": 0.005448589946142875,
+        "n_rebalances": 102,
+        "start": "2018-01-31",
+        "end": "2026-07-01",
+        "description": "candidate: 0.6*TSMOM + 0.4*GEM, 10% vol target"
+      }
+    }
+  }
+}
