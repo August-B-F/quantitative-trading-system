@@ -27,7 +27,7 @@ def _align(df: pd.DataFrame, cal: pd.DatetimeIndex) -> pd.DataFrame:
     return df.reindex(cal)
 
 
-# ============================ STEP 1: INTERACTIONS ============================
+# Interactions
 
 def build_interactions(close: pd.DataFrame) -> int:
     cal = close.index
@@ -139,7 +139,7 @@ def build_interactions(close: pd.DataFrame) -> int:
     return n_files
 
 
-# ============================ STEP 2: TARGETS ============================
+# Targets
 
 TARGET_UNIVERSE = ["SOXX", "QQQ", "XLK", "VGT", "IGV", "XLE", "GLD", "SHY"]
 HORIZON = 21
@@ -222,7 +222,7 @@ def build_targets(close: pd.DataFrame) -> dict:
     }
 
 
-# ============================ VALIDATION ============================
+# Validation
 
 def validate(close: pd.DataFrame, ctx: dict) -> None:
     print("\n=== TARGETS VALIDATION ===")
@@ -263,7 +263,7 @@ def validate(close: pd.DataFrame, ctx: dict) -> None:
           f"(>0 means confirming, expect positive: XLE & crude both rising)")
 
 
-# ============================ MAIN ============================
+# Main
 
 def main() -> None:
     from src.features.engineer import ALL_TICKERS

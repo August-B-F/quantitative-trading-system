@@ -51,7 +51,6 @@ def page_title(fig, title, subtitle=None):
              fontsize=7, color="#94a3b8")
 
 
-# ---------------------------------------------------------------------------
 def page1(pdf, data):
     fig = fig_blank()
     page_title(fig, "ETF Momentum Rotation — AI-Enhanced",
@@ -98,7 +97,6 @@ def page1(pdf, data):
     pdf.savefig(fig); plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
 def page2(pdf, data):
     fig = fig_blank()
     page_title(fig, "Annual Returns", "Strategy vs SPY, 2010–present")
@@ -149,7 +147,6 @@ def page2(pdf, data):
     pdf.savefig(fig); plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
 def page3(pdf, data):
     fig = fig_blank()
     page_title(fig, "Consistency & Drawdowns")
@@ -198,7 +195,6 @@ def page3(pdf, data):
     pdf.savefig(fig); plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
 def page4(pdf, data):
     fig = fig_blank()
     page_title(fig, "Statistics Comparison", "Strategy vs SPY (buy & hold)")
@@ -241,7 +237,6 @@ def page4(pdf, data):
     pdf.savefig(fig); plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
 def page5(pdf, data):
     fig = fig_blank()
     page_title(fig, "Risk Analysis", "Regime breakdown + rolling Sharpe")
@@ -292,7 +287,6 @@ def page5(pdf, data):
     pdf.savefig(fig); plt.close(fig)
 
 
-# ---------------------------------------------------------------------------
 def page6(pdf, data):
     fig = fig_blank()
     page_title(fig, "Strategy Description")

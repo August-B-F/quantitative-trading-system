@@ -36,7 +36,6 @@ def build_splitter(cfg: dict) -> ExpandingSplitter:
 
 
 def build_estimator(cfg: dict) -> HistGradientBoostingClassifier:
-    """Build the HistGB estimator with pinned hyperparameters."""
     c = cfg["classifier"]
     return HistGradientBoostingClassifier(
         max_iter=c["max_iter"],

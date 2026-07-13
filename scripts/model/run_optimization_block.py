@@ -39,9 +39,7 @@ SPLIT_KW = dict(
 REGIME_CLASSES = ["regime_hg_li", "regime_hg_hi", "regime_lg_li", "regime_lg_hi_stagflation"]
 REGIME_FEATS = [f"regime_growth_inflation__{c}" for c in REGIME_CLASSES]
 
-# ---------------------------------------------------------------------------
 # Load
-# ---------------------------------------------------------------------------
 print("Loading master panel…")
 df = pd.read_parquet(ROOT / "data/features/master_panel.parquet")
 feature_sets = yaml.safe_load(open(ROOT / "configs/feature_sets.yaml"))
@@ -83,9 +81,7 @@ print(f"  folds: {len(folds)}  test dates: {len(test_dates)}")
 # Current regime (labels)
 current_reg = df[REGIME_FEATS].values.argmax(axis=1)
 
-# ---------------------------------------------------------------------------
 # Walk-forward regime classifier (re-used across all mods)
-# ---------------------------------------------------------------------------
 print("Training walk-forward regime classifier…")
 target_col = "TARGET_TREG_growth_inflation_fwd21"
 cls_to_idx = {c: i for i, c in enumerate(REGIME_CLASSES)}
@@ -123,9 +119,7 @@ for fold in folds:
 regime_acc = float(np.mean(fold_accs)) if fold_accs else float("nan")
 print(f"  WF regime accuracy: {regime_acc:.3f}")
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 def stats(r):
     """Compute CAGR / Sharpe / MaxDD for a return series."""
     r = np.asarray(r, float)
@@ -185,9 +179,7 @@ def topk_indices(mom, k):
 # Use atr_21d as a proxy where available — simpler and aligned to the data we have
 atr21 = pd.read_parquet(ROOT / "data/features/price/atr_21d.parquet").reindex(DATES)
 
-# ---------------------------------------------------------------------------
 # Strategy builder
-# ---------------------------------------------------------------------------
 def build_strategy(
     universe=ETFS,
     lookback_stable=63,
@@ -261,9 +253,7 @@ def build_strategy(
     daily = weight_top1 * top1_ret + weight_topk * topk_ret
     return daily
 
-# ---------------------------------------------------------------------------
 # Soft EV gate (M19) — minimal port
-# ---------------------------------------------------------------------------
 MACRO_FEATS = [
     "vol_features__vix",
     "credit_features__nfci", "credit_features__hy_ig_spread", "credit_features__nfci_chg21",
@@ -320,9 +310,7 @@ def soft_ev_apply(daily_full):
             out[pd.Timestamp(d)] = w * br + (1 - w) * shy_ret[te_pos_f[i]]
     return out
 
-# ---------------------------------------------------------------------------
 # Gates / overlays
-# ---------------------------------------------------------------------------
 hy_z = df["credit_features__hy_ig_spread_z252"].values if "credit_features__hy_ig_spread_z252" in df.columns else np.full(NDAYS, np.nan)
 vix = df["vol_features__vix"].values
 yc_slope = df["yield_curve_features__yc_slope_10y_2y"].values
@@ -394,9 +382,7 @@ def signal_disagreement_scale(universe):
             s[i] = 0.7
     return s
 
-# ---------------------------------------------------------------------------
 # Rebalancing variants (M24..M27)
-# ---------------------------------------------------------------------------
 def monthly_simulate(universe, lookback_stable=63, lookback_trans=21,
                      k=3, weight_top1=0.5, weight_topk=0.5,
                      weekly_threshold=None, defer_fomc=False, defer_quad=False,
@@ -478,9 +464,7 @@ def monthly_simulate(universe, lookback_stable=63, lookback_trans=21,
 
     raise ValueError("monthly_simulate called without a variant flag")
 
-# ---------------------------------------------------------------------------
 # Run mods
-# ---------------------------------------------------------------------------
 RESULTS = {}
 
 def run_daily(name, daily, desc):
@@ -564,16 +548,12 @@ run_monthly(
 )
 run_monthly("M27", monthly_simulate(ETFS, defer_quad=True), "Defer quad witching 5d")
 
-# ---------------------------------------------------------------------------
 # Save individual JSONs
-# ---------------------------------------------------------------------------
 for name, payload in RESULTS.items():
     if name.startswith("M"):
         (OUT_DIR / f"{name}.json").write_text(json.dumps(payload, indent=2, default=str))
 
-# ---------------------------------------------------------------------------
 # Haircut evaluation
-# ---------------------------------------------------------------------------
 ctrl_st = RESULTS["E-R1"]["stats"]
 def haircut_pass(name):
     """Apply transaction-cost haircut and return whether the strategy still beats baseline."""
@@ -588,9 +568,7 @@ def haircut_pass(name):
     not_worse_dd = d_mdd > -0.02
     return (cagr_ok or sh_ok) and not_worse_dd, d_cagr, d_sh, d_mdd
 
-# ---------------------------------------------------------------------------
 # Combine passing mods incrementally
-# ---------------------------------------------------------------------------
 BLOCK_MODS = {
     "B1": ["M01","M02","M03","M04","M05","M06"],
     "B2": ["M07","M08","M09","M10","M11","M12","M13"],
@@ -694,9 +672,7 @@ RESULTS["OPTIMIZED"] = {
 }
 (OUT_DIR / "OPTIMIZED.json").write_text(json.dumps(RESULTS["OPTIMIZED"], indent=2, default=str))
 
-# ---------------------------------------------------------------------------
 # OPTIMIZATION_REPORT.md
-# ---------------------------------------------------------------------------
 def fmt_pct(v):
     """Format a float as a percentage string."""
     return "n/a" if v is None or v != v else f"{v*100:.1f}%"
@@ -747,9 +723,7 @@ lines.append(f"- ΔSharpe vs E-R1: {final_st['sharpe']-ctrl_st['sharpe']:+.2f}")
 (ROOT / "results/OPTIMIZATION_REPORT.md").write_text("\n".join(lines), encoding="utf-8")
 print("\nWrote results/OPTIMIZATION_REPORT.md")
 
-# ---------------------------------------------------------------------------
 # OPTIMIZED_STRATEGY.md
-# ---------------------------------------------------------------------------
 spec_lines = []
 spec_lines.append("# OPTIMIZED STRATEGY SPEC\n")
 spec_lines.append("Derived from incremental layering of best-of-block modifications that passed the haircut.\n")

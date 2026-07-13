@@ -81,7 +81,7 @@ def build():
 
     feat_count = 0
 
-    # ========== STEP 1 — YIELD CURVE & RATES ==========
+    # Yield curve & rates
     t10 = L("treasury_10y"); t2 = L("treasury_2y"); t5 = L("treasury_5y")
     t3m = L("treasury_3m"); ffd = L("fed_funds_daily"); cpi_yoy = L("cpi_yoy")
 
@@ -103,7 +103,7 @@ def build():
     df["yc_curvature"] = 2.0 * t5 - t2 - t10
     feat_count += save(df, "yield_curve_features")
 
-    # ========== STEP 2 — INFLATION ==========
+    # Inflation
     cpi_core = L("cpi_core_yoy"); cpi_mom = L("cpi_mom"); pce_core = L("pce_core")
     be5 = L("breakeven_5y"); be10 = L("breakeven_10y")
 
@@ -129,7 +129,7 @@ def build():
     df["disinflation_flag"] = decl.reindex(cpi_yoy.index, method="ffill").astype(float)
     feat_count += save(df, "inflation_features")
 
-    # ========== STEP 3 — ECONOMIC ACTIVITY ==========
+    # Economic activity
     pmi = L("ism_manufacturing_pmi"); unemp = L("unemployment_rate")
     ic = L("initial_claims"); ip = L("industrial_production")
     cu = L("capacity_utilization"); retail = L("retail_sales_ex_food")
@@ -156,7 +156,7 @@ def build():
     })
     feat_count += save(df, "activity_features")
 
-    # ========== STEP 4 — CREDIT ==========
+    # Credit
     hy = L("hy_oas"); ig = L("bbb_oas")
     baa_aaa = L("spread_baa_aaa"); ted = L("ted_spread")
     nfci = L("nfci"); stlfsi = L("stlfsi4") if L("stlfsi4") is not None else L("stlfsi")
@@ -179,7 +179,7 @@ def build():
     })
     feat_count += save(df, "credit_features")
 
-    # ========== STEP 5 — LIQUIDITY ==========
+    # Liquidity
     m2 = L("m2_money_supply"); m2y = L("m2_yoy")
     fbs = L("fed_balance_sheet"); rrp = L("overnight_repo")
 
@@ -192,7 +192,7 @@ def build():
     })
     feat_count += save(df, "liquidity_features")
 
-    # ========== STEP 6 — CONSUMER ==========
+    # Consumer
     umich = L("umich_sentiment"); cbconf = L("conference_board_conf")
     psr = L("personal_savings_rate"); cct = L("consumer_credit_total")
     mort = L("mortgage_30y"); hs = L("housing_starts")
@@ -217,7 +217,7 @@ def build():
     })
     feat_count += save(df, "consumer_features")
 
-    # ========== STEP 7 — VOLATILITY ==========
+    # Volatility
     vix = vix_df["close"].reindex(cal).ffill()
     spy_path = PRICES / "SPY.parquet"
     if spy_path.exists():
@@ -243,7 +243,7 @@ def build():
     })
     feat_count += save(df, "vol_features")
 
-    # ========== STEP 8 — REGIMES ==========
+    # Regimes
     # Regime 1 already saved as part of vol_features; also save standalone
     reg1 = df[["vix_regime_low", "vix_regime_medium", "vix_regime_high", "vix_regime_extreme"]].copy()
     feat_count += save(reg1, "regime_vix")
@@ -288,7 +288,7 @@ def build():
     })
     feat_count += save(reg5, "regime_monetary")
 
-    # ========== VALIDATION ==========
+    # Validation
     print("\n=== VALIDATION ===")
     # 1) HG/HI in 2021-2022
     hghi_2122 = reg3.loc["2021-01-01":"2022-12-31", "regime_hg_hi"].sum()

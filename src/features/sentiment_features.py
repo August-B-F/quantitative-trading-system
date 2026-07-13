@@ -63,7 +63,7 @@ def _save(df: pd.DataFrame, category: str, name: str) -> None:
     save_features(df, category, name)
 
 
-# ============================ STEP 1: SURVEY ============================
+# Survey
 
 def step1_survey() -> int:
     n = 0
@@ -112,7 +112,7 @@ def step1_survey() -> int:
     return n
 
 
-# ============================ STEP 2: POSITIONING ============================
+# Positioning
 
 COT_CONTRACTS = {
     "crude": "cot_crude_oil_wti.parquet",
@@ -207,7 +207,7 @@ def step2_positioning() -> int:
     return n
 
 
-# ============================ STEP 3: NEWS ============================
+# News
 
 NEWS_TOPICS = ["tech", "energy", "inflation", "recession", "market", "gold"]
 
@@ -267,7 +267,7 @@ def step3_news() -> int:
     return n
 
 
-# ============================ STEP 4: FUNDAMENTAL ============================
+# Fundamental
 
 def step4_fundamental() -> int:
     n = 0
@@ -331,7 +331,7 @@ def step4_fundamental() -> int:
     return n
 
 
-# ============================ VALIDATION ============================
+# Validation
 
 def validate() -> None:
     print("\n=== VALIDATION ===")
@@ -383,7 +383,7 @@ def validate() -> None:
             print(" ", o)
 
 
-# ============================ MAIN ============================
+# Main
 
 def main() -> None:
     print(f"Building Phase-4 sentiment + fundamental features ({START}..{END})")

@@ -61,9 +61,7 @@ REGIME_ELIGIBLE = {
     3: ["GLD", "XLE", "SHY"],
 }
 
-# ---------------------------------------------------------------------------
 # Load
-# ---------------------------------------------------------------------------
 
 print("Loading master panel…")
 df = pd.read_parquet(ROOT / "data/features/master_panel.parquet")
@@ -113,9 +111,7 @@ test_dates = pd.DatetimeIndex(sorted(set(d for f in folds for d in f["test_dates
 te_pos = df.index.get_indexer(test_dates)
 print(f"  folds: {len(folds)}  test dates: {len(test_dates)}")
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 
 def stats(r):
     r = np.asarray(r, dtype=float)
@@ -173,9 +169,7 @@ def trend_gate(base, threshold=-0.04):
     return np.where(spy_dist > threshold, base, shy_ret)
 
 
-# ---------------------------------------------------------------------------
 # Walk-forward regime classifier (EA1 pattern) → per-test-date prediction
-# ---------------------------------------------------------------------------
 
 print("Training walk-forward regime classifier…")
 target_col = "TARGET_TREG_growth_inflation_fwd21"
@@ -222,9 +216,7 @@ regime_acc = float(np.mean(fold_accs)) if fold_accs else float("nan")
 print(f"  regime walk-forward accuracy (mean over folds): {regime_acc:.3f}")
 
 
-# ---------------------------------------------------------------------------
 # Dispersion predictor (lightweight ED5-style) for E-R5
-# ---------------------------------------------------------------------------
 
 print("Training walk-forward dispersion predictor…")
 fwd_mat = fwd_arr
@@ -261,9 +253,7 @@ disp_med = float(np.nanmedian(pred_disp[te_pos]))
 print(f"  dispersion median (test): {disp_med:.4f}")
 
 
-# ---------------------------------------------------------------------------
 # Soft EV gate (copy of T2 version) — returns per-test-date daily arrays
-# ---------------------------------------------------------------------------
 
 MACRO_FEATS = [
     "vol_features__vix",
@@ -323,9 +313,7 @@ def soft_ev_weights(ensemble_full):
     return out
 
 
-# ---------------------------------------------------------------------------
 # Strategy registry
-# ---------------------------------------------------------------------------
 
 STRATS = {}
 
@@ -364,9 +352,7 @@ def register_monthly(name, monthly_series, description, extra=None):
           f"MaxDD {st['max_dd']*100:6.2f}%  n={st['n']}")
 
 
-# ---------------------------------------------------------------------------
 # Reference strategies (baseline + T2 winners) rebuilt for comparison
-# ---------------------------------------------------------------------------
 
 print("\n=== Reference strategies ===")
 register_daily("B3_top1_63d", top1_full,
@@ -389,9 +375,7 @@ register_monthly("T2_3legCAGR_softML", sm,
                  "T2_3legCAGR base + soft ML EV gate (HistGB on macro)")
 
 
-# ---------------------------------------------------------------------------
 # E-R1: Regime-conditional lookback
-# ---------------------------------------------------------------------------
 
 print("\n=== E-R1: regime-conditional lookback ===")
 # For each day, pick lookback based on pred vs current regime.
@@ -409,9 +393,7 @@ register_daily("E-R1", er1_daily,
                       "transition_rate_test": transition_rate})
 
 
-# ---------------------------------------------------------------------------
 # E-R2: Regime-conditional universe weighting
-# ---------------------------------------------------------------------------
 
 print("\n=== E-R2: regime-conditional weight tilt ===")
 # Top-3 by 63d momentum, then tilt weights 1.5x favored / 0.75x others, renormalize.
@@ -439,9 +421,7 @@ register_daily("E-R2", er2_daily,
                extra={"regime_accuracy": regime_acc})
 
 
-# ---------------------------------------------------------------------------
 # E-R3: Regime as exposure scaler on soft-ML gate
-# ---------------------------------------------------------------------------
 
 print("\n=== E-R3: regime overlay on T2_3legCAGR_softML ===")
 # If transition toward recessionary quadrants (pred in {2,3} and pred != current),
@@ -467,9 +447,7 @@ register_monthly("E-R3", sm,
                         "n_days_downscaled": int(n_adj)})
 
 
-# ---------------------------------------------------------------------------
 # E-R4: Regime-filtered universe (expanded with TLT, XLV)
-# ---------------------------------------------------------------------------
 
 print("\n=== E-R4: regime-filtered momentum (10-ETF universe) ===")
 def er4_returns():
@@ -504,9 +482,7 @@ register_daily("E-R4", er4_daily,
                       "extended_universe": ETFS_EXT})
 
 
-# ---------------------------------------------------------------------------
 # E-R5: Dispersion × regime interaction
-# ---------------------------------------------------------------------------
 
 print("\n=== E-R5: dispersion × regime interaction ===")
 # High disp (>= median) + stable → full position, momentum top-3 + SMA
@@ -548,9 +524,7 @@ register_daily("E-R5", er5_daily,
                       "category_counts_full": cat_counts})
 
 
-# ---------------------------------------------------------------------------
 # E-R6: Kitchen sink — incremental layers
-# ---------------------------------------------------------------------------
 
 print("\n=== E-R6: kitchen sink (incremental) ===")
 # Layer 0: T2_3legCAGR (top1_63 + top3_63 + rank_avg(63,126)_top1) / 3
@@ -717,9 +691,7 @@ register_monthly("E-R6", final_series,
                         "final_layer": final_key})
 
 
-# ---------------------------------------------------------------------------
 # Save JSONs
-# ---------------------------------------------------------------------------
 
 for name in ["E-R1", "E-R2", "E-R3", "E-R4", "E-R5", "E-R6"]:
     out = OUT_DIR / f"{name}.json"
@@ -727,9 +699,7 @@ for name in ["E-R1", "E-R2", "E-R3", "E-R4", "E-R5", "E-R6"]:
 print(f"\nWrote {6} experiment JSONs to {OUT_DIR}")
 
 
-# ---------------------------------------------------------------------------
 # Annual return table
-# ---------------------------------------------------------------------------
 
 def annual_returns(payload):
     m = [(pd.Timestamp(r["date"]), r["fwd_ret"]) for r in payload["monthly_returns"]]
@@ -743,9 +713,7 @@ def annual_returns(payload):
 annual_tbl = {n: annual_returns(STRATS[n]) for n in STRATS}
 
 
-# ---------------------------------------------------------------------------
 # Report
-# ---------------------------------------------------------------------------
 
 def fmt_pct(v):
     if v is None or v != v:
@@ -869,9 +837,7 @@ else:
 print("wrote REGIME_INTEGRATION_REPORT.md")
 
 
-# ---------------------------------------------------------------------------
 # STRATEGY_CANDIDATES.md — full ranking across all sessions
-# ---------------------------------------------------------------------------
 
 print("\nBuilding STRATEGY_CANDIDATES.md…")
 exp_dir = OUT_DIR

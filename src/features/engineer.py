@@ -330,9 +330,7 @@ if __name__ == "__main__":
     main()
 
 
-# ======================================================================
 # Production helpers (added for layered production port, keep side-effect free)
-# ======================================================================
 
 def load_core_feature_list(root: Path, key: str = "core") -> list[str]:
     """Load the CORE feature set from configs/feature_sets.yaml."""

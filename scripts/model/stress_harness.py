@@ -54,9 +54,7 @@ M26_POST_DAYS = 3
 M26_WINDOW_POST = 2
 
 
-# ============================================================================
 # Cache build (run once)
-# ============================================================================
 def build_cache() -> dict:
     from sklearn.ensemble import HistGradientBoostingClassifier
 
@@ -195,9 +193,7 @@ def load_cache() -> dict:
         return pickle.load(f)
 
 
-# ============================================================================
 # Stats helpers
-# ============================================================================
 def stats(r):
     r = np.asarray(r, float)
     r = r[~np.isnan(r)]
@@ -237,9 +233,7 @@ def fomc_window_mask_from_idx(fomc_day_idx, NDAYS, pre_days=0, post_days=2):
     return m
 
 
-# ============================================================================
 # The workhorse simulator
-# ============================================================================
 def run_strategy_from_cache(
     cache: dict,
     *,
@@ -421,9 +415,7 @@ def run_strategy_from_cache(
     return result
 
 
-# ============================================================================
 # Validation
-# ============================================================================
 TARGET_BASELINE = dict(cagr=0.2361, sharpe=1.50, max_dd=-0.1294)
 
 

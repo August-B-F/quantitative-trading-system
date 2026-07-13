@@ -43,9 +43,7 @@ def main():
     b_st = baseline["stats"]
     print(f"Baseline : {_fmt(b_st)}")
 
-    # ====================================================================
     # TEST 1 — Leave-one-year-out
-    # ====================================================================
     print("\n=== TEST 1: Leave-one-year-out ===")
     t1 = {"baseline": b_st, "exclusions": {}}
     monthly = baseline["monthly"].copy()
@@ -63,9 +61,7 @@ def main():
         print(f"  ex-{key:14s}: {_fmt(st)}  [{flag}]")
     _save("test1", t1)
 
-    # ====================================================================
     # TEST 2 — Parameter sensitivity (no retrain; perturb per-param)
-    # ====================================================================
     print("\n=== TEST 2: Parameter sensitivity ===")
     t2 = {"baseline": b_st, "perturbations": {}}
 
@@ -104,9 +100,7 @@ def main():
 
     _save("test2", t2)
 
-    # ====================================================================
     # TEST 3b — Classifier degradation (flip decisions)
-    # ====================================================================
     print("\n=== TEST 3b: Classifier degradation (flip rebalance picks) ===")
     n_rebals = len(baseline["picks"])
     t3 = {"baseline_sharpe": b_st["sharpe"], "n_rebals": n_rebals, "rates": {}}
@@ -159,9 +153,7 @@ def main():
     print(f"  p05 break (5%-ile Sharpe<1.22): {p05_break}")
     _save("test3b", t3)
 
-    # ====================================================================
     # TEST 4 — Start dates
-    # ====================================================================
     print("\n=== TEST 4: Start dates ===")
     t4 = {"starts": {}}
     starts = ["2008-01-01", "2010-01-01", "2012-01-01", "2014-01-01",
@@ -180,9 +172,7 @@ def main():
     print(f"  CAGR range: {cagr_range_pp:.2f}pp  [{'FLAG' if t4['flag'] else 'ok'}]")
     _save("test4", t4)
 
-    # ====================================================================
     # TEST 6 — Transaction costs
-    # ====================================================================
     print("\n=== TEST 6: Transaction costs ===")
     t6 = {"levels": {}}
     # First compute turnover from baseline picks
@@ -246,10 +236,8 @@ def main():
     print(f"  survives 20bps: {t6['survives_20bps']}")
     _save("test6", t6)
 
-    # ====================================================================
     # TEST 7 — Drawdown deep dive (on monthly series; daily not reliably
     # available in cache — approximate with monthly cumulative)
-    # ====================================================================
     print("\n=== TEST 7: Drawdowns ===")
     t7 = {}
     s = baseline["monthly"]
@@ -332,9 +320,7 @@ def main():
     print(f"  Longest 12m-rolling SPY-underperf streak: {max_streak} months")
     _save("test7", t7)
 
-    # ====================================================================
     # TEST 8 — Monte Carlo bootstrap
-    # ====================================================================
     print("\n=== TEST 8: Monte Carlo ===")
     t8 = {}
     r_arr = s.values
@@ -408,9 +394,7 @@ def main():
         print(f"  {k_}: {v_}")
     _save("test8", t8)
 
-    # ====================================================================
     # TEST 9 — Regime buckets
-    # ====================================================================
     print("\n=== TEST 9: Regime buckets ===")
     t9 = {}
     DATES = cache["DATES"]

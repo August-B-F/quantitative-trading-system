@@ -37,9 +37,7 @@ def fomc_in_range(start, end):
             if start <= DATES[i] <= end]
 
 
-# =========================================================================
 # FOLLOW-UP 1 — Leave-one-out 2018
-# =========================================================================
 print("\n=== FOLLOW-UP 1: leave-one-out 2018 ===")
 
 FOMC_SYM = fomc_window_mask(2, 2)
@@ -75,9 +73,7 @@ print(f"    5d vs base : dCAGR {cagr_d_5d_ex:+.2f}pp  dMaxDD {dd_imp_5d_ex:+.2f}
 print(f"    3d vs base : dCAGR {cagr_d_3d_ex:+.2f}pp  dMaxDD {dd_imp_3d_ex:+.2f}pp")
 
 
-# =========================================================================
 # FOLLOW-UP 2 — 3d deep dive (Test 4 + Test 5)
-# =========================================================================
 print("\n=== FOLLOW-UP 2: 3d deep dive ===")
 
 base_dd = drawdown_periods(base_s, top_n=5)
@@ -147,9 +143,7 @@ fc_3d = {
 }
 
 
-# =========================================================================
 # FOLLOW-UP 3 — Asymmetric windows
-# =========================================================================
 print("\n=== FOLLOW-UP 3: asymmetric windows ===")
 
 PRE_MASK = fomc_window_mask(2, 0)   # [i_f-2, i_f]
@@ -166,9 +160,7 @@ for days in (3, 5):
         print(f"  {lbl:4s} {days}d  CAGR {st['cagr']*100:5.2f}%  Sharpe {st['sharpe']:.2f}  MaxDD {st['max_dd']*100:6.2f}%  deferred={n_def}")
 
 
-# =========================================================================
 # FINAL VERDICT
-# =========================================================================
 print("\n=== FINAL PICK ===")
 # Rank by: (DD improvement * 1.0) + (CAGR delta * 1.0)  — user cares about DD primarily
 base_full = stats(base_s.values)
@@ -185,9 +177,7 @@ final_name, final_st, final_dc, final_dd, _ = candidates[0]
 print(f"\n  WINNER: {final_name}")
 
 
-# =========================================================================
 # SAVE JSON + MARKDOWN
-# =========================================================================
 payload = {
     "description": "M26 follow-up: LOO-2018, 3d deep dive, asymmetric windows",
     "followup1_leave_one_out_2018": loo_rows,
@@ -288,9 +278,7 @@ md.append(f"**Concentration note:** {concentration_note}\n")
 print(f"Wrote results/M26_FOLLOWUP.md")
 
 
-# =========================================================================
 # UPDATE OPTIMIZED_STRATEGY.md with the final winner
-# =========================================================================
 opt_path = ROOT / "results/OPTIMIZED_STRATEGY.md"
 lines = opt_path.read_text(encoding="utf-8").splitlines()
 

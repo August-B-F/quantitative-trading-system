@@ -250,9 +250,7 @@ def drawdown_periods(s, top_n=5):
     return episodes[:top_n]
 
 if __name__ == "__main__":
-    # ============================================================
     # TEST 1 — OPTIMIZED base vs OPTIMIZED + M26 (defer 5d)
-    # ============================================================
     print("\n=== TEST 1: OPTIMIZED base vs +M26 (5d) ===")
     base_s, base_picks = run_variant(deferral_days=0, event_mask=None)
     m26_s, m26_picks = run_variant(deferral_days=5, event_mask=FOMC_WIN)
@@ -265,9 +263,7 @@ if __name__ == "__main__":
     n_deferred = int(m26_picks["deferred"].sum())
     print(f"  n_rebals={len(m26_picks)}  n_deferred={n_deferred}")
 
-    # ============================================================
     # TEST 2 — Deferral window sensitivity
-    # ============================================================
     print("\n=== TEST 2: Deferral window sensitivity ===")
     window_results = {}
     for days in (3, 5, 7, 10):
@@ -276,9 +272,7 @@ if __name__ == "__main__":
         window_results[f"defer_{days}d"] = st
         print(f"  defer {days:2d}d : CAGR {st['cagr']*100:.2f}%  Sharpe {st['sharpe']:.2f}  MaxDD {st['max_dd']*100:.2f}%")
 
-    # ============================================================
     # TEST 3 — Multi-event stacking (5d deferral, varying event sets)
-    # ============================================================
     print("\n=== TEST 3: Multi-event stacking (5d defer) ===")
     def make_week_mask(flag_arr, pre=2, post=2):
         """For a 'week' flag, window it ±pre/post trading days."""
@@ -301,9 +295,7 @@ if __name__ == "__main__":
         stack_results[lbl] = {**st, "n_deferred": int(p["deferred"].sum())}
         print(f"  {lbl:20s}: CAGR {st['cagr']*100:.2f}%  Sharpe {st['sharpe']:.2f}  MaxDD {st['max_dd']*100:.2f}%  deferred={int(p['deferred'].sum())}")
 
-    # ============================================================
     # TEST 4 — Drawdown deep dive (OPTIMIZED vs OPTIMIZED+M26)
-    # ============================================================
     print("\n=== TEST 4: Drawdown deep dive ===")
     base_dd = drawdown_periods(base_s, top_n=5)
     m26_dd = drawdown_periods(m26_s, top_n=5)
@@ -358,9 +350,7 @@ if __name__ == "__main__":
         })
         print(f"  {name:12s}: base {base_cum*100:+.2f}%  M26 {m26_cum*100:+.2f}%  d {(m26_cum-base_cum)*100:+.2f}pp  FOMC={len(fds)}  deferred={len(deferred_here)}")
 
-    # ============================================================
     # TEST 5 — False cost check (pick diffs on deferred months)
-    # ============================================================
     print("\n=== TEST 5: False cost check ===")
     merged = base_picks.merge(m26_picks, on="rebal_date", suffixes=("_base", "_m26"))
     deferred_rows = merged[merged["deferred_m26"]].copy()
@@ -397,9 +387,7 @@ if __name__ == "__main__":
         ).to_dict("records"),
     }
 
-    # ============================================================
     # VERDICT
-    # ============================================================
     dd_improvement_pp = (m26_st["max_dd"] - base_st["max_dd"]) * 100  # both negative; positive = better (less deep)
     cagr_drop_pp = (base_st["cagr"] - m26_st["cagr"]) * 100
     verdict_pass = (

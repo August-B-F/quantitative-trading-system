@@ -42,9 +42,7 @@ SPLIT_KW = dict(
 OUT_DIR = ROOT / "results/experiments"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ---------------------------------------------------------------------------
 # Load
-# ---------------------------------------------------------------------------
 
 df = pd.read_parquet(ROOT / "data/features/master_panel.parquet")
 r63 = pd.read_parquet(ROOT / "data/features/price/returns_63d.parquet")[ETFS].reindex(df.index)
@@ -66,9 +64,7 @@ test_dates = pd.DatetimeIndex(sorted(set(d for f in folds for d in f["test_dates
 te_pos = df.index.get_indexer(test_dates)
 
 
-# ---------------------------------------------------------------------------
 # Helpers
-# ---------------------------------------------------------------------------
 
 def stats(r):
     r = np.asarray(r, dtype=float)
@@ -125,9 +121,7 @@ def trend_gate(base, threshold=-0.04):
     return np.where(spy_dist_full > threshold, base, shy_ret)
 
 
-# ---------------------------------------------------------------------------
 # ML EV gate (soft) — used by Tier 2 winning strategies
-# ---------------------------------------------------------------------------
 
 MACRO_FEATS = [
     "vol_features__vix",
@@ -211,9 +205,7 @@ def soft_ev_gate(ensemble_full):
     return monthly, fold_thresholds
 
 
-# ---------------------------------------------------------------------------
 # Tier 2 strategies registry
-# ---------------------------------------------------------------------------
 
 STRATS = {}
 
@@ -295,9 +287,7 @@ register("T2_3leg_softML",
          ml_overlay=soft_ev_gate)
 
 
-# ---------------------------------------------------------------------------
 # Save per-strategy JSONs
-# ---------------------------------------------------------------------------
 
 for name, payload in STRATS.items():
     out = OUT_DIR / f"{name}.json"
@@ -305,9 +295,7 @@ for name, payload in STRATS.items():
 print(f"\nWrote {len(STRATS)} strategy JSONs to {OUT_DIR}")
 
 
-# ---------------------------------------------------------------------------
 # Annual return tables
-# ---------------------------------------------------------------------------
 
 def annual_returns(monthly_dt, monthly_ret):
     s = pd.Series(monthly_ret, index=pd.DatetimeIndex(monthly_dt))
@@ -326,9 +314,7 @@ for name, payload in STRATS.items():
     annual_table[name] = annual_returns(m_dt, m_ret)
 
 
-# ---------------------------------------------------------------------------
 # Build TIER2 report
-# ---------------------------------------------------------------------------
 
 def fmt_pct(v):
     return f"{v*100:.1f}%" if v == v else "n/a"
@@ -433,9 +419,7 @@ lines.append("5. **What did NOT work**: ML rotation (cross-sectional regression 
 print("wrote TIER2_REPORT.md")
 
 
-# ---------------------------------------------------------------------------
 # Verdict
-# ---------------------------------------------------------------------------
 
 # Pick the recommended strategy
 def score(name):

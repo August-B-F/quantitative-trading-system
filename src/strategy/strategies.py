@@ -38,9 +38,7 @@ from features.regime_labels import current_regime as _cr
 log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
 # Helpers shared by the champion adapters
-# ---------------------------------------------------------------------------
 
 ROOT = Path(__file__).resolve().parents[2]
 P46_CACHE = ROOT / "tests" / "autonomous" / "cache" / "pred_proba_p46.pkl"
@@ -202,9 +200,7 @@ def _portfolio_fwd_return(eng, i, top1_w, topk_w, vol_exp=1.0):
     return float(top1_w * r1 + topk_w * rk)
 
 
-# ---------------------------------------------------------------------------
 # Strategy 1 — OPTIMIZED (canary). Thin wrapper around the canonical engine.
-# ---------------------------------------------------------------------------
 
 def run_optimized(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     """Canary strategy — reuses the stock PortfolioEngine + run_backtest."""
@@ -234,9 +230,7 @@ def run_optimized(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     return res.monthly_returns, weights_history
 
 
-# ---------------------------------------------------------------------------
 # Strategy 3 — DROPOVERLAP. OPTIMIZED with a trimmed universe.
-# ---------------------------------------------------------------------------
 
 def run_dropoverlap(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     """Remove VGT/XLK from the universe; everything else unchanged."""
@@ -265,9 +259,7 @@ def run_dropoverlap(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     return res.monthly_returns, weights_history
 
 
-# ---------------------------------------------------------------------------
 # Strategy 4 — T2_BALANCED. Rules-only, 63d momentum, equal-weight top3.
-# ---------------------------------------------------------------------------
 
 def run_t2_balanced(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     """Rules momentum runner-up. No regime switch, no FOMC defer, eq-wt top3."""
@@ -320,9 +312,7 @@ def run_t2_balanced(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     return monthly, weights_history
 
 
-# ---------------------------------------------------------------------------
 # Strategy 5 — TREND_SIMPLE. SPY > SMA200 -> SPY, else SHY.
-# ---------------------------------------------------------------------------
 
 def run_trend_simple(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     """200-day SMA switcher on SPY; monthly rebalance."""
@@ -343,9 +333,7 @@ def run_trend_simple(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     return pd.Series(out).sort_index(), weights_history
 
 
-# ---------------------------------------------------------------------------
 # Strategy 6 — DUAL_MOMENTUM. 12-1m relative + absolute filter.
-# ---------------------------------------------------------------------------
 
 def run_dual_momentum(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     """Antonacci dual momentum on the 8-ETF universe.
@@ -391,9 +379,7 @@ def run_dual_momentum(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     return pd.Series(out).sort_index(), weights_history
 
 
-# ---------------------------------------------------------------------------
 # Champion core — shared loop for S2/S7/S8/S9
-# ---------------------------------------------------------------------------
 
 def _run_champion_loop(bundle, cfg_global, test_dates, *,
                        stable_uni, trans_uni,
@@ -452,9 +438,7 @@ def _run_champion_loop(bundle, cfg_global, test_dates, *,
     return pd.Series(out).sort_index(), weights_history
 
 
-# ---------------------------------------------------------------------------
 # Strategy 2 — ROBUST_STACK
-# ---------------------------------------------------------------------------
 
 def run_robust_stack(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     """6-layer post-purge winner. Sizing: normal 0.50, full-boost 0.82."""
@@ -482,9 +466,7 @@ def run_robust_stack(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     )
 
 
-# ---------------------------------------------------------------------------
 # Strategy 7 — ROBUST_VAR. Same as S2 but basket inverse-variance (exp=2).
-# ---------------------------------------------------------------------------
 
 def run_robust_var(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     pr_raw, mp_raw = _load_p46_proba(len(bundle.dates))
@@ -511,9 +493,7 @@ def run_robust_var(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     )
 
 
-# ---------------------------------------------------------------------------
 # Strategy 8 — P59_FULL_STACK. 10-layer control; 4-state sizing + FOMC (0,1,4).
-# ---------------------------------------------------------------------------
 
 def run_p59(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     pr_raw, mp_raw = _load_p46_proba(len(bundle.dates))
@@ -549,9 +529,7 @@ def run_p59(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     )
 
 
-# ---------------------------------------------------------------------------
 # Strategy 9 — P57_FRONTLOADED. P53 4-state + stagflation/high-conf/own-vol.
-# ---------------------------------------------------------------------------
 
 STAGFLATION_CLASS = 3  # regime_lg_hi_stagflation — see features/regime_labels.py
 
@@ -637,9 +615,7 @@ def run_p57(cfg_file, bundle, pred_reg, test_dates, cfg_global):
     )
 
 
-# ---------------------------------------------------------------------------
 # Dispatch table
-# ---------------------------------------------------------------------------
 
 STRATEGY_DISPATCH = {
     "OPTIMIZED": run_optimized,

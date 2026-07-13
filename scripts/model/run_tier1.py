@@ -56,9 +56,7 @@ def load_feature_sets():
     return yaml.safe_load(open(ROOT / "configs/feature_sets.yaml"))
 
 
-# ----------------------------------------------------------------------
 # Cross-sectional expansion
-# ----------------------------------------------------------------------
 
 def split_features_by_ticker(feature_list, df_cols):
     """Return (shared_cols, template_prefixes) for cross-sectional expansion."""
@@ -110,9 +108,7 @@ def build_expanded_matrix(df, shared, templates):
     return X, y, dates, tickers, feat_names
 
 
-# ----------------------------------------------------------------------
 # Backtest helpers
-# ----------------------------------------------------------------------
 
 def annual_returns_from_monthly(monthly_dt: pd.DatetimeIndex, monthly_ret: np.ndarray):
     s = pd.Series(monthly_ret, index=pd.DatetimeIndex(monthly_dt))
@@ -163,9 +159,7 @@ def fwd_lookup_series(df_panel: pd.DataFrame, dates, tickers):
     return out
 
 
-# ----------------------------------------------------------------------
 # Experiments
-# ----------------------------------------------------------------------
 
 def run_regression_expanded(df, feature_list, model_factory, target_horizon=21):
     """E01/E02 style: cross-sectional expansion + regression on per-ETF fwd return."""
@@ -318,9 +312,7 @@ def aggregate_rotation(sample_records, df_panel):
     return monthly
 
 
-# ----------------------------------------------------------------------
 # Classification (E03)
-# ----------------------------------------------------------------------
 
 def run_t1_classification(df, feature_list):
     feats = [c for c in feature_list if c in df.columns]
@@ -385,9 +377,7 @@ def aggregate_classification(sample_records):
     return monthly
 
 
-# ----------------------------------------------------------------------
 # Drawdown (E04, E05)
-# ----------------------------------------------------------------------
 
 def run_drawdown(df, feature_list, model_name):
     feats = [c for c in feature_list if c in df.columns]
@@ -455,9 +445,7 @@ def aggregate_drawdown(sample_records):
     return monthly
 
 
-# ----------------------------------------------------------------------
 # Systematic 63d momentum signal (B2 in walk-forward space)
-# ----------------------------------------------------------------------
 
 def systematic_picks(df):
     """Return per-date (rotation_ticker, fwd21_return)."""
@@ -488,9 +476,7 @@ def spy_monthly_rets(df):
     return df["TARGET_FWD21_QQQ"]
 
 
-# ----------------------------------------------------------------------
 # Per-experiment driver
-# ----------------------------------------------------------------------
 
 def metrics_for_rotation(monthly_df, df_panel, name, fold_records):
     fwd = monthly_df["fwd_ret_pred_ticker"].to_numpy()
@@ -742,9 +728,7 @@ def run_drawdown_experiment(df, feature_sets, model_name, exp_id):
     return res, last_dt, fwd_rets, sys_only
 
 
-# ----------------------------------------------------------------------
 # Main
-# ----------------------------------------------------------------------
 
 def main():
     out_dir = ROOT / "results/experiments"

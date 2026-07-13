@@ -31,9 +31,7 @@ REGIME_NAMES = ["HG_LI", "HG_HI", "LG_LI", "LG_HI_stag"]
 REGIME_LABELS = ["Hi-Growth/Lo-Inf", "Hi-Growth/Hi-Inf", "Lo-Growth/Lo-Inf", "Lo-Growth/Hi-Inf (stag)"]
 
 
-# ----------------------------------------------------------------------------
 # Helpers
-# ----------------------------------------------------------------------------
 def _equity(r: np.ndarray) -> np.ndarray:
     r = np.nan_to_num(r, nan=0.0)
     return np.cumprod(1.0 + r)
@@ -108,9 +106,7 @@ def _key_stats(r: pd.Series) -> dict:
     }
 
 
-# ----------------------------------------------------------------------------
 # Comparison series
-# ----------------------------------------------------------------------------
 def build_spy_monthly(cache: dict, month_last_pos: pd.Series) -> pd.Series:
     """SPY forward-21d return at each month-end rebalance position."""
     spy_fwd21 = cache["spy_ret_21d"]  # trailing 21d — convert to forward
@@ -137,9 +133,7 @@ def build_original_b3(cache: dict, month_last_pos: pd.Series) -> pd.Series:
     return pd.Series(out).sort_index()
 
 
-# ----------------------------------------------------------------------------
 # Component attribution (cumulative-build variants)
-# ----------------------------------------------------------------------------
 def build_attribution(cache: dict, month_last_pos: pd.Series) -> dict:
     """Compute per-year contribution by progressively adding components.
 
@@ -215,9 +209,7 @@ def build_attribution(cache: dict, month_last_pos: pd.Series) -> dict:
     return {"per_year": rows}
 
 
-# ----------------------------------------------------------------------------
 # Regime breakdowns
-# ----------------------------------------------------------------------------
 def regime_breakdown(cache, strat: pd.Series, picks: pd.DataFrame) -> dict:
     DATES = cache["DATES"]
     vix = cache["vix"]; cur_reg = cache["current_reg"]
@@ -246,9 +238,7 @@ def regime_breakdown(cache, strat: pd.Series, picks: pd.DataFrame) -> dict:
     return {"vix": vix_buckets, "regime": reg_buckets}
 
 
-# ----------------------------------------------------------------------------
 # Main
-# ----------------------------------------------------------------------------
 def main():
     print("[gen] Loading cache...")
     cache = load_cache()

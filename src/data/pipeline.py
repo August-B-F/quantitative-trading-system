@@ -45,7 +45,6 @@ class PanelBundle:
 
 
 def load_config(root: Path) -> dict:
-    """Load strategy.yaml."""
     with open(root / "configs/strategy.yaml", "r") as f:
         return yaml.safe_load(f)
 
@@ -224,9 +223,7 @@ def load_panel(root: Path, cfg: dict, live_extend: bool = False) -> PanelBundle:
     )
 
 
-# ======================================================================
 # Live refresh path — used by the rebalance script on rebalance day.
-# ======================================================================
 
 def _trading_calendar(start: str, end: pd.Timestamp) -> pd.DatetimeIndex:
     try:
