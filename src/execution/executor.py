@@ -40,7 +40,7 @@ class StrategyExecutor:
         self.client = client
         self.initial_capital = float(initial_capital)
 
-    # ---- helpers -----------------------------------------------------------
+    # helpers
 
     def _current_weights(self, equity: float, positions: dict) -> dict[str, float]:
         if equity <= 0:
@@ -299,7 +299,7 @@ class StrategyExecutor:
                 "status": "residual_close" if closed_ok else "error",
             })
 
-    # ---- main --------------------------------------------------------------
+    # main
 
     def execute_rebalance(self, target_weights: dict, dry_run: bool = True) -> dict:
         result: dict[str, Any] = {
@@ -334,7 +334,7 @@ class StrategyExecutor:
             result["success"] = True
             return result
 
-        # ---- live submission ----
+        # live submission
         log.info("[%s] checking market status before order submission ...", self.name)
         clock = self.client.wait_for_market_open()
         if "error" in clock:
@@ -453,7 +453,7 @@ class StrategyExecutor:
         )
         return result
 
-    # ---- reconciliation ----------------------------------------------------
+    # reconciliation
 
     def reconcile(self, target_weights: dict) -> dict:
         """Compare live weights against targets (usable by the health check).
@@ -480,7 +480,7 @@ class StrategyExecutor:
             "reconciled": max_dev <= RECONCILE_TOLERANCE,
         }
 
-    # ---- status / kill -----------------------------------------------------
+    # status / kill
 
     def get_status(self) -> dict:
         account = self.client.get_account()

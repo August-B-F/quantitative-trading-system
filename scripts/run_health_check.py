@@ -78,7 +78,7 @@ FREQ_MAX_TDAYS = {
 }
 
 
-# ---------- utilities ------------------------------------------------------
+# utilities
 
 
 @dataclass
@@ -147,7 +147,7 @@ def _read_parquet_last_date(path: Path) -> pd.Timestamp | None:
     return pd.Timestamp(df.index.max()).normalize()
 
 
-# ---------- checks ---------------------------------------------------------
+# checks
 
 
 def check_prices(today: pd.Timestamp, cfg: dict, alerts_cfg: dict) -> Section:
@@ -731,7 +731,7 @@ def rebalance_countdown(today: pd.Timestamp) -> tuple[pd.Timestamp, int, pd.Time
     return nxt, cal_days, fomc, info_section
 
 
-# ---------- report ---------------------------------------------------------
+# report
 
 
 def _format_report(
@@ -802,7 +802,7 @@ def _append_log(report: str) -> None:
         f.write(f"\n[{stamp}]\n{report}\n")
 
 
-# ---------- main -----------------------------------------------------------
+# main
 
 
 def main(argv: list[str] | None = None) -> int:

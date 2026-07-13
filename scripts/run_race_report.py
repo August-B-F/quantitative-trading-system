@@ -58,7 +58,7 @@ POWER_FACTS = {
 }
 
 
-# ---------- loading -----------------------------------------------------------
+# loading
 
 def load_accounts(path: Path) -> tuple[dict[int, str], float]:
     """slot -> display name, plus initial capital."""
@@ -86,7 +86,7 @@ def equity_columns(df: pd.DataFrame) -> list[tuple[int, str]]:
     return sorted(out)
 
 
-# ---------- metrics -----------------------------------------------------------
+# metrics
 
 def tripwire_flag(min_drawdown: float) -> str:
     """EVALUATION.md §3 drawdown tripwires on equity vs high-water mark."""
@@ -143,7 +143,7 @@ def months_elapsed(dates: pd.DatetimeIndex, race_start: pd.Timestamp | None) -> 
     return int(d.to_period("M").nunique())
 
 
-# ---------- report ------------------------------------------------------------
+# report
 
 def build_report(
     comparison: pd.DataFrame,
@@ -179,7 +179,7 @@ def build_report(
     else:
         L += [f"Race window starts {race_start.date()}; rows before it are excluded.", ""]
 
-    # ---- per-arm equity vs SPY ----
+    # per-arm equity vs SPY
     L += ["## Per-arm equity vs SPY", ""]
     if len(window) == 0:
         L += ["No snapshot rows in the window.", ""]
@@ -204,7 +204,7 @@ def build_report(
             )
         L.append("")
 
-    # ---- implementation fidelity ----
+    # implementation fidelity
     L += [
         "## Implementation fidelity",
         "",
@@ -219,7 +219,7 @@ def build_report(
         "",
     ]
 
-    # ---- drawdown tripwires ----
+    # drawdown tripwires
     L += [
         "## Drawdown vs tripwires",
         "",
@@ -245,7 +245,7 @@ def build_report(
     L += ["", "Tripwire action required: "
           + ("YES — see flagged rows above." if any_tripped else "none."), ""]
 
-    # ---- execution errors ----
+    # execution errors
     err_table, total_errors, warn_entries = count_execution_errors(log_entries)
     L += [
         "## Execution errors",
@@ -262,7 +262,7 @@ def build_report(
     if total_errors:
         L += ["Any error must be fixed before the next rebalance (§3).", ""]
 
-    # ---- race clock ----
+    # race clock
     elapsed = months_elapsed(window.index, race_start) if len(window) else 0
     remaining = max(0, RACE_MONTHS - elapsed)
     L += [
@@ -274,7 +274,7 @@ def build_report(
         "",
     ]
 
-    # ---- power-corrected verdict ----
+    # power-corrected verdict
     p = POWER_FACTS
     L += [
         "## Power-corrected verdict language (Study 13)",
@@ -310,7 +310,7 @@ def build_report(
     return "\n".join(L)
 
 
-# ---------- cli -----------------------------------------------------------------
+# cli
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])

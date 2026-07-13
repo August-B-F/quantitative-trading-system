@@ -44,7 +44,7 @@ def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     warnings: list[str] = []
 
-    # ---- STEP 1 — refresh -------------------------------------------------
+    # refresh
     _print_section("STEP 1 — refresh_and_rebuild")
     if args.no_refresh:
         print("(skipped)")
@@ -62,7 +62,7 @@ def main() -> int:
             if s.get("status") not in ("ok",):
                 warnings.append(f"{k}: status={s.get('status')} ({s.get('error') or s.get('errors') or s.get('stale')})")
 
-    # ---- STEP 2 — live features ------------------------------------------
+    # live features
     _print_section("STEP 2 — compute_classifier_features")
     cfg = load_config(ROOT)
     bundle = load_panel(ROOT, cfg)
@@ -90,7 +90,7 @@ def main() -> int:
     if diffs:
         warnings.append(f"live features diverge from panel: {diffs[:3]}")
 
-    # ---- STEP 3 — classifier ----------------------------------------------
+    # classifier
     _print_section("STEP 3 — classifier (walk-forward predict)")
     core = load_core_feature_list(ROOT, cfg["classifier"]["feature_set"])
     core_present = select_core_features(bundle.df, core)
@@ -115,7 +115,7 @@ def main() -> int:
         print(f"date {target_date} not in panel; aborting")
         return 1
 
-    # ---- STEP 4 — rebalance schedule + FOMC deferral ----------------------
+    # rebalance schedule + FOMC deferral
     _print_section("STEP 4 — rebalance / FOMC deferral check")
     me_positions = month_end_positions(bundle.dates)
     is_rebal_day = pos in set(me_positions.values.tolist())
@@ -132,7 +132,7 @@ def main() -> int:
     if not is_rebal_day:
         print("(NOTE: today is not a scheduled rebalance day — computing signal anyway for verification)")
 
-    # ---- STEP 5 — decide --------------------------------------------------
+    # decide
     _print_section("STEP 5 — decision")
     rec = engine.decide(pos, pos, deferred=in_fomc_window)
     lb = rec.lookback_used
@@ -162,7 +162,7 @@ def main() -> int:
     if not np.isclose(total, 1.0, atol=1e-4):
         warnings.append(f"weights sum to {total:.4f}, not 1.0")
 
-    # ---- STEP 6 — warnings ------------------------------------------------
+    # warnings
     _print_section("DATA QUALITY WARNINGS")
     if warnings:
         for w in warnings:

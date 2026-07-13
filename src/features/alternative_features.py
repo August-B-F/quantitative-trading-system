@@ -39,7 +39,7 @@ def _load_price(t: str) -> pd.Series:
     return load_clean(PRICE_CLEAN / f"{t}.parquet")["adj_close"]
 
 
-# ---------------- STEP 1: Google Trends ----------------
+# Google Trends
 
 GTRENDS_TERMS = [
     "recession", "inflation", "stock_market_crash", "ai_stocks", "gold_buy",
@@ -74,7 +74,7 @@ def step1_gtrends() -> int:
     return n
 
 
-# ---------------- STEP 2: Wikipedia pageviews ----------------
+# Wikipedia pageviews
 
 WIKI_PAGES = [
     "recession", "artificial_intelligence", "semiconductor",
@@ -110,7 +110,7 @@ def step2_wikipedia() -> int:
     return n
 
 
-# ---------------- STEP 3: Economic activity proxies ----------------
+# Economic activity proxies
 
 def _yoy_weekly(s: pd.Series, weeks: int = 52) -> pd.Series:
     return s / s.shift(weeks * 5) - 1.0
@@ -199,7 +199,7 @@ def step3_activity() -> int:
     return n
 
 
-# ---------------- STEP 4: Cross-asset ratios ----------------
+# Cross-asset ratios
 
 def step4_cross_asset() -> int:
     n = 0
@@ -288,7 +288,7 @@ def step4_cross_asset() -> int:
     return n
 
 
-# ---------------- STEP 5: Experimental ----------------
+# Experimental
 
 GITHUB_REPOS = ["amd", "apple", "google", "meta", "microsoft", "nvidia"]
 REDDIT_SUBS = ["economics", "investing", "stocks", "wallstreetbets"]
@@ -351,7 +351,7 @@ def step5_experimental() -> int:
     return n
 
 
-# ---------------- STEP 6: Calendar ----------------
+# Calendar
 
 def step6_calendar() -> int:
     ev = load_clean(CAL_CLEAN / "events.parquet")
@@ -381,7 +381,7 @@ def step6_calendar() -> int:
     return 2
 
 
-# ---------------- Validation ----------------
+# Validation
 
 def validate() -> None:
     print("\n=== VALIDATION ===")
@@ -419,7 +419,7 @@ def validate() -> None:
               f"nan={nan_pct:5.1f}%  {rng}")
 
 
-# ---------------- Main ----------------
+# Main
 
 def main() -> None:
     total = 0

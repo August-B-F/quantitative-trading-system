@@ -191,7 +191,7 @@ def main():
     cal = get_trading_calendar(START, END)
     df = pd.DataFrame(index=cal)
 
-    # ---- FOMC ----
+    # FOMC
     fomc_dates = [pd.Timestamp(d) for d in FOMC_MEETINGS]
     fomc_trading = sorted({to_trading_day(d, cal) for d in fomc_dates if to_trading_day(d, cal) is not None})
     df["is_fomc_day"] = df.index.isin(fomc_trading).astype(np.int8)
@@ -213,7 +213,7 @@ def main():
     df["days_since_last_fomc"] = days_since
     df["days_to_next_fomc"] = days_to
 
-    # ---- Economic releases (rules-based; precise days vary, week flags are robust) ----
+    # Economic releases (rules-based; precise days vary, week flags are robust)
     # NFP: first Friday of each month
     nfp_dates = []
     for y in range(2005, 2028):
@@ -254,7 +254,7 @@ def main():
                     gdp_week_days.add(x)
     df["is_gdp_week"] = df.index.isin(gdp_week_days).astype(np.int8)
 
-    # ---- Earnings season: weeks 3-6 after quarter end ----
+    # Earnings season: weeks 3-6 after quarter end
     earnings = pd.Series(0, index=df.index, dtype=np.int8)
     for y in range(2005, 2028):
         for qm in (1, 4, 7, 10):  # month after quarter end
@@ -263,7 +263,7 @@ def main():
             earnings[mask] = 1
     df["is_earnings_season"] = earnings.values
 
-    # ---- Options expiration ----
+    # Options expiration
     opex_dates = []
     quad_dates = []
     for y in range(2005, 2028):
@@ -285,7 +285,7 @@ def main():
     df["is_opex_week"] = df.index.isin(opex_week).astype(np.int8)
     df["is_quad_witching_week"] = df.index.isin(quad_week).astype(np.int8)
 
-    # ---- Russell reconstitution: last Friday of June ----
+    # Russell reconstitution: last Friday of June
     russell_dates = [last_friday(y, 6) for y in range(2005, 2028)]
     russell_trading = [to_trading_day(d, cal) for d in russell_dates if to_trading_day(d, cal)]
     russell_week = set()
@@ -297,7 +297,7 @@ def main():
     # S&P quarterly rebalance = quad witching dates
     df["is_sp_rebalance_week"] = df["is_quad_witching_week"].values
 
-    # ---- Cyclical encodings ----
+    # Cyclical encodings
     moy = df.index.month
     df["month_sin"] = np.sin(2 * np.pi * moy / 12)
     df["month_cos"] = np.cos(2 * np.pi * moy / 12)
@@ -308,7 +308,7 @@ def main():
     df["woy_sin"] = np.sin(2 * np.pi * woy / 52)
     df["woy_cos"] = np.cos(2 * np.pi * woy / 52)
 
-    # ---- Elections ----
+    # Elections
     elec_months = set()
     for y in range(2004, 2030):
         ed = election_day(y)
@@ -319,12 +319,12 @@ def main():
     ]
     df["is_election_month"] = df["is_election_month"].astype(np.int8)
 
-    # ---- ECB ----
+    # ECB
     ecb_dates = [pd.Timestamp(d) for d in ECB_MEETINGS]
     ecb_trading = [to_trading_day(d, cal) for d in ecb_dates if to_trading_day(d, cal)]
     df["is_ecb_day"] = df.index.isin(ecb_trading).astype(np.int8)
 
-    # ---- BOJ: ~8 meetings/year, rule approximation: mid Jan/Mar/Apr/Jun/Jul/Sep/Oct/Dec ----
+    # BOJ: ~8 meetings/year, rule approximation: mid Jan/Mar/Apr/Jun/Jul/Sep/Oct/Dec
     boj_week = set()
     for y in range(2005, 2028):
         for m in (1, 3, 4, 6, 7, 9, 10, 12):
@@ -335,7 +335,7 @@ def main():
                     boj_week.add(x)
     df["is_boj_week"] = df.index.isin(boj_week).astype(np.int8)
 
-    # ---- China NBS PMI: released 1st of month ----
+    # China NBS PMI: released 1st of month
     cn_pmi_week = set()
     for y in range(2005, 2028):
         for m in range(1, 13):

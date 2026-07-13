@@ -28,7 +28,7 @@ from model.preprocessing import FeaturePreprocessor  # noqa: E402
 
 OUT_DIR = ROOT / "results/experiments"
 
-# ---- Universe / spec from OPTIMIZED_STRATEGY.md ----
+# Universe / spec from OPTIMIZED_STRATEGY.md
 ETFS = ["SOXX", "QQQ", "XLK", "VGT", "IGV", "XLE", "GLD", "SHY"]
 LB_STABLE = 63
 LB_TRANS = 21
@@ -68,7 +68,7 @@ FWD = {t: fwd21(t) for t in ALL}
 shy_ret = FWD["SHY"]
 spy_dist = df["quality_dist_sma200__SPY"].values
 
-# ---- WF regime classifier (same as run_optimization_block) ----
+# WF regime classifier (same as run_optimization_block)
 splitter = ExpandingSplitter(**SPLIT_KW)
 folds = splitter.split(DATES)
 test_dates = pd.DatetimeIndex(sorted(set(d for f in folds for d in f["test_dates"])))
@@ -103,7 +103,7 @@ for fold in folds:
     pr = np.argmax(full, axis=1)
     pred_reg[DATES.get_indexer(te)] = pr
 
-# ---- momentum arrays ----
+# momentum arrays
 def mom_arr(lookback):
     a = np.full((NDAYS, len(ETFS)), np.nan)
     rdf = R[lookback]
@@ -128,7 +128,7 @@ for j, t in enumerate(ETFS):
     if t in atr21.columns:
         ATR[:, j] = atr21[t].values
 
-# ---- event windows ----
+# event windows
 is_fomc_day = (df["timing__is_fomc_day"].values > 0)
 is_cpi_wk = (df["timing__is_cpi_week"].values > 0)
 is_nfp_wk = (df["timing__is_nfp_week"].values > 0)
@@ -147,7 +147,7 @@ def fomc_window_mask(pre_days=2, post_days=2):
 
 FOMC_WIN = fomc_window_mask(2, 2)  # ±2 trading days
 
-# ---- strategy core (inv_vol top-k, SMA200 gate on top-1, single date) ----
+# strategy core (inv_vol top-k, SMA200 gate on top-1, single date)
 def pick_at(i):
     """Return (top1_idx, topk_idx_sorted) at daily position i."""
     sf_i = SF[i]
@@ -167,7 +167,7 @@ def ret_at(i, top1, tk):
         rk = np.nansum(FWD_ARR[i, tk] * w)
     return W_TOP1 * r1 + W_TOPK * rk
 
-# ---- monthly rebalance engine ----
+# monthly rebalance engine
 def month_last_positions():
     """For each month in test_dates, return (period, daily_pos)."""
     s = pd.Series(te_pos, index=test_dates)
@@ -199,7 +199,7 @@ def run_variant(deferral_days=0, event_mask=None, label=""):
         })
     return pd.Series(out).sort_index(), pd.DataFrame(picks)
 
-# ---- stats helpers ----
+# stats helpers
 def stats(r):
     r = np.asarray(r, float); r = r[~np.isnan(r)]
     if len(r) == 0:
@@ -401,7 +401,7 @@ if __name__ == "__main__":
     print(f"  FOMC in targets  : {any(t['n_fomc']>0 for t in target_analysis)}")
     print(f"  VERDICT          : {'INCLUDE' if verdict_pass else 'DROP'}")
 
-    # ---- save outputs ----
+    # save outputs
     payload = {
         "description": "M26 deep dive on OPTIMIZED (E-R1 + M11 inv_vol)",
         "optimized_base": {
@@ -437,7 +437,7 @@ if __name__ == "__main__":
     (OUT_DIR / "M26_deep.json").write_text(json.dumps(payload, indent=2, default=str))
     print(f"\nWrote {OUT_DIR / 'M26_deep.json'}")
 
-    # ---- markdown report ----
+    # markdown report
     def fmt_pct(v): return f"{v*100:.2f}%" if v == v else "n/a"
 
     md = []
@@ -530,7 +530,7 @@ if __name__ == "__main__":
     (ROOT / "results/M26_ANALYSIS.md").write_text("\n".join(md), encoding="utf-8")
     print(f"Wrote results/M26_ANALYSIS.md")
 
-    # ---- optionally update OPTIMIZED_STRATEGY.md ----
+    # optionally update OPTIMIZED_STRATEGY.md
     if verdict_pass:
         opt_path = ROOT / "results/OPTIMIZED_STRATEGY.md"
         lines = opt_path.read_text(encoding="utf-8").splitlines()

@@ -79,7 +79,7 @@ LOCK_MAX_AGE_HOURS = 12
 log = logging.getLogger("rebalance")
 
 
-# ---------- single-instance lock --------------------------------------------
+# single-instance lock
 
 def _pid_alive(pid: int) -> bool | None:
     """Tri-state liveness: True=alive, False=dead, None=cannot determine."""
@@ -155,7 +155,7 @@ def assert_paper_mode_or_exit() -> None:
         sys.exit(2)
 
 
-# ---------- NYSE calendar ---------------------------------------------------
+# NYSE calendar
 
 def _nyse():
     import pandas_market_calendars as mcal
@@ -199,7 +199,7 @@ def signal_is_fresh(as_of, today, max_lag_td: int = MAX_SIGNAL_LAG_TD) -> bool:
     return lag_td <= max_lag_td
 
 
-# ---------- shared compute --------------------------------------------------
+# shared compute
 
 # A retrain cache older than this is discarded (quarterly cadence + margin).
 PRED_CACHE_MAX_AGE_DAYS = 100
@@ -309,7 +309,7 @@ def compute_target_weights(runner, bundle, pred_reg, test_dates, cfg_global, as_
     return weights
 
 
-# ---------- rotation-engine compute path (tranched candidate) ----------------
+# rotation-engine compute path (tranched candidate)
 #
 # An accounts.yaml strategy entry with `engine: rotation` is NOT run through
 # StrategyRunner. Its signal comes from strategy.rotation.blend_rotation_weights
@@ -491,7 +491,7 @@ def _run_rotation_entry(
     }
 
 
-# ---------- log writers -----------------------------------------------------
+# log writers
 
 def append_rebalance_log(entry: dict) -> None:
     REBAL_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -567,7 +567,7 @@ def write_monthly_comparison_row(date_iso: str, equities: dict, spy_return: floa
         w.writerows(rows)
 
 
-# ---------- report ----------------------------------------------------------
+# report
 
 TIER_TITLE = {
     "confident": "CONFIDENT TIER",
@@ -662,7 +662,7 @@ def print_status_report(today, statuses: list[dict]) -> None:
     print(bar)
 
 
-# ---------- subcommands -----------------------------------------------------
+# subcommands
 
 def cmd_status() -> int:
     accounts_cfg = load_accounts_cfg()

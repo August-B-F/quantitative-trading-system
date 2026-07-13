@@ -40,7 +40,7 @@ class AlpacaPaperClient:
         }
         self._session = requests.Session()
 
-    # ---- low-level ---------------------------------------------------------
+    # low-level
 
     def _request(self, method: str, path: str, base: str | None = None, **kwargs) -> Any:
         url = f"{base or self.base_url}{path}"
@@ -70,7 +70,7 @@ class AlpacaPaperClient:
                 return {"error": "non-json response"}
         return {"error": "exhausted retries"}
 
-    # ---- account / market --------------------------------------------------
+    # account / market
 
     def get_account(self) -> dict:
         data = self._request("GET", "/v2/account")
@@ -182,7 +182,7 @@ class AlpacaPaperClient:
             })
         return out
 
-    # ---- orders ------------------------------------------------------------
+    # orders
 
     def submit_order(
         self,

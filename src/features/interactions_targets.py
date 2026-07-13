@@ -17,7 +17,7 @@ from src.features.engineer import (
 )
 
 
-# ----------------------------- IO helpers -----------------------------
+# IO helpers
 
 def _load_feature(category: str, name: str) -> pd.DataFrame:
     return pd.read_parquet(FEATURES_DIR / category / f"{name}.parquet")
@@ -81,7 +81,7 @@ def build_interactions(close: pd.DataFrame) -> int:
     save_features(mom_x_pcr, "interaction", "mom63_x_pcr_total_z")
     n_files += 1
 
-    # ---- Cross-asset confirmation ----
+    # Cross-asset confirmation
 
     # Energy: XLE 63d mom × USO (crude proxy) 63d mom alignment.
     uso_close = load_clean(DATA_DIR / "clean" / "prices" / "USO.parquet")["adj_close"].reindex(cal)
@@ -127,7 +127,7 @@ def build_interactions(close: pd.DataFrame) -> int:
                   "interaction", "bond_confirmation")
     n_files += 1
 
-    # ---- Spread signals ----
+    # Spread signals
     spreads = pd.DataFrame(index=cal)
     spreads["soxx_minus_xle_63d"] = mom63["SOXX"] - mom63["XLE"]
     spreads["qqq_minus_xlv_63d"] = mom63["QQQ"] - close["XLV"].pct_change(63).shift(1)

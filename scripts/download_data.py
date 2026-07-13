@@ -60,9 +60,7 @@ def main():
     )
     all_bar_tickers = list(dict.fromkeys(t for t in all_bar_tickers if t))  # dedup, preserve order
 
-    # ----------------------------------------------------------------
     # 1. Market bars
-    # ----------------------------------------------------------------
     log.info(f"Fetching bars for {len(all_bar_tickers)} tickers (force_refresh={args.refresh})...")
     market = MarketDataFetcher(cfg)
     bars = market.fetch(all_bar_tickers, force_refresh=args.refresh)
@@ -73,9 +71,7 @@ def main():
         sample = next(iter(bars.values()))
         log.info(f"Date range in data: {sample.index.min().date()} -> {sample.index.max().date()}")
 
-    # ----------------------------------------------------------------
     # 2. News + FinBERT sentiment
-    # ----------------------------------------------------------------
     if not args.no_news and cfg.news.enabled:
         lookback = args.lookback_days or cfg.news.lookback_days
         log.info(f"Fetching + scoring news for {len(symbols)} symbols "

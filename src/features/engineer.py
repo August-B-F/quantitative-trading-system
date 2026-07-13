@@ -25,7 +25,7 @@ EXTRA_TICKERS = ["SPY", "TLT", "DBC", "XLF", "XLI", "XLV", "AGG", "EEM", "IWM"]
 ALL_TICKERS = PRIMARY_UNIVERSE + EXTRA_TICKERS
 
 
-# ----------------------------- IO helpers -----------------------------
+# IO helpers
 
 def load_prices(tickers: Iterable[str]) -> dict[str, pd.DataFrame]:
     """Load OHLCV price panels for the given tickers."""
@@ -73,7 +73,7 @@ def save_features(df: pd.DataFrame, category: str, name: str) -> Path:
     return path
 
 
-# ------------------------- Feature primitives -------------------------
+# Feature primitives
 
 def rolling_return(prices_wide: pd.DataFrame, n: int) -> pd.DataFrame:
     """Rolling n-day total return for each ticker (wide format)."""
@@ -112,7 +112,7 @@ def rsi(prices_wide: pd.DataFrame, n: int) -> pd.DataFrame:
     return (100 - 100 / (1 + rs)).shift(1)
 
 
-# ------------------------------- Steps -------------------------------
+# Steps
 
 def step2_returns(close: pd.DataFrame) -> int:
     """Build return-based features (multi-horizon momentum)."""
@@ -268,7 +268,7 @@ def step7_relative_strength(close: pd.DataFrame) -> int:
     return n_files + 1
 
 
-# ------------------------------ Validation ------------------------------
+# Validation
 
 def validate(close: pd.DataFrame) -> None:
     """Run sanity checks on the assembled feature panel."""
@@ -303,7 +303,7 @@ def validate(close: pd.DataFrame) -> None:
           f"voladj_mom_mean={voladj['XLE'].loc['2021'].mean():.4f}")
 
 
-# ---------------------------------- Main ----------------------------------
+# Main
 
 def main() -> None:
     """CLI entry: build the full feature panel and write to disk."""

@@ -61,7 +61,7 @@ class AuctionExecutor:
         self.name = strategy_name
         self.client = client
 
-    # ---- helpers -----------------------------------------------------------
+    # helpers
 
     def _current_weights(self, equity: float, positions: dict) -> dict[str, float]:
         if equity <= 0:
@@ -242,7 +242,7 @@ class AuctionExecutor:
                 continue
             o["status"] = final.get("status", "unknown")
 
-    # ---- main --------------------------------------------------------------
+    # main
 
     def execute_rebalance_cls(self, target_weights: dict, dry_run: bool = True) -> dict:
         """Rebalance to ``target_weights`` via closing-auction orders.

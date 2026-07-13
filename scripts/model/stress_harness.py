@@ -32,7 +32,7 @@ CACHE_DIR = ROOT / "results/stress"
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 CACHE_PATH = CACHE_DIR / "cache.pkl"
 
-# ---- Strategy constants (OPTIMIZED = E-R1 + M11 inv_vol) --------------------
+# Strategy constants (OPTIMIZED = E-R1 + M11 inv_vol)
 ETFS = ["SOXX", "QQQ", "XLK", "VGT", "IGV", "XLE", "GLD", "SHY"]
 LB_STABLE = 63
 LB_TRANS = 21

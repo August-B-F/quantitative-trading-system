@@ -60,7 +60,7 @@ MD_PATH = ROOT / "results" / "BASELINES.md"
 JSON_PATH = ROOT / "results" / "baselines.json"
 
 
-# ---------- weight functions for the simple baselines ------------------------
+# weight functions for the simple baselines
 
 def _const_weights(weights: dict[str, float]):
     def fn(prices: dict, as_of: pd.Timestamp) -> dict[str, float]:
@@ -93,7 +93,7 @@ def _inverse_vol_weights(prices: dict, as_of: pd.Timestamp) -> dict[str, float] 
     return {t: iv / total for t, iv in inv.items()}
 
 
-# ---------- runner ------------------------------------------------------------
+# runner
 
 # name -> (description, calendar tickers for build_schedule, weight fn)
 STRATEGIES: list[tuple[str, str, list[str], object]] = [

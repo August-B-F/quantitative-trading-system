@@ -33,7 +33,7 @@ OUT = ROOT / "results/stress"
 OUT.mkdir(exist_ok=True, parents=True)
 
 
-# ---------- helpers ----------------------------------------------------------
+# helpers
 
 def load_price_panel(dates: pd.DatetimeIndex) -> np.ndarray:
     """Load adjusted close for each ETF into (NDAYS, n_etfs)."""
@@ -91,7 +91,7 @@ def fmt(st):
     return f"CAGR {st['cagr']*100:.2f}%  Sharpe {st['sharpe']:.2f}  MaxDD {st['max_dd']*100:.2f}%"
 
 
-# ---------- PART 1 -----------------------------------------------------------
+# PART 1
 
 def part1(cache):
     print("\n=== PART 1 — Blended lookback ===")
@@ -151,7 +151,7 @@ def part1(cache):
     return results
 
 
-# ---------- PART 2 -----------------------------------------------------------
+# PART 2
 
 def part2(cache):
     print("\n=== PART 2 — Dispersion-conditional expectations ===")
@@ -230,7 +230,7 @@ def part2(cache):
     return results
 
 
-# ---------- PART 3 -----------------------------------------------------------
+# PART 3
 
 def run_strategy_custom_timing(cache, dom_mode: str = "end", seed: int | None = None):
     """Rerun strategy but with rebalance day shifted inside each month.
@@ -363,7 +363,7 @@ def part3(cache):
     return results
 
 
-# ---------- main -------------------------------------------------------------
+# main
 
 def main():
     cache = load_cache()
